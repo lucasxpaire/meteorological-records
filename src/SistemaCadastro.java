@@ -1,4 +1,4 @@
-public class TesteData {
+public class SistemaCadastro {
     public static void main(String[] args) {
 
     }
