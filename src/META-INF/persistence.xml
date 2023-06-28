@@ -7,7 +7,7 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
             <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="hibernate.connection.url" value="jdbc:mysql://cupim.mega/estagio_"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://cupim.mega/estagio_gabriela"/>
             <property name="hibernate.connection.username" value="estagio"/>
             <property name="hibernate.connection.password" value="estagio"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
