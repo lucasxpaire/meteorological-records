@@ -1,0 +1,53 @@
+package modelo;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "COR")
+public class Cor {
+
+    public static final String FORMATO_CODIGO_HEXADECIMAL_VALIDO = "^#[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$";
+
+    private Long id;
+    private String nome;
+    private String codigoHexadecimal;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID_COR")
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Column(name = "NOME", nullable = false, unique = true)
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    @Column(name = "CODIGO_HEXADECIMAL", nullable = false, unique = true)
+    public String getCodigoHexadecimal() {
+        return codigoHexadecimal;
+    }
+
+    public void setCodigoHexadecimal(String codigoHexadecimal) {
+        this.codigoHexadecimal = codigoHexadecimal;
+    }
+
+    @Transient
+    public static boolean validarCodigoHexadecimal(String codigo) {
+        return codigo != null && codigo.matches(FORMATO_CODIGO_HEXADECIMAL_VALIDO);
+    }
+    @Transient
+    public static boolean validarNome(String nome) {
+        return nome != null && !nome.trim().isEmpty();
+    }
+
+}

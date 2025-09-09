@@ -1,5 +1,6 @@
+<%@page pageEncoding="UTF-8" %>
 <%@ include file="cabecalho.jspf" %>
-<tags:cabecalho/>
-<tags:menu/>
-${helloWorld}
-<tags:rodape/>
+<tags:corpo>
+    <h2></h2>
+</tags:corpo>
+
