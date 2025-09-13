@@ -5,7 +5,6 @@ import modelo.Propriedade;
 import modelo.Proprietario;
 import util.FormatadorUtil;
 
-import javax.persistence.*;
 import java.util.Set;
 
 public class CadastroProprietarioCommand {

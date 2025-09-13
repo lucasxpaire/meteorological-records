@@ -2,10 +2,13 @@ package servico;
 
 import dados.Dados;
 import modelo.Proprietario;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import util.FormatadorUtil;
 
 import java.util.List;
 
+@Service
 public class ProprietarioServico {
 
     private final Dados dados;

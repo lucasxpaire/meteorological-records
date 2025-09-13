@@ -8,5 +8,4 @@
 </head>
 <body>
 <header class="cabecalho">
-    <a href="index.html"><img src="img/logo.png" width="270px" height="90px"/></a>
 </header>
