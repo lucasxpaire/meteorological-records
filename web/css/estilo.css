@@ -4,10 +4,6 @@ body {
     background-color: #f4f7f6;
 }
 
-.painel-container {
-    display: flex;
-}
-
 .menu-lateral {
     width: 250px;
     background-color: #1a2a42;
@@ -61,33 +57,20 @@ body {
     font-weight: bold;
 }
 
-.conteudo-principal {
+.estrutura-pagina {
+    display: flex;
+}
+
+.estrutura-pagina-conteudo {
     flex-grow: 1;
     padding: 20px;
 }
 
-.cabecalho-pagina {
+.estrutura-pagina-cabecalho {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-}
-
-.botao {
-    text-decoration: none;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.botao-novo {
-    background-color: #5a67d8;
-}
-
-.botao-novo:hover {
-    background-color: #434190;
 }
 
 .tabela {
@@ -111,6 +94,23 @@ body {
 
 .tabela tbody tr:last-child td {
     border-bottom: none;
+}
+
+.botao {
+    text-decoration: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.botao-novo {
+    background-color: #5a67d8;
+}
+
+.botao-novo:hover {
+    background-color: #434190;
 }
 
 .botao-acao {

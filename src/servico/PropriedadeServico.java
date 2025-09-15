@@ -2,9 +2,11 @@ package servico;
 
 import dados.Dados;
 import modelo.Propriedade;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class PropriedadeServico {
 
     private final Dados dados;

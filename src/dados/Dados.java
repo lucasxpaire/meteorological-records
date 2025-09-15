@@ -15,7 +15,7 @@ public class Dados {
 
     protected final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("dados");
     public EntityManager entityManager = entityManagerFactory.createEntityManager();
-
+    
     public void iniciarTransacao() {
         if (!entityManager.getTransaction().isActive()) {
             entityManager.getTransaction().begin();

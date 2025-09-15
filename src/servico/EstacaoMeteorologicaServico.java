@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import dados.Dados;
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
+import org.springframework.stereotype.Service;
 import util.*;
 
 import javax.persistence.PersistenceException;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class EstacaoMeteorologicaServico {
 
     private static final double METROS_PARA_GRAU = 111320.0;

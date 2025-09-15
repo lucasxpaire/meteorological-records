@@ -1,15 +1,12 @@
 package web;
 
 import modelo.Cor;
-import modelo.Propriedade;
 import modelo.Proprietario;
 import util.FormatadorUtil;
 
-import java.util.Set;
-
 public class CadastroProprietarioCommand {
 
-    public Proprietario proprietario = new Proprietario();
+    private Proprietario proprietario = new Proprietario();
 
     public Proprietario getProprietario() {
         return proprietario;
@@ -55,15 +52,8 @@ public class CadastroProprietarioCommand {
         return proprietario.getCor();
     }
 
-    public void setCor(Cor corProprietario) {
-        proprietario.setCor(corProprietario);
+    public void setCor(Cor cor) {
+        proprietario.setCor(cor);
     }
 
-    public Set<Propriedade> getPropriedades() {
-        return proprietario.getPropriedades();
-    }
-
-    public void setPropriedades(Set<Propriedade> propriedades) {
-        proprietario.setPropriedades(propriedades);
-    }
 }

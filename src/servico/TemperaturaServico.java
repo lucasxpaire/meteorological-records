@@ -5,6 +5,7 @@ import dados.Dados;
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
 import modelo.Temperatura;
+import org.springframework.stereotype.Service;
 import smile.timeseries.AR;
 import util.EscritorUtil;
 import util.FormatadorUtil;
@@ -24,9 +25,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Service
 public class TemperaturaServico {
 
-    public static final long ATRASO_INICIAL_PARA_EXECUCAO = 0L;
+    public static final long ATRASO_INICIAL_PARA_EXECUCAO = 1L;
     public static final long INTERVALO_PARA_EXECUTAR = 24L;
     public static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
 
@@ -255,7 +257,7 @@ public class TemperaturaServico {
 
     public void popularHistoricoInicialPara(EstacaoMeteorologica estacao) {
         try {
-            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS2 + estacao.getCodigoEstacao());
+            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS + estacao.getCodigoEstacao());
 
             List<Temperatura> historicoExistente = estacao.getLocalizacao().getHistoricoTemperaturas();
             Set<LocalDateTime> datasExistentes = historicoExistente.stream()

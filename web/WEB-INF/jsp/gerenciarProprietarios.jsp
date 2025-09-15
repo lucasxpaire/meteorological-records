@@ -3,11 +3,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <tags:corpo>
-    <div class="painel-container">
+    <div class="estrutura-pagina">
         <tags:barraLateral paginaAtiva="proprietarios"/>
-        <main class="conteudo-principal">
+        <main class="estrutura-pagina-conteudo">
 
-            <div class="cabecalho-pagina">
+            <div class="estrutura-pagina-cabecalho">
                 <h1>Gerenciar Proprietários</h1>
                 <a href="cadastroProprietario.html" class="botao botao-novo">Novo Proprietário</a>
             </div>

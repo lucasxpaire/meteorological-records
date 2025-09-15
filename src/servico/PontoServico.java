@@ -2,7 +2,9 @@ package servico;
 
 import dados.Dados;
 import modelo.Ponto;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PontoServico {
 
     private final Dados dados;

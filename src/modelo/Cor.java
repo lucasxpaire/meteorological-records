@@ -23,7 +23,7 @@ public class Cor {
         this.id = id;
     }
 
-    @Column(name = "NOME", nullable = false, unique = true)
+    @Column(name = "NOME", unique = true)
     public String getNome() {
         return nome;
     }
@@ -32,7 +32,7 @@ public class Cor {
         this.nome = nome;
     }
 
-    @Column(name = "CODIGO_HEXADECIMAL", nullable = false, unique = true)
+    @Column(name = "CODIGO_HEXADECIMAL", unique = true)
     public String getCodigoHexadecimal() {
         return codigoHexadecimal;
     }
