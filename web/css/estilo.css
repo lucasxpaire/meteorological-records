@@ -8,13 +8,17 @@ body {
     width: 250px;
     background-color: #1a2a42;
     color: #ffffff;
-    min-height: 100vh;
+
     padding: 20px;
     box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
 }
 
 .menu-lateral-cabecalho {
-    margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid #4a5a70;
 }
@@ -25,6 +29,21 @@ body {
 
 .menu-lateral-cabecalho span {
     font-size: 0.85em;
+    color: #a0b0c0;
+}
+
+.menu-lateral-rodape {
+    padding-top: 20px;
+    border-top: 1px solid #4a5a70;
+}
+
+.menu-lateral-rodape h3 {
+    font-size: 0.50em;
+    margin: 0;
+}
+
+.menu-lateral-rodape span {
+    font-size: 0.25em;
     color: #a0b0c0;
 }
 
@@ -128,4 +147,64 @@ body {
 
 .botao-deletar {
     background-color: #d9534f;
+}
+
+.formulario-container {
+    background-color: #efeded;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.formulario-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.formulario-container input[type="text"], .formulario-container input[type="password"], .formulario-container input[type="email"], .formulario-container select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #5e5c5c;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.formulario-container input[type="text"]:focus, .formulario-container input[type="password"]:focus, .formulario-container input[type="email"]:focus, .formulario-container select:focus {
+    border-color: #001aff;
+    outline: none;
+}
+
+.formulario-container input[type="submit"] {
+    width: 25%;
+    display: block;
+    margin: 20px auto;
+    border: none;
+    cursor: pointer;
+}
+
+.alerta {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    font-weight: bold;
+}
+
+.alerta-erro {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.alerta-sucesso {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
 }

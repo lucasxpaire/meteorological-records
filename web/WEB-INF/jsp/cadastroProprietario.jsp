@@ -8,31 +8,36 @@
         <tags:barraLateral paginaAtiva="proprietarios"/>
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
-                <h1>Cadastro de Proprietário</h1>
+                <c:choose>
+                    <c:when test="${not empty proprietario}">
+                        <h1>Edição de Proprietário</h1>
+                    </c:when>
+                    <c:otherwise>
+                        <h1>Cadastro de Proprietário</h1>
+                    </c:otherwise>
+                </c:choose>
                 <a href="gerenciarProprietarios.html" class="botao botao-novo">Voltar</a>
             </div>
-            <c:choose>
-                <c:when test="${not empty proprietario}">
-                    <c:if test="${not empty resultado}">
-                        <div class="alerta alerta-sucesso">
-                            ${resultado}
-                        </div>
-                    </c:if>
-                    <h2 class="conteiner-titulo-editar">Sistema de gerenciamento de propriedades -> Gerenciar Proprietário -> Edição de Proprietário</h2>
-                    <h3>Altere os dados necessários do proprietário</h3>
-                </c:when>
-                <c:otherwise>
-                    <c:if test="${not empty resultado}">
-                        <div class="alerta alerta-erro">
-                            ${resultado}
-                        </div>
-                    </c:if>
-                    <h2 class="conteiner-titulo-editar">Sistema de gerenciamento de propriedades -> Gerenciar Proprietário -> Cadastro de Proprietário</h2>
-                    <h3>Insira os dados no formulário abaixo para cadastrar um proprietário</h3>
-                </c:otherwise>
-            </c:choose>
-            <div>
-                <form:form modelAttribute="CadastroProprietarioCommand" method="post">
+
+            <c:if test="${not empty resultado}">
+                <div class="alerta alerta-sucesso">
+                        ${resultado}
+                </div>
+            </c:if>
+
+            <form:errors element="div" cssClass="alerta alerta-erro"/>
+
+            <div class="formulario-container">
+                <c:choose>
+                    <c:when test="${not empty proprietario}">
+                        <h3>Altere os dados necessários do proprietário</h3>
+                    </c:when>
+                    <c:otherwise>
+                        <h3>Insira os dados no formulário abaixo para cadastrar um proprietário</h3>
+                    </c:otherwise>
+                </c:choose>
+
+                <form:form modelAttribute="CadastroProprietarioCommand" method="post" action="cadastroProprietario.html">
                     <form:hidden path="id"/>
                     <form:errors element="div" cssClass="alerta alerta-erro"/>
 
@@ -61,6 +66,7 @@
                     </c:choose>
                 </form:form>
             </div>
+
         </main>
     </div>
     <script>

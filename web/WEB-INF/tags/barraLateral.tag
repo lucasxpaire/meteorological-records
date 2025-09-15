@@ -25,4 +25,9 @@
             <a href="previsaoTemperatura.html" class="${paginaAtiva == 'previsao' ? 'active' : ''}">Previsão de Temperatura</a>
         </li>
     </ul>
+
+    <div class="menu-lateral-rodape">
+        <h3>2025 Gerenciamento De Propriedades</h3>
+        <span>Todos os direitos reservados</span>
+    </div>
 </nav>

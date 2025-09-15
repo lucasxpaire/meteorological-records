@@ -9,18 +9,18 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 @Component
-public class CadastroProprietarioValidator implements Validator {
+public class ProprietarioValidator implements Validator {
 
     @Autowired
     private Dados dados;
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return aClass.equals(CadastroProprietarioCommand.class);
+        return aClass.equals(ProprietarioCommand.class);
     }
 
     public void validate(Object o, Errors errors) {
-        CadastroProprietarioCommand command = (CadastroProprietarioCommand) o;
+        ProprietarioCommand command = (ProprietarioCommand) o;
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nome", "field.required", "Não é possível cadastrar uma pessoa com nome nulo");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "cpf", "field.required", "Não é possível cadastrar uma pessoa com cpf nulo");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "telefone", "field.required", "Não é possível cadastrar uma pessoa com telefone nulo");

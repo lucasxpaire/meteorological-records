@@ -4,7 +4,7 @@ import modelo.Cor;
 import modelo.Proprietario;
 import util.FormatadorUtil;
 
-public class CadastroProprietarioCommand {
+public class ProprietarioCommand {
 
     private Proprietario proprietario = new Proprietario();
 
