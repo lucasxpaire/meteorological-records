@@ -45,18 +45,5 @@
 
         </main>
     </div>
-    <script>
-        const campoBusca = document.getElementById('campo-busca');
-        campoBusca.addEventListener('input', function(event) {
-            const valorAtual = event.target.value;
 
-            const contemLetras = /[a-zA-Z]/.test(valorAtual);
-
-            if (contemLetras) {
-                VMasker(campoBusca).unMask();
-            } else {
-                VMasker(campoBusca).maskPattern('999.999.999-99');
-            }
-        });
-    </script>
 </tags:corpo>
