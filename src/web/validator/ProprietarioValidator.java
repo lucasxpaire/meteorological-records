@@ -1,4 +1,4 @@
-package web;
+package web.validator;
 
 import dados.Dados;
 import modelo.Proprietario;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+import web.command.ProprietarioCommand;
 
 @Component
 public class ProprietarioValidator implements Validator {

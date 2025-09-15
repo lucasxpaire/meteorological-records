@@ -1,4 +1,4 @@
-package web;
+package web.command;
 
 import modelo.Cor;
 import modelo.Proprietario;

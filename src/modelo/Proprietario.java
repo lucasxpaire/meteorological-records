@@ -1,5 +1,7 @@
 package modelo;
 
+import util.FormatadorUtil;
+
 import javax.persistence.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -107,4 +109,15 @@ public class Proprietario {
         String telefoneSemFormatacao = telefone.replaceAll(PONTOS_E_TRACOS, ESPACO_EM_BRANCO);
         return telefoneSemFormatacao.length() == QUANTIDADE_DIGITOS_SEM_NOVE_NO_COMECO || telefoneSemFormatacao.length() == QUANTIDADE_DIGITOS_COM_NOVE_NO_COMECO;
     }
+
+    @Transient
+    public String getCpfFormatado() {
+        return util.FormatadorUtil.formatarCpf(this.cpf);
+    }
+
+    @Transient
+    public String getTelefoneFormatado() {
+        return util.FormatadorUtil.formatarTelefone(this.telefone);
+    }
+
 }

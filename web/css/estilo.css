@@ -208,3 +208,24 @@ body {
     background-color: #dff0d8;
     border-color: #d6e9c6;
 }
+
+.formulario-busca {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.campo-busca {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+}
+
+.botao-busca {
+    padding: 10px 20px;
+    border: none;
+    background-color: #5a67d8;
+    color: white;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0;
+}

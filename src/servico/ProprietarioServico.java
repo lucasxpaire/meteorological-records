@@ -34,6 +34,19 @@ public class ProprietarioServico {
         }
     }
 
+    public List<Proprietario> buscarPorTermo(String termo) {
+        if (termo == null || termo.trim().isEmpty()) {
+            return listarTodos();
+        }
+
+        String termoNormalizado = FormatadorUtil.removerFormatacaoCpf(termo);
+        if (!termoNormalizado.isEmpty() && termoNormalizado.matches("^[0-9]+$")) {
+            return dados.buscarListaPorCampo(Proprietario.class, "cpf", termoNormalizado);
+        } else {
+            return dados.buscarPorCampoContendo(Proprietario.class, "nome", termo);
+        }
+    }
+
     public Proprietario buscarUltimoAdicionado() {
         return dados.buscarMaisRecente(Proprietario.class);
     }

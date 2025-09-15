@@ -1,4 +1,4 @@
-package web;
+package web.controller;
 
 import dados.Dados;
 import modelo.Cor;
@@ -9,8 +9,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 import servico.ProprietarioServico;
+import web.validator.ProprietarioValidator;
+import web.command.ProprietarioCommand;
 
 import java.util.List;
 
@@ -37,8 +38,8 @@ public class ProprietarioController {
     }
 
     @GetMapping("/gerenciarProprietarios.html")
-    public ModelAndView listar() {
-        List<Proprietario> proprietarios = proprietarioServico.listarTodos();
+    public ModelAndView listarTodosOuBuscar(@RequestParam(value = "busca", required = false) String nomeOuCpf) {
+        List<Proprietario> proprietarios = proprietarioServico.buscarPorTermo(nomeOuCpf);
         ModelAndView mv = new ModelAndView("gerenciarProprietarios");
         mv.addObject("proprietarios", proprietarios);
         return mv;

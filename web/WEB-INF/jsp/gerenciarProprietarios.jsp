@@ -12,6 +12,13 @@
                 <a href="cadastroProprietario.html" class="botao botao-novo">Novo Proprietário</a>
             </div>
 
+            <div class="busca-container">
+                <form action="gerenciarProprietarios.html" method="get" class="formulario-busca">
+                    <input type="text" name="busca" id="campo-busca" placeholder="Buscar por nome ou CPF..." class="campo-busca" value="${param.busca}">
+                    <button type="submit" class="botao-busca">Buscar</button>
+                </form>
+            </div>
+
             <table class="tabela">
                 <thead>
                     <th>Nome</th>
@@ -24,8 +31,8 @@
                     <c:forEach var="proprietario" items="${proprietarios}">
                         <tr>
                             <td>${proprietario.nome}</td>
-                            <td>${proprietario.cpf}</td>
-                            <td>${proprietario.telefone}</td>
+                            <td>${proprietario.cpfFormatado} </td>
+                            <td>${proprietario.telefoneFormatado}</td>
                             <td>${proprietario.cor.nome}</td>
                             <td>
                                 <a href="alterarProprietario.html?id=${proprietario.id}" class="botao-acao botao-alterar">Alterar</a>
@@ -38,4 +45,18 @@
 
         </main>
     </div>
+    <script>
+        const campoBusca = document.getElementById('campo-busca');
+        campoBusca.addEventListener('input', function(event) {
+            const valorAtual = event.target.value;
+
+            const contemLetras = /[a-zA-Z]/.test(valorAtual);
+
+            if (contemLetras) {
+                VMasker(campoBusca).unMask();
+            } else {
+                VMasker(campoBusca).maskPattern('999.999.999-99');
+            }
+        });
+    </script>
 </tags:corpo>

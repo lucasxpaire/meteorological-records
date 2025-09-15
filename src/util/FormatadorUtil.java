@@ -2,6 +2,8 @@ package util;
 
 import modelo.Ponto;
 
+import javax.swing.text.MaskFormatter;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -39,6 +41,31 @@ public class FormatadorUtil {
             return " ";
         }
         return String.format("%.2f", valor).replace('.', ',');
+    }
+
+    public static String formatarString(String texto, String mascara) {
+        if (texto == null || texto.trim().isEmpty()) {
+            return "";
+        }
+        try {
+            MaskFormatter mf = new MaskFormatter(mascara);
+            mf.setValueContainsLiteralCharacters(false);
+            return mf.valueToString(texto);
+        } catch (ParseException ex) {
+            return texto;
+        }
+    }
+
+    public static String formatarCpf(String cpf) {
+        return formatarString(cpf, "###.###.###-##");
+    }
+
+    public static String formatarTelefone(String telefone) {
+        if (telefone != null && telefone.length() == 11) {
+            return formatarString(telefone, "(##) #####-####");
+        }
+
+        return formatarString(telefone, "(##) ####-####");
     }
 
     public static String removerFormatacaoCpf(String cpf) {

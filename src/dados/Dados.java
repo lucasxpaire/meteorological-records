@@ -62,6 +62,16 @@ public class Dados {
         }
     }
 
+    public <T> List<T> buscarPorCampoContendo(Class<T> classe, String campo, String valor) {
+        try {
+            return entityManager.createQuery("SELECT e FROM " + classe.getSimpleName() + " e WHERE LOWER(e." + campo + ") LIKE :valor", classe)
+                    .setParameter("valor", "%" + valor + "%")
+                    .getResultList();
+        } catch (PersistenceException e) {
+            throw new RuntimeException("Não foi possível buscar a lista de " + classe.getSimpleName() + " por " + campo, e);
+        }
+    }
+
     public <T> T buscarMaisRecente(Class<T> classe) {
         try {
             return entityManager.createQuery("SELECT e FROM " + classe.getSimpleName() + " e ORDER BY e.id DESC", classe)
