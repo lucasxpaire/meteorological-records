@@ -38,25 +38,10 @@
                 <form:form modelAttribute="CadastroProprietarioCommand" method="post" action="cadastroProprietario.html">
                     <form:hidden path="id"/>
 
-                    <form:label for="nome" path="nome">Nome:</form:label>
-                    <form:input path="nome" id="nome" placeholder="Digite o nome completo" required="required"/>
-                    <form:errors path="nome" element="div" cssClass="alerta-erro" />
-
-                    <form:label for="cpf" path="cpf">CPF:</form:label>
-                    <form:input path="cpf" id="cpf" placeholder="Digite o CPF" required="required"/>
-                    <form:errors path="cpf" element="div" cssClass="alerta-erro" />
-
-
-                    <form:label for="telefone" path="telefone">Telefone:</form:label>
-                    <form:input path="telefone" id="telefone" placeholder="Digite o telefone" required="required"/>
-                    <form:errors path="telefone" element="div" cssClass="alerta-erro" />
-
-                    <form:label for="cor" path="cor.id">Cor:</form:label>
-                    <form:select path="cor.id" id="cor" required="required">
-                        <form:option value="" label="Selecione uma cor"/>
-                        <form:options items="${cores}" itemValue="id" itemLabel="nome"/>
-                    </form:select>
-                    <form:errors path="cor.id" element="div" cssClass="alerta-erro" />
+                    <tags:inputForm path="nome" label="Nome" placeholder="Digite o nome completo" />
+                    <tags:inputForm path="cpf" label="Cpf" placeholder="Digite o cpf" />
+                    <tags:inputForm path="telefone" label="Telefone" placeholder="Digite o telefone" />
+                    <tags:selectForm path="cor.id" label="Cor" items="${cores}" itemValue="id" itemLabel="nome" descricao="Selecione uma cor" />
 
                     <c:choose>
                         <c:when test="${not empty proprietario}">
