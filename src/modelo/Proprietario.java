@@ -1,7 +1,5 @@
 package modelo;
 
-import util.FormatadorUtil;
-
 import javax.persistence.*;
 import java.util.LinkedHashSet;
 import java.util.Set;

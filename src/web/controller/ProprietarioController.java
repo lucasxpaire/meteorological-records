@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import servico.ProprietarioServico;
@@ -27,8 +28,8 @@ public class ProprietarioController {
     @Autowired
     private ProprietarioValidator proprietarioValidator;
 
-    @InitBinder("CadastroProprietarioCommand")
-    void validator(org.springframework.web.bind.WebDataBinder webDataBinder) {
+    @InitBinder("ProprietarioCommand")
+    void validator(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(proprietarioValidator);
     }
 
@@ -56,13 +57,14 @@ public class ProprietarioController {
             mv.addObject("proprietario", proprietario);
         }
 
-        mv.addObject("CadastroProprietarioCommand", command);
+        mv.addObject("ProprietarioCommand", command);
         return mv;
     }
 
     @PostMapping("/cadastroProprietario.html")
-    public ModelAndView salvar(@ModelAttribute("CadastroProprietarioCommand") @Validated ProprietarioCommand command, BindingResult errors) {
+    public ModelAndView salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult errors) {
         ModelAndView mv = new ModelAndView("cadastroProprietario");
+
         if (errors.hasErrors()) {
             if (command.getId() != null) {
                 mv.addObject("proprietario", dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getId()));
@@ -70,28 +72,30 @@ public class ProprietarioController {
             return mv;
         }
 
-        if (command.getCor() != null && command.getCor().getId() != null) {
-            Cor corSelecionada = dados.buscarUnicoPorCampo(Cor.class, "id", command.getCor().getId());
-            command.setCor(corSelecionada);
-        }
-
         Proprietario proprietario;
         if (command.getId() != null) {
             proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getId());
-            proprietario.setNome(command.getNome());
-            proprietario.setCpf(command.getCpf());
-            proprietario.setTelefone(command.getTelefone());
-            proprietario.setCor(command.getCor());
-            dados.salvar(proprietario);
             mv.addObject("resultado", "Proprietário atualizado com sucesso!");
+
         } else {
             proprietario = command.getProprietario();
-            dados.salvar(proprietario);
             mv.addObject("resultado", "Proprietário cadastrado com sucesso!");
         }
 
+        proprietario.setNome(command.getNome());
+        proprietario.setCpf(command.getCpf());
+        proprietario.setTelefone(command.getTelefone());
+
+        if (command.getCorId() != null) {
+            Cor corSelecionada = dados.buscarUnicoPorCampo(Cor.class, "id", command.getCorId());
+            proprietario.setCor(corSelecionada);
+        }
+
+        dados.salvar(proprietario);
+
         mv.addObject("proprietario", proprietario);
-        mv.addObject("CadastroProprietarioCommand", command);
+        mv.addObject("ProprietarioCommand", command);
+
         return mv;
     }
 

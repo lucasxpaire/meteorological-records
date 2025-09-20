@@ -8,6 +8,16 @@ public class ProprietarioCommand {
 
     private Proprietario proprietario = new Proprietario();
 
+    private Long corId;
+
+    public Long getCorId() {
+        return corId;
+    }
+
+    public void setCorId(Long corId) {
+        this.corId = corId;
+    }
+
     public Proprietario getProprietario() {
         return proprietario;
     }
