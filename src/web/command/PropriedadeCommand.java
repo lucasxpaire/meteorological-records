@@ -1,17 +1,16 @@
 package web.command;
 
-import modelo.Ponto;
 import modelo.Propriedade;
 import org.springframework.web.multipart.MultipartFile;
 
 public class PropriedadeCommand {
 
     Propriedade propriedade = new Propriedade();
-    Ponto centroide = new Ponto();
 
     private Long proprietarioId;
+
     private String tipoEntradaPoligono;
-    private String coordenasPorInsercaoManual;
+    private String coordenadasPorInsercaoManual;
     private MultipartFile coordenadasPorArquivo;
 
     public Propriedade getPropriedade() {
@@ -54,12 +53,12 @@ public class PropriedadeCommand {
         this.tipoEntradaPoligono = tipoEntradaPoligono;
     }
 
-    public String getCoordenasPorInsercaoManual() {
-        return coordenasPorInsercaoManual;
+    public String getCoordenadasPorInsercaoManual() {
+        return coordenadasPorInsercaoManual;
     }
 
-    public void setCoordenasPorInsercaoManual(String coordenasPorInsercaoManual) {
-        this.coordenasPorInsercaoManual = coordenasPorInsercaoManual;
+    public void setCoordenadasPorInsercaoManual(String coordenadasPorInsercaoManual) {
+        this.coordenadasPorInsercaoManual = coordenadasPorInsercaoManual;
     }
 
     public MultipartFile getCoordenadasPorArquivo() {

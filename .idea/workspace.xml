@@ -9,37 +9,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9010d5d8-9c5c-4794-aa7b-d28af4d26f91" name="Changes" comment="Biblioteca faltante">
-      <change afterPath="$PROJECT_DIR$/.idea/artifacts/pre_estagio_2022_war_exploded.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/commons-logging-1.2.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/jstl.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-aop-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-beans-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-context-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-context-support-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-core-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-expression-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-orm-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-tx-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-web-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/spring/spring-webmvc-4.3.30.RELEASE.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/standard.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/web/IndexController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/web/configuracao/AppConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/WEB-INF/jsp/cabecalho.jspf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/WEB-INF/jsp/index.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/WEB-INF/spring-config.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/WEB-INF/tags/cabecalho.tag" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/WEB-INF/tags/menu.tag" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/WEB-INF/tags/rodape.tag" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/lib.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/lib.xml" afterDir="false" />
+    <list default="true" id="9010d5d8-9c5c-4794-aa7b-d28af4d26f91" name="Changes" comment="Adiciona tags de select e input de formulário.">
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/WEB-INF/jsp/cadastroPropriedade.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/WEB-INF/jsp/gerenciarPropriedadesDoProprietario.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/js/mascarasCoordenadas.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pre-estagio-2022.iml" beforeDir="false" afterPath="$PROJECT_DIR$/pre-estagio-2022.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/META-INF/persistence.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/META-INF/persistence.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SistemaCadastro.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dados/Dados.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dados/Dados.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modelo/Poligono.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/modelo/Poligono.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/servico/PropriedadeServico.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/servico/PropriedadeServico.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/servico/ProprietarioServico.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/servico/ProprietarioServico.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/web/command/PropriedadeCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/web/command/PropriedadeCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/web/controller/PropriedadeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/web/controller/PropriedadeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/web/controller/ProprietarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/web/controller/ProprietarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/WEB-INF/jsp/cadastroProprietario.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/web/WEB-INF/jsp/cadastroProprietario.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/WEB-INF/jsp/gerenciarProprietarios.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/web/WEB-INF/jsp/gerenciarProprietarios.jsp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,6 +39,8 @@
       <list>
         <option value="JUnit5 Test Class" />
         <option value="Class" />
+        <option value="Jsp File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -85,6 +75,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2O1I3qBKZLlmlLyXGkSKWCP22Rt" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -93,32 +86,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Downloaded.Files.Path.Enabled": "false",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
-    "git-widget-placeholder": "main-persistencia-web",
-    "jdk.selected.JAVA_MODULE": "11",
-    "last_opened_file_path": "C:/Projetos/pre-estagio-2022/lib",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "project.structure.last.edited": "Artifacts",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "spring.configuration.checksum": "032debfc8bdd98b484e33931e2f23cba",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Tomcat Server.Tomcat 9.0.109.executor&quot;: &quot;Run&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;lucas-persistencia-web&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projetos/pre-estagio-2022/lib&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;032debfc8bdd98b484e33931e2f23cba&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Projetos\pre-estagio-2022\lib" />
@@ -131,10 +127,11 @@
       <recent name="" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\lucas\Desktop\PROJETOS\ESTAGIO\PERSISTENCIA-WEB\web\WEB-INF" />
+      <recent name="C:\Users\lucas\Desktop\PROJETOS\ESTAGIO\PERSISTENCIA-WEB\web" />
+      <recent name="C:\Users\lucas\Desktop\PROJETOS\ESTAGIO\PERSISTENCIA-WEB\resources" />
       <recent name="C:\Projetos\pre-estagio-2022\lib" />
       <recent name="C:\Projetos\pre-estagio-2022\src\META-INF" />
-      <recent name="C:\Projetos\pre-estagio-2022\src" />
-      <recent name="C:\Projetos\pre-estagio-2022\out\production\pre-estagio-2022\META-INF" />
     </key>
     <key name="CreateTestDialog.RecentsKey">
       <recent name="dados" />
@@ -144,7 +141,7 @@
       <recent name="sistemaCadastroPessoa" />
     </key>
   </component>
-  <component name="RunManager" selected="Tomcat Server.Tomcat 9.0.58">
+  <component name="RunManager" selected="Tomcat Server.Tomcat 9.0.109">
     <configuration name="All in pre-estagio-2022" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="pre-estagio-2022" />
       <option name="PACKAGE_NAME" value="" />
@@ -155,18 +152,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Tomcat 9.0.58" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.58" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
+    <configuration name="Tomcat 9.0.109" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.109" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
       <option name="OPEN_IN_BROWSER" value="false" />
-      <option name="UPDATING_POLICY" value="restart-server" />
+      <option name="UPDATE_ON_FRAME_DEACTIVATION" value="true" />
+      <option name="UPDATE_CLASSES_ON_FRAME_DEACTIVATION" value="true" />
       <deployment>
-        <artifact name="pre-estagio:war exploded">
+        <artifact name="pre-estagio-2022:war exploded">
           <settings>
-            <option name="CONTEXT_PATH" value="/pre_estagio" />
+            <option name="CONTEXT_PATH" value="/pre_estagio_2022_war_exploded" />
           </settings>
         </artifact>
       </deployment>
       <server-settings>
         <option name="BASE_DIRECTORY_NAME" value="a12ccd62-4999-4799-977d-eb944e1b4466" />
+        <option name="DEPLOY_TOMCAT_APPS" value="true" />
         <option name="HTTP_PORT" value="80" />
       </server-settings>
       <predefined_log_file enabled="true" id="Tomcat" />
@@ -207,6 +206,21 @@
           <option name="PROGRAM_PARAMETERS" value="" />
         </SHUTDOWN>
       </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
       <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
         <option name="USE_ENV_VARIABLES" value="true" />
         <STARTUP>
@@ -224,19 +238,27 @@
       </ConfigurationWrapper>
       <method v="2">
         <option name="BuildArtifacts" enabled="true">
-          <artifact name="pre-estagio:war exploded" />
+          <artifact name="pre-estagio-2022:war exploded" />
         </option>
       </method>
     </configuration>
     <list>
       <item itemvalue="JUnit.All in pre-estagio-2022" />
-      <item itemvalue="Tomcat Server.Tomcat 9.0.58" />
+      <item itemvalue="Tomcat Server.Tomcat 9.0.109" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.All in pre-estagio-2022" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.28293.22" />
+        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.28293.22" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -266,6 +288,10 @@
       <workItem from="1683835120346" duration="11635000" />
       <workItem from="1687961329828" duration="1679000" />
       <workItem from="1687963049056" duration="1331000" />
+      <workItem from="1758063977919" duration="13206000" />
+      <workItem from="1758203997957" duration="19000" />
+      <workItem from="1758373849796" duration="4213000" />
+      <workItem from="1758378377680" duration="14818000" />
     </task>
     <task id="LOCAL-00001" summary="classes de testes">
       <created>1681413833291</created>
@@ -319,7 +345,23 @@
       <option name="project" value="LOCAL" />
       <updated>1687960319521</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Melhora tratamento de validação de cadastro de proprietário.">
+      <option name="closed" value="true" />
+      <created>1758072812970</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1758072812970</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Adiciona tags de select e input de formulário.">
+      <option name="closed" value="true" />
+      <created>1758077633792</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1758077633792</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -380,7 +422,9 @@
     <MESSAGE value="Biblioteca faltante" />
     <MESSAGE value="configurando diretório de testes" />
     <MESSAGE value="Configurando persistência" />
-    <option name="LAST_COMMIT_MESSAGE" value="Configurando persistência" />
+    <MESSAGE value="Melhora tratamento de validação de cadastro de proprietário." />
+    <MESSAGE value="Adiciona tags de select e input de formulário." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adiciona tags de select e input de formulário." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

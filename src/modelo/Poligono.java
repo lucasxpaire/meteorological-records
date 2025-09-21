@@ -14,6 +14,12 @@ public class Poligono {
     private Long id;
     private List<Ponto> pontos = new ArrayList<>();
 
+    public Poligono() {}
+
+    public Poligono(List<Ponto> pontos) {
+        this.pontos = pontos;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_POLIGONO")

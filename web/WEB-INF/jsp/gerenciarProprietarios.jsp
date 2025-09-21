@@ -25,7 +25,6 @@
                     <th>CPF</th>
                     <th>Telefone</th>
                     <th>Cor</th>
-                    <th>Propriedades</th>
                     <th>Ações</th>
                 </thead>
                 <tbody>
@@ -36,9 +35,7 @@
                             <td>${proprietario.telefoneFormatado}</td>
                             <td>${proprietario.cor.nome}</td>
                             <td>
-                                <a href="propriedadesPorProprietario.html?proprietarioId=${proprietario.id}" class="botao-acao botao-visualizar">Propriedades</a>
-                            </td>
-                            <td>
+                                <a href="gerenciarPropriedades.html?proprietarioId=${proprietario.id}" class="botao-acao botao-visualizar">Adicionar Propriedade</a>
                                 <a href="alterarProprietario.html?id=${proprietario.id}" class="botao-acao botao-alterar">Alterar</a>
                                 <a href="deletarProprietario.html?id=${proprietario.id}" class="botao-acao botao-deletar">Deletar</a>
                             </td>

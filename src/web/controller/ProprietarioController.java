@@ -38,14 +38,6 @@ public class ProprietarioController {
         return dados.listarTodos(Cor.class);
     }
 
-    @GetMapping("/gerenciarProprietarios.html")
-    public ModelAndView listarTodosOuBuscar(@RequestParam(value = "busca", required = false) String nomeOuCpf) {
-        List<Proprietario> proprietarios = proprietarioServico.buscarPorTermo(nomeOuCpf);
-        ModelAndView mv = new ModelAndView("gerenciarProprietarios");
-        mv.addObject("proprietarios", proprietarios);
-        return mv;
-    }
-
     @GetMapping(value = {"/cadastroProprietario.html", "/alterarProprietario.html"})
     public ModelAndView exibirFormulario(@RequestParam(value = "id", required = false) Long id) {
         ModelAndView mv = new ModelAndView("cadastroProprietario");
@@ -61,11 +53,25 @@ public class ProprietarioController {
         return mv;
     }
 
+    @GetMapping("/gerenciarProprietarios.html")
+    public ModelAndView listarTodosOuBuscar(@RequestParam(value = "busca", required = false) String busca) {
+        ModelAndView mv = new ModelAndView("gerenciarProprietarios");
+        List<Proprietario> proprietarios;
+        if (busca == null || busca.trim().isEmpty()) {
+            proprietarios = proprietarioServico.listarTodos();
+        } else {
+            proprietarios = proprietarioServico.buscarPorCpfOuNome(busca);
+        }
+
+        mv.addObject("proprietarios", proprietarios);
+        return mv;
+    }
+
     @PostMapping("/cadastroProprietario.html")
-    public ModelAndView salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult errors) {
+    public ModelAndView salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult erros) {
         ModelAndView mv = new ModelAndView("cadastroProprietario");
 
-        if (errors.hasErrors()) {
+        if (erros.hasErrors()) {
             if (command.getId() != null) {
                 mv.addObject("proprietario", dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getId()));
             }

@@ -2,7 +2,6 @@ package servico;
 
 import dados.Dados;
 import modelo.Proprietario;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import util.FormatadorUtil;
 
@@ -34,7 +33,7 @@ public class ProprietarioServico {
         }
     }
 
-    public List<Proprietario> buscarPorTermo(String termo) {
+    public List<Proprietario> buscarPorCpfOuNome(String termo) {
         if (termo == null || termo.trim().isEmpty()) {
             return listarTodos();
         }
