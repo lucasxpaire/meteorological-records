@@ -27,14 +27,6 @@ public class PropriedadeServico {
         return dados.buscarMaisRecente(Propriedade.class);
     }
 
-    public List<Propriedade> buscarPorTermoDeBusca (String termoDeBusca) {
-        if (termoDeBusca == null || termoDeBusca.trim().isEmpty()) {
-            return listarTodas();
-        }
-
-        return dados.buscarPorCampoContendo(Propriedade.class, "nome", termoDeBusca);
-    }
-
     public List<Propriedade> buscarPorNome(String nome) {
         if (Propriedade.validarNome(nome)) {
             return dados.buscarListaPorCampo(Propriedade.class, "nome", nome);

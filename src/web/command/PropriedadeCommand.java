@@ -7,7 +7,10 @@ public class PropriedadeCommand {
 
     Propriedade propriedade = new Propriedade();
 
-    private Long proprietarioId;
+    private Long idProprietario;
+    private String cpfProprietario;
+
+    private String paginaOrigemRequisicao;
 
     private String tipoEntradaPoligono;
     private String coordenadasPorInsercaoManual;
@@ -37,12 +40,28 @@ public class PropriedadeCommand {
         propriedade.setNome(nome);
     }
 
-    public Long getProprietarioId() {
-        return proprietarioId;
+    public String getPaginaOrigemRequisicao() {
+        return paginaOrigemRequisicao;
     }
 
-    public void setProprietarioId(Long proprietarioId) {
-        this.proprietarioId = proprietarioId;
+    public void setPaginaOrigemRequisicao(String paginaOrigemRequisicao) {
+        this.paginaOrigemRequisicao = paginaOrigemRequisicao;
+    }
+
+    public Long getIdProprietario() {
+        return idProprietario;
+    }
+
+    public void setIdProprietario(Long idProprietario) {
+        this.idProprietario = idProprietario;
+    }
+
+    public String getCpfProprietario() {
+        return cpfProprietario;
+    }
+
+    public void setCpfProprietario(String cpfProprietario) {
+        this.cpfProprietario = cpfProprietario;
     }
 
     public String getTipoEntradaPoligono() {

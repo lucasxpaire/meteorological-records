@@ -12,6 +12,9 @@ public class Propriedade {
     private Proprietario proprietario;
     private Ponto centroide;
 
+    private String tipoEntradaPoligono;
+    private byte[] arquivoPoligonos;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_PROPRIEDADE")
@@ -60,6 +63,25 @@ public class Propriedade {
 
     public void setCentroide(Ponto centroide) {
         this.centroide = centroide;
+    }
+
+    @Column(name = "TIPO_ENTRADA_POLIGONO")
+    public String getTipoEntradaPoligono() {
+        return tipoEntradaPoligono;
+    }
+
+    public void setTipoEntradaPoligono(String tipoInsercaoPontos) {
+        this.tipoEntradaPoligono = tipoInsercaoPontos;
+    }
+
+    @Lob
+    @Column(name = "ARQUIVO_POLIGONO")
+    public byte[] getArquivoPoligonos() {
+        return arquivoPoligonos;
+    }
+
+    public void setArquivoPoligonos(byte[] arquivoPoligonos) {
+        this.arquivoPoligonos = arquivoPoligonos;
     }
 
     @Transient

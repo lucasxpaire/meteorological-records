@@ -5,11 +5,13 @@ import modelo.Cor;
 import modelo.Proprietario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import servico.ProprietarioServico;
 import web.validator.ProprietarioValidator;
 import web.command.ProprietarioCommand;
@@ -39,12 +41,12 @@ public class ProprietarioController {
     }
 
     @GetMapping(value = {"/cadastroProprietario.html", "/alterarProprietario.html"})
-    public ModelAndView exibirFormulario(@RequestParam(value = "id", required = false) Long id) {
+    public ModelAndView exibirFormulario(@RequestParam(value = "idProprietario", required = false) Long idProprietario) {
         ModelAndView mv = new ModelAndView("cadastroProprietario");
         ProprietarioCommand command = new ProprietarioCommand();
 
-        if (id != null) {
-            Proprietario proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", id);
+        if (idProprietario != null) {
+            Proprietario proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", idProprietario);
             command.setProprietario(proprietario);
             mv.addObject("proprietario", proprietario);
         }
@@ -68,48 +70,46 @@ public class ProprietarioController {
     }
 
     @PostMapping("/cadastroProprietario.html")
-    public ModelAndView salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult erros) {
-        ModelAndView mv = new ModelAndView("cadastroProprietario");
-
-        if (erros.hasErrors()) {
+    public String salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult errors, Model model, RedirectAttributes redirectAttributes) {
+        if (errors.hasErrors()) {
             if (command.getId() != null) {
-                mv.addObject("proprietario", dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getId()));
+                model.addAttribute("proprietario", dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getId()));
             }
-            return mv;
+            return "cadastroProprietario";
         }
 
         Proprietario proprietario;
         if (command.getId() != null) {
             proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getId());
-            mv.addObject("resultado", "Proprietário atualizado com sucesso!");
-
+            redirectAttributes.addFlashAttribute("resultado", "Proprietário atualizado com sucesso!");
         } else {
             proprietario = command.getProprietario();
-            mv.addObject("resultado", "Proprietário cadastrado com sucesso!");
+            redirectAttributes.addFlashAttribute("resultado", "Proprietário cadastrado com sucesso!");
         }
 
         proprietario.setNome(command.getNome());
         proprietario.setCpf(command.getCpf());
         proprietario.setTelefone(command.getTelefone());
-
-        if (command.getCorId() != null) {
-            Cor corSelecionada = dados.buscarUnicoPorCampo(Cor.class, "id", command.getCorId());
-            proprietario.setCor(corSelecionada);
-        }
+        proprietario.setCor(dados.buscarUnicoPorCampo(Cor.class, "id", command.getCorId()));
 
         dados.salvar(proprietario);
 
-        mv.addObject("proprietario", proprietario);
-        mv.addObject("ProprietarioCommand", command);
-
-        return mv;
+        return "redirect:/gerenciarProprietarios.html";
     }
 
+
+    // Falta: adicionar redirect pra exclusão de propriedades se existerem
     @GetMapping("/deletarProprietario.html")
-    public String deletar(@RequestParam("id") Long id) {
-        Proprietario proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", id);
-        dados.deletar(proprietario);
-        return "redirect:/gerenciarProprietarios.html";
+    public String deletar(@RequestParam("idProprietario") Long idProprietario, RedirectAttributes redirectAttributes) {
+        Proprietario proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", idProprietario);
+        if (proprietario.getPropriedades().isEmpty()) {
+            dados.deletar(proprietario);
+            redirectAttributes.addFlashAttribute("resultado", "Proprietário deletado com sucesso!");
+            return "redirect:/gerenciarProprietarios.html";
+        } else {
+            redirectAttributes.addFlashAttribute("resultado", "Falha: Não é possível deletar proprietário com propriedades existentes!");
+            return  "redirect:/gerenciarProprietarios.html";
+        }
     }
 
 }
