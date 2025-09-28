@@ -1,4 +1,5 @@
 <%@ tag pageEncoding="UTF-8" %>
+<%@ tag trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
@@ -7,12 +8,12 @@
 <%@ attribute name="textoCondicaoFalsa" required="true" type="java.lang.String" %>
 <%@ attribute name="tagHtml" required="false" type="java.lang.String" description="Elemento HTML para envolver o texto." %>
 
-<:c:set var="textoFinal">
+<c:set var="textoFinal">
     <c:choose>
         <c:when test="${condicao}">${textoCondicaoVerdadeira}</c:when>
         <c:otherwise>${textoCondicaoFalsa}</c:otherwise>
     </c:choose>
-</:c:set>
+</c:set>
 
 <c:choose>
     <c:when test="${not empty tagHtml}">

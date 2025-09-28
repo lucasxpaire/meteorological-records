@@ -2,6 +2,7 @@ package modelo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.iakovlev.timeshape.TimeZoneEngine;
+import util.FormatadorUtil;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -284,5 +285,10 @@ public class Ponto {
     @Transient
     public static boolean validarLongitude(double longitude) {
         return longitude >= LONGITUDE_MINIMA && longitude <= LONGITUDE_MAXIMA;
+    }
+
+    @Transient
+    public String obterCentroideFormatado() {
+        return FormatadorUtil.formatarPontoDecimalParaVirgula(latitude) + FormatadorUtil.formatarPontoDecimalParaVirgula(longitude);
     }
 }

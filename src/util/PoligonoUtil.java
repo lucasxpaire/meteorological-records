@@ -2,13 +2,42 @@ package util;
 
 import modelo.Poligono;
 import modelo.Ponto;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PoligonoUtil {
 
     public static final int INSERCAO_MANUAL = 1;
     public static final int ARQUIVO_CSV = 2;
+
+    public static final String TIPO_MANUAL = "manual";
+    public static final String TIPO_ARQUIVO = "arquivo";
+
+    public static Poligono criarPoligonoPorArquivo(MultipartFile arquivo) {
+        List<Ponto> pontos = new ArrayList<>();
+
+        try (BufferedReader leitor = new BufferedReader(new InputStreamReader(arquivo.getInputStream()))) {
+            String linha;
+
+            while ((linha = leitor.readLine()) != null) {
+                if (linha.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] partes = linha.split(";");
+                Double latitude = FormatadorUtil.StringParaDouble(partes[0]);
+                Double longitude = FormatadorUtil.StringParaDouble(partes[1]);
+                pontos.add(new Ponto(latitude, longitude));
+            }
+            return new Poligono(pontos);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Erro ao ler o arquivo: " + e.getMessage());
+        }
+    }
 
     public static Poligono obterCriacaoDePoligono() {
         while (true) {
