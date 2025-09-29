@@ -1,7 +1,6 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ tag trimDirectiveWhitespaces="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ include file="../jsp/cabecalho.jspf"%>
 
 <%@ attribute name="condicao" required="true" type="java.lang.Boolean" %>
 <%@ attribute name="textoCondicaoVerdadeira" required="true" type="java.lang.String" %>

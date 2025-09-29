@@ -31,7 +31,7 @@
                     <tags:inputForm path="nome" label="Nome" placeholder="Digite o nome da propriedade" />
 
                     <h4>Definição do Polígono</h4>
-                    <form:errors path="tipoEntradaPoligono" cssClass="alerta-erro" />
+                    <form:errors path="tipoEntradaPoligono" cssClass="alerta-erro-formulario" />
 
                     <div class="radio-group">
                         <label for="tipoManual">
@@ -47,13 +47,13 @@
                     <div id="campoManual" >
                         <label for="coordenadaPorInsercaoManual">Coordenadas:</label>
                         <form:textarea path="coordenadasPorInsercaoManual" id="coordenadaPorInsercaoManual" placeholder="Insira as coordenadas no formato (lat;long): XX,XXXX;XX,XXXX. Pressione Enter para uma nova coordenada." cssStyle="width: 700px; height: 200px; overflow: hidden"/>
-                        <form:errors path="coordenadasPorInsercaoManual" cssClass="alerta-erro" />
+                        <form:errors path="coordenadasPorInsercaoManual" cssClass="alerta-erro-formulario" />
                     </div>
 
                     <div id="campoArquivo" class="formulario">
                         <label for="coordenadaPorArquivo">Arquivo CSV:</label>
                         <form:input path="coordenadasPorArquivo" type="file" id="coordenadaPorArquivo" />
-                        <form:errors path="coordenadasPorArquivo" cssClass="alerta-erro" />
+                        <form:errors path="coordenadasPorArquivo" cssClass="alerta-erro-formulario" />
                     </div>
 
                     <div class="formulario-acoes">

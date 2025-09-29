@@ -248,13 +248,23 @@ body {
     border-bottom: none;
 }
 
-.alerta-erro {
+.alerta-erro-formulario {
     color: #DC3545;
     font-size: 0.9em;
     margin-top: -15px;
     margin-bottom: 15px;
     display: block;
 }
+
+.alerta-falha {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #edd4d4;
+    color: #571515;
+    border: 1px solid #e6c3c3;
+}
+
 
 .alerta-sucesso {
     padding: 15px;

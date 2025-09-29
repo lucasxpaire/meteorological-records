@@ -1,6 +1,5 @@
 <%@ tag pageEncoding="UTF-8" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ include file="../jsp/cabecalho.jspf"%>
 
 <%@ attribute name="path" required="true" type="java.lang.String" %>
 <%@ attribute name="label" required="true" type="java.lang.String" %>
@@ -15,4 +14,4 @@
     <form:option value="" label="${descricao}" disabled="true" />
     <form:options items="${items}" itemValue="${itemValue}" itemLabel="${itemLabel}"/>
 </form:select>
-<form:errors path="${path}" element="div" cssClass="alerta-erro" />
+<form:errors path="${path}" element="div" cssClass="alerta-erro-formulario" />

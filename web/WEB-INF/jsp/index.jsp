@@ -1,5 +1,6 @@
-<%@page pageEncoding="UTF-8" %>
+<%@ page pageEncoding="UTF-8" %>
 <%@ include file="cabecalho.jspf" %>
+
 <tags:corpo>
     <div class="estrutura-pagina">
 
