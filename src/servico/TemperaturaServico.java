@@ -48,8 +48,12 @@ public class TemperaturaServico {
     public TemperaturaServico(Dados dados, EstacaoMeteorologicaServico estacaoMeteorologicaServico) {
         this.dados = dados;
         this.estacaoMeteorologicaServico = estacaoMeteorologicaServico;
+        inicializarServicos();
+    }
+
+    public void inicializarServicos() {
         popularHistoricosIniciaisSeNecessario();
-        iniciarRotinaDeAtualizacaoAutomatica();
+        //iniciarRotinaDeAtualizacaoAutomatica();
     }
 
     public void iniciarRotinaDeAtualizacaoAutomatica() {
@@ -257,7 +261,7 @@ public class TemperaturaServico {
 
     public void popularHistoricoInicialPara(EstacaoMeteorologica estacao) {
         try {
-            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS + estacao.getCodigoEstacao());
+            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS2 + estacao.getCodigoEstacao());
 
             List<Temperatura> historicoExistente = estacao.getLocalizacao().getHistoricoTemperaturas();
             Set<LocalDateTime> datasExistentes = historicoExistente.stream()

@@ -3,19 +3,19 @@ package dados;
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
 import modelo.Temperatura;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Repository
 public class Dados {
 
     protected final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("dados");
     public EntityManager entityManager = entityManagerFactory.createEntityManager();
-    
+
     public void iniciarTransacao() {
         if (!entityManager.getTransaction().isActive()) {
             entityManager.getTransaction().begin();
@@ -34,9 +34,9 @@ public class Dados {
         }
     }
 
-    public <T> void salvar(T objeto) {
+    public <T> T salvar(T objeto) {
         try {
-            entityManager.merge(objeto);
+            return entityManager.merge(objeto);
         } catch (PersistenceException e) {
             throw new RuntimeException("Não foi possível salvar o objeto: " + objeto.getClass().getSimpleName(), e);
         }

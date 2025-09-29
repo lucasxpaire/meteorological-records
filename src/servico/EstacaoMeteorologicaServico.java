@@ -29,11 +29,11 @@ public class EstacaoMeteorologicaServico {
         inicializarEstacoesMeteorologicas();
     }
 
-    private void inicializarEstacoesMeteorologicas() {
+    public void inicializarEstacoesMeteorologicas() {
         if (listarTodos().isEmpty()) {
             List<String> urlsEstacoes = List.of(JsonUtil.URL_ESTACOES_MANUAIS, JsonUtil.URL_ESTACOES_AUTOMATICAS);
             for (String url : urlsEstacoes) {
-                dados.iniciarTransacao();
+               dados.iniciarTransacao();
                try {
                    preencherBancoComEstacoesDaApi(url);
                    dados.confirmarTransacao();

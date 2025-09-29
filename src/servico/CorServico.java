@@ -2,7 +2,6 @@ package servico;
 
 import dados.Dados;
 import modelo.Cor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import util.CorUtil;
 
@@ -14,16 +13,14 @@ import java.util.Properties;
 @Service
 public class CorServico {
 
-    @Autowired
     private final Dados dados;
 
-    @Autowired
     public CorServico(Dados dados) {
         this.dados = dados;
         inicializarCores();
     }
 
-    private void inicializarCores() {
+    public void inicializarCores() {
         if (dados.existeAlgum(Cor.class)) {
             return;
         }
