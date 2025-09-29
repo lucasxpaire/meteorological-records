@@ -1,6 +1,9 @@
 <%@page pageEncoding="UTF-8" %>
 <%@ include file="cabecalho.jspf" %>
 
+<%--@elvariable id="sucesso" type="java.lang.String"--%>
+<%--@elvariable id="falha" type="java.lang.String"--%>
+
 <tags:corpo>
     <div class="estrutura-pagina">
         <tags:barraLateral paginaAtiva="proprietarios"/>
@@ -10,11 +13,8 @@
                 <a href="cadastroProprietario.html" class="botao botao-novo">Novo Proprietário</a>
             </div>
 
-            <c:if test="${not empty resultado}">
-                <div class="alerta-sucesso">
-                    ${resultado}
-                </div>
-            </c:if>
+            <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
+            <tags:alerta css="alerta-falha" alerta="${falha}" />
 
             <div class="busca-container">
                 <form action="gerenciarProprietarios.html" method="get" class="formulario-busca">
@@ -49,4 +49,22 @@
             </table>
         </main>
     </div>
+    <script>
+        const campoBusca = document.getElementById("campo-busca");
+        const masker = VMasker(campoBusca);
+
+        campoBusca.addEventListener('input', function(event) {
+            const input = event.target;
+            let valor = input.value;
+
+            const contemLetra = /[a-zA-Z]/.test(valor);
+
+            if (contemLetra) {
+                return;
+            }
+
+            const apenasNumeros = valor.replace(/\D/g, '');
+            input.value = VMasker.toPattern(apenasNumeros, "999.999.999-99");
+        })
+    </script>
 </tags:corpo>
