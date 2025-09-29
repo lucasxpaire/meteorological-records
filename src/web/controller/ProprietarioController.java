@@ -81,10 +81,10 @@ public class ProprietarioController {
         Proprietario proprietario;
         if (command.getId() != null) {
             proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getId());
-            redirectAttributes.addFlashAttribute("resultado", "Proprietário atualizado com sucesso!");
+            redirectAttributes.addFlashAttribute("sucesso", "Proprietário atualizado com sucesso!");
         } else {
             proprietario = command.getProprietario();
-            redirectAttributes.addFlashAttribute("resultado", "Proprietário cadastrado com sucesso!");
+            redirectAttributes.addFlashAttribute("falha", "Proprietário cadastrado com sucesso!");
         }
 
         proprietario.setNome(command.getNome());
@@ -97,17 +97,15 @@ public class ProprietarioController {
         return "redirect:/gerenciarProprietarios.html";
     }
 
-
-    // Falta: adicionar redirect pra exclusão de propriedades se existerem
     @GetMapping("/deletarProprietario.html")
     public String deletar(@RequestParam("idProprietario") Long idProprietario, RedirectAttributes redirectAttributes) {
         Proprietario proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", idProprietario);
         if (proprietario.getPropriedades().isEmpty()) {
             dados.deletar(proprietario);
-            redirectAttributes.addFlashAttribute("resultado", "Proprietário deletado com sucesso!");
+            redirectAttributes.addFlashAttribute("sucesso", "Proprietário deletado com sucesso!");
             return "redirect:/gerenciarProprietarios.html";
         } else {
-            redirectAttributes.addFlashAttribute("resultado", "Falha: Não é possível deletar proprietário com propriedades existentes!");
+            redirectAttributes.addFlashAttribute("falha", "Falha: Não é possível deletar proprietário com propriedades existentes!");
             return  "redirect:/gerenciarProprietarios.html";
         }
     }

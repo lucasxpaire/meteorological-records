@@ -48,7 +48,7 @@ public class ProprietarioValidator implements Validator {
             else if (dados.existeAlgumComEsseCampo(Proprietario.class, "telefone", command.getTelefone())) {
                 Proprietario proprietarioExistente = dados.buscarUnicoPorCampo(Proprietario.class, "telefone", command.getTelefone());
                 if (proprietarioExistente != null && !proprietarioExistente.getId().equals(command.getId())) {
-                    errors.rejectValue("telefone", "telefone.jaExiste", "Falaha: Esse telefone já pertence a outro proprietário");
+                    errors.rejectValue("telefone", "telefone.jaExiste", "Falha: Esse telefone já pertence a outro proprietário");
                 }
             }
         }

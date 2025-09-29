@@ -158,7 +158,7 @@ public class PropriedadeController {
             propriedade.setProprietario(dados.buscarUnicoPorCampo(Proprietario.class, "cpf", FormatadorUtil.removerFormatacaoCpf(command.getCpfProprietario())));
         }
 
-        dados.salvar(propriedade);
+        propriedadeServico.salvar(propriedade);
 
         if (command.getPaginaOrigemRequisicao().equals("gerenciarPropriedadesDoProprietario")) {
             redirectAttributes.addAttribute("idProprietario", command.getIdProprietario());
