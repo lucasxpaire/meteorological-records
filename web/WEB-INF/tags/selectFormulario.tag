@@ -8,7 +8,6 @@
 <%@ attribute name="itemLabel" required="true" type="java.lang.String" %>
 <%@ attribute name="descricao" required="true" type="java.lang.String" %>
 
-
 <form:label path="${path}">${label}:</form:label>
 <form:select path="${path}" id="${path}" cssClass="form-control">
     <form:option value="" label="${descricao}" disabled="true" />
