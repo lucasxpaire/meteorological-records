@@ -130,10 +130,10 @@ public class PropriedadeController {
         Propriedade propriedade;
         if (command.getId() != null) {
             propriedade = dados.buscarUnicoPorCampo(Propriedade.class, "id", command.getId());
-            redirectAttributes.addFlashAttribute("resultado", "Propriedade atualizada com sucesso!");
+            redirectAttributes.addFlashAttribute("sucesso", "Propriedade atualizada com sucesso!");
         } else {
             propriedade = command.getPropriedade();
-            redirectAttributes.addFlashAttribute("resultado", "Propriedade cadastrada com sucesso!");
+            redirectAttributes.addFlashAttribute("sucesso", "Propriedade cadastrada com sucesso!");
         }
 
         MultipartFile arquivoRecebido = null;
@@ -147,7 +147,9 @@ public class PropriedadeController {
         Poligono poligono = PoligonoUtil.criarPoligonoPorArquivo(arquivoRecebido);
 
         propriedade.setTipoEntradaPoligono(command.getTipoEntradaPoligono());
-        propriedade.setArquivoPoligonos(arquivoRecebido.getBytes());
+        if (arquivoRecebido != null) {
+            propriedade.setArquivoPoligonos(arquivoRecebido.getBytes());
+        }
         propriedade.setNome(command.getNome());
         propriedade.setPoligono(poligono);
         propriedade.setCentroide(poligono.calcularCentroide());
@@ -175,9 +177,10 @@ public class PropriedadeController {
 
         if (paginaOrigemRequisicao.equals("gerenciarPropriedadesDoProprietario")) {
             redirectAttributes.addAttribute("idProprietario", propriedade.getProprietario().getId());
-            redirectAttributes.addFlashAttribute("resultado", "Propriedade deletada com sucesso");
+            redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");
             return "redirect:/gerenciarPropriedadesDoProprietario.html";
         } else {
+            redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");
             return "redirect:/gerenciarPropriedades.html";
         }
     }

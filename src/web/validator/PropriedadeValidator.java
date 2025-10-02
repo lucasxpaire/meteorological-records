@@ -37,7 +37,7 @@ public class PropriedadeValidator implements Validator {
             if (!errors.hasFieldErrors("cpfProprietario")) {
                 String cpfSemFormatacao = FormatadorUtil.removerFormatacaoCpf(command.getCpfProprietario());
                 if (!cpfSemFormatacao.matches("\\d{11}")) {
-                    errors.rejectValue("cpf", "cpf.tamanhoInvalido", "Falha: CPF deve conter exatamente 11 dígitos numéricos");
+                    errors.rejectValue("cpfProprietario", "cpf.tamanhoInvalido", "Falha: CPF deve conter exatamente 11 dígitos numéricos");
                 }
                 if (!dados.existeAlgumComEsseCampo(Proprietario.class, "cpf", cpfSemFormatacao)) {
                     errors.rejectValue("cpfProprietario", "cpf.naoExiste", "Falha: Nenhum proprietário encontrado com esse CPF.");

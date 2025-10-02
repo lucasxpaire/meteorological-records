@@ -1,5 +1,9 @@
 package modelo;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.*;
 
 @Entity
@@ -87,6 +91,24 @@ public class Propriedade {
     @Transient
     public static boolean validarNome(String nome) {
         return nome != null && !nome.trim().isEmpty();
+    }
+
+    @Transient
+    @JsonProperty("corCodigoHexadecimal")
+    public String obterCodigoHexadecimalCor() {
+        return proprietario.getCor().getCodigoHexadecimal();
+    }
+
+    @Transient
+    @JsonProperty("nomeProprietario")
+    public String obterNomeProprietario() {
+        return proprietario.getNome();
+    }
+
+    @Transient
+    @JsonProperty("cpfProprietario")
+    public String obterCpfProprietario() {
+        return proprietario.getCpf();
     }
 }
 

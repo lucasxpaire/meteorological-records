@@ -1,6 +1,5 @@
 package modelo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import servico.CorServico;
 
@@ -19,7 +18,6 @@ public class EstacaoMeteorologica {
     private String situacao;
     private String tipoEstacao;
 
-    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_ESTACAO_METEOROLOGICA")
@@ -59,7 +57,6 @@ public class EstacaoMeteorologica {
         this.nome = nome;
     }
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ID_COR", nullable = false)
     public Cor getCor() {

@@ -24,6 +24,11 @@ public class PoligonoUtil {
             String linha;
 
             while ((linha = leitor.readLine()) != null) {
+
+                if (linha.equals("lat;long")) {
+                    continue;
+                }
+
                 if (linha.trim().isEmpty()) {
                     continue;
                 }

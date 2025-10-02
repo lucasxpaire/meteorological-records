@@ -1,16 +1,14 @@
 package modelo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import net.iakovlev.timeshape.TimeZoneEngine;
 import util.FormatadorUtil;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -33,6 +31,7 @@ public class Ponto {
     private static final int NUMERADOR_PESO_PROXIMIDADE = 1;
 
     private static final int RAIO_DA_TERRA_EM_METROS = 6371000;
+    public static final String TEMPERATURA_INDISPONIVEL = "Indisponível";
 
     private Long id;
     private Double latitude;
@@ -285,6 +284,26 @@ public class Ponto {
     @Transient
     public static boolean validarLongitude(double longitude) {
         return longitude >= LONGITUDE_MINIMA && longitude <= LONGITUDE_MAXIMA;
+    }
+
+    @Transient
+    @JsonProperty("temperaturaRecente")
+    public String obterTemperaturaRecenteFormatada() {
+        if (historicoTemperaturas.isEmpty()) {
+            return TEMPERATURA_INDISPONIVEL;
+        }
+
+        Temperatura temperatura = getHistoricoTemperaturas().stream().max(Comparator.comparing(Temperatura::getDataHora))
+                .orElse(null);
+
+        if (temperatura == null || temperatura.getTemperaturaReal() == null || temperatura.getDataHora() == null) {
+            return TEMPERATURA_INDISPONIVEL;
+        }
+
+        String temperaturaFormatada = FormatadorUtil.formatarTemperatura(temperatura.getTemperaturaReal());
+        String dataFormatada = temperatura.getDataHora().format(FormatadorUtil.FORMATADOR_DATAHORA_PARA_EXIBICAO_MAPA);
+
+        return String.format("<span class='temperatura-destaque'>%s</span> (%s)", temperaturaFormatada, dataFormatada);
     }
 
     @Transient
