@@ -251,8 +251,8 @@ body {
 .alerta-erro-formulario {
     color: #DC3545;
     font-size: 0.9em;
-    margin-top: -15px;
-    margin-bottom: 15px;
+    margin-top: 5px;
+    margin-bottom: 20px;
     display: block;
 }
 
@@ -273,6 +273,10 @@ body {
     background-color: #D4EDDA;
     color: #155724;
     border: 1px solid #C3E6CB;
+}
+
+.is-invalid {
+    border-color: #DC3545 !important;
 }
 
 .botao-tabela {
@@ -313,4 +317,90 @@ body {
 }
 .botao-tabela--deletar:hover {
     background-color: #c82333;
+}
+
+.menu-flutuante {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    width: 320px;
+    background-color: #FFFFFF;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    border: 1px solid #DEE2E6;
+}
+
+.menu-flutuante h3 {
+    margin-top: 0;
+    margin-bottom: 2px;
+    color: #2A3F54;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+.menu-flutuante-grupo {
+    margin-bottom: 20px;
+}
+
+.menu-flutuante-grupo label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.9em;
+}
+
+.menu-flutuante-grupo select, .menu-flutuante-grupo input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #CED4DA;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    font-family: 'Poppins', sans-serif;
+}
+
+.menu-flutuante-grupo .checkbox-label {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.menu-flutuante-grupo .checkbox-label:hover {
+    background-color: #F8F9FA;
+}
+
+.menu-flutuante-grupo .checkbox-label input[type="checkbox"] {
+    margin-right: 10px;
+    width: 1.2em;
+    height: 1.2em;
+}
+
+.menu-flutuante .botao {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.info-window-conteudo h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+    color: #000000;
+}
+
+.info-window-conteudo p {
+    margin: 0;
+    line-height: 1.4;
+    color: #000000;
+}
+
+.temperatura-destaque {
+    color: #000000;
+    font-weight: 900;
 }

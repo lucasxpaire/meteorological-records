@@ -13,6 +13,8 @@ import static util.LeitorArquivoUtil.DUAS_COLUNAS;
 
 public class FormatadorUtil {
 
+    public static final DateTimeFormatter FORMATADOR_DATAHORA_PARA_EXIBICAO_MAPA = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
+
     public static final DateTimeFormatter FORMATADOR_DATA_PADRAO = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_EXIBICAO = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
@@ -20,6 +22,10 @@ public class FormatadorUtil {
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_COMPARACAO_JSON = DateTimeFormatter.ofPattern("dd/MM/yyyy HH");
+
+    public static String formatarTemperatura(Double temperatura) {
+        return String.format("%.2f°C", temperatura).replace('.', ',');
+    }
 
     public static Double StringParaDouble(String valor) {
         return Double.parseDouble(valor.trim().replace(",", "."));
