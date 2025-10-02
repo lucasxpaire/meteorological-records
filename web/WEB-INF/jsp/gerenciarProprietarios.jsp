@@ -51,7 +51,6 @@
     </div>
     <script>
         const campoBusca = document.getElementById("campo-busca");
-        const masker = VMasker(campoBusca);
 
         campoBusca.addEventListener('input', function(event) {
             const input = event.target;
@@ -65,6 +64,7 @@
 
             const apenasNumeros = valor.replace(/\D/g, '');
             input.value = VMasker.toPattern(apenasNumeros, "999.999.999-99");
-        })
+        });
+
     </script>
 </tags:corpo>

@@ -16,10 +16,10 @@
                 <form:form modelAttribute="ProprietarioCommand" method="post" action="cadastroProprietario.html">
                     <form:hidden path="id"/>
 
-                    <tags:inputForm path="nome" label="Nome" placeholder="Digite o nome completo" />
-                    <tags:inputForm path="cpf" label="Cpf" placeholder="Digite o cpf" />
-                    <tags:inputForm path="telefone" label="Telefone" placeholder="Digite o telefone" />
-                    <tags:selectForm path="corId" label="Cor" items="${cores}" itemValue="id" itemLabel="nome" descricao="Selecione uma cor" />
+                    <tags:inputFormulario path="nome" label="Nome" placeholder="Digite o nome completo" />
+                    <tags:inputFormulario path="cpf" label="Cpf" placeholder="Digite o cpf" />
+                    <tags:inputFormulario path="telefone" label="Telefone" placeholder="Digite o telefone" />
+                    <tags:selectFormulario path="corId" label="Cor" items="${cores}" itemValue="id" itemLabel="nome" descricao="Selecione uma cor" />
 
                     <div class="formulario-acoes">
                         <input type="submit" value="<tags:conteudoCondicional condicao='${not empty proprietario}' textoCondicaoVerdadeira='Alterar' textoCondicaoFalsa='Cadastrar' />" class="botao botao-novo"/>

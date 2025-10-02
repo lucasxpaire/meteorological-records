@@ -1,6 +1,8 @@
 <%@page pageEncoding="UTF-8" %>
 <%@ include file="cabecalho.jspf" %>
 
+<%--@elvariable id="sucesso" type="java.lang.String"--%>
+
 <tags:corpo>
     <div class="estrutura-pagina">
         <tags:barraLateral paginaAtiva="propriedades" />
@@ -10,11 +12,7 @@
                 <a href="cadastroPropriedade.html" class="botao botao-novo">Nova Propriedade</a>
             </div>
 
-            <c:if test="${not empty resultado}">
-                <div class="alerta-sucesso">
-                        ${resultado}
-                </div>
-            </c:if>
+            <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
 
             <div class="busca-container">
                 <form action="gerenciarPropriedades.html" method="get" class="formulario-busca">

@@ -1,6 +1,8 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ include file="cabecalho.jspf" %>
 
+<%--@elvariable id="sucesso" type="java.lang.String"--%>
+
 <tags:corpo>
     <div class="estrutura-pagina">
         <main class="estrutura-pagina-conteudo">
@@ -14,11 +16,7 @@
                 </div>
             </div>
 
-            <c:if test="${not empty resultado}">
-                <div class="alerta alerta-sucesso">
-                        ${resultado}
-                </div>
-            </c:if>
+            <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
 
             <div class="busca-container">
                 <form action="gerenciarPropriedadesDoProprietario.html" method="get" class="formulario-busca">

@@ -24,14 +24,13 @@
                             <form:hidden path="idProprietario" />
                         </c:when>
                         <c:otherwise>
-                            <tags:inputForm path="cpfProprietario" label="Cpf do Proprietário" placeholder="Digite o CPF do proprietário" />
+                            <tags:inputFormulario path="cpfProprietario" label="Cpf do Proprietário" placeholder="Digite o CPF do proprietário" />
                         </c:otherwise>
                     </c:choose>
 
-                    <tags:inputForm path="nome" label="Nome" placeholder="Digite o nome da propriedade" />
+                    <tags:inputFormulario path="nome" label="Nome" placeholder="Digite o nome da propriedade" />
 
                     <h4>Definição do Polígono</h4>
-                    <form:errors path="tipoEntradaPoligono" cssClass="alerta-erro-formulario" />
 
                     <div class="radio-group">
                         <label for="tipoManual">
@@ -46,7 +45,7 @@
 
                     <div id="campoManual" >
                         <label for="coordenadaPorInsercaoManual">Coordenadas:</label>
-                        <form:textarea path="coordenadasPorInsercaoManual" id="coordenadaPorInsercaoManual" placeholder="Insira as coordenadas no formato (lat;long): XX,XXXX;XX,XXXX. Pressione Enter para uma nova coordenada." cssStyle="width: 700px; height: 200px; overflow: hidden"/>
+                        <form:textarea path="coordenadasPorInsercaoManual" id="coordenadaPorInsercaoManual" placeholder="Inserir no formato (lat;long): XX,XXXX;XX,XXXX. Aperte Enter para uma nova coordenada." cssStyle="width: 700px; height: 200px; overflow: hidden"/>
                         <form:errors path="coordenadasPorInsercaoManual" cssClass="alerta-erro-formulario" />
                     </div>
 
@@ -55,6 +54,8 @@
                         <form:input path="coordenadasPorArquivo" type="file" id="coordenadaPorArquivo" />
                         <form:errors path="coordenadasPorArquivo" cssClass="alerta-erro-formulario" />
                     </div>
+
+                    <form:errors path="tipoEntradaPoligono" cssClass="alerta-erro-formulario" />
 
                     <div class="formulario-acoes">
                         <input type="submit" value="<tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Alterar" textoCondicaoFalsa="Cadastrar" />" class="botao botao-novo"/>
@@ -86,7 +87,6 @@
             tipoManualRadio.addEventListener('change', toggleCampos);
             tipoArquivoRadio.addEventListener('change', toggleCampos);
         })
-
     </script>
     <script src="<c:url value='/js/mascarasCoordenadas.js'/>"></script>
     <script>
