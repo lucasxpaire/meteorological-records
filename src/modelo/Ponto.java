@@ -40,6 +40,8 @@ public class Ponto {
     private List<EstacaoMeteorologica> estacoesMeteorologicas = new ArrayList<>();
     private String fusoHorario;
 
+    private static final TimeZoneEngine timeZoneEngine = TimeZoneEngine.initialize();
+
     public Ponto(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
@@ -113,10 +115,8 @@ public class Ponto {
     }
 
     @Transient
-    public String obterFusoHorario() {
-        TimeZoneEngine inicializador = TimeZoneEngine.initialize();
-
-        return inicializador.query(getLatitude(), getLongitude())
+    public String determinarFusoHorario() {
+        return timeZoneEngine.query(getLatitude(), getLongitude())
                 .map(ZoneId::getId)
                 .orElse(null);
     }
@@ -159,19 +159,40 @@ public class Ponto {
     }
 
     @Transient
+    private LocalDateTime calcularDataHoraEstimativa(List<Temperatura> temperaturas) {
+        if (temperaturas == null || temperaturas.isEmpty()) {
+            return null;
+        }
+
+        return temperaturas.stream()
+                .collect(Collectors.groupingBy(Temperatura::getDataHora, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+    }
+
+    @Transient
     public Temperatura interpolarTemperaturaAtual(List<EstacaoMeteorologica> estacoes) {
         double somaTemperaturasPonderadas = 0.0;
         double somaPesos = 0.0;
 
+        List<Temperatura> temperaturasRecentes = new ArrayList<>();
+
         for (EstacaoMeteorologica estacao : estacoes) {
-            List<Temperatura> historico = estacao.getLocalizacao().getHistoricoTemperaturas();
-            if (historico.isEmpty()) {
+            Temperatura temperaturaMaisRecente = estacao.getLocalizacao().getHistoricoTemperaturas().stream()
+                    .max(Comparator.comparing(Temperatura::getDataHora))
+                    .orElse(null);
+
+            if (temperaturaMaisRecente == null) {
                 continue;
             }
 
-            Double temperaturaAtualDaEstacao = historico.getFirst().getTemperaturaReal();
+            temperaturasRecentes.add(temperaturaMaisRecente);
+
+            Double temperatura = temperaturaMaisRecente.getTemperaturaReal();
             Double peso = calcularPesoDeProximidadePara(estacao);
-            somaTemperaturasPonderadas += temperaturaAtualDaEstacao * peso;
+            somaTemperaturasPonderadas += temperatura * peso;
             somaPesos += peso;
         }
 
@@ -180,7 +201,7 @@ public class Ponto {
         }
 
         Double temperaturaAtualInterpolada = somaTemperaturasPonderadas / somaPesos;
-        LocalDateTime dataHoraEstimativa = calcularDataHoraEstimativa(estacoes);
+        LocalDateTime dataHoraEstimativa = calcularDataHoraEstimativa(temperaturasRecentes);
 
         Temperatura novaTemperatura = new Temperatura();
         novaTemperatura.setPonto(this);
@@ -247,33 +268,6 @@ public class Ponto {
         previsaoFinal.setPonto(this);
 
         return previsaoFinal;
-    }
-
-    @Transient
-    private LocalDateTime calcularDataHoraEstimativa(List<EstacaoMeteorologica> estacoes) {
-        List<LocalDateTime> datasRecentes = new ArrayList<>();
-
-        for (EstacaoMeteorologica estacao : estacoes) {
-            List<Temperatura> historico = estacao.getLocalizacao().getHistoricoTemperaturas();
-            if (historico.isEmpty()) {
-                datasRecentes.add(null);
-            } else {
-                datasRecentes.add(historico.getFirst().getDataHora());
-            }
-        }
-        if (datasRecentes.isEmpty() || datasRecentes.getFirst() == null) {
-            return null;
-        }
-
-        LocalDateTime dataMaisRecente = datasRecentes.getFirst();
-
-        return datasRecentes.stream()
-                .filter(dataHora -> dataHora.toLocalDate().equals(dataMaisRecente.toLocalDate()))
-                .collect(Collectors.groupingBy(dataHora -> dataHora, Collectors.counting()))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse(null);
     }
 
     @Transient

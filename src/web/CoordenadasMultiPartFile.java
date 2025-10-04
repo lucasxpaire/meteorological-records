@@ -5,14 +5,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 
-public class StringMultipartFile implements MultipartFile {
+public class CoordenadasMultiPartFile implements MultipartFile {
 
     private final byte[] conteudo;
     private final String nomeArquivo;
     private final String nomeOriginal;
     private final String tipoConteudo;
 
-    public StringMultipartFile(String conteudo, String nomeArquivo, String nomeOriginal, String tipoConteudo) {
+    public CoordenadasMultiPartFile(String conteudo, String nomeArquivo, String nomeOriginal, String tipoConteudo) {
         this.conteudo = conteudo.getBytes();
         this.nomeArquivo = nomeArquivo;
         this.nomeOriginal = nomeOriginal;
@@ -45,12 +45,12 @@ public class StringMultipartFile implements MultipartFile {
     }
 
     @Override
-    public byte[] getBytes() throws IOException {
+    public byte[] getBytes() {
         return conteudo;
     }
 
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         return new ByteArrayInputStream(conteudo);
     }
 

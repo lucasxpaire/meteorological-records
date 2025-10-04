@@ -3,6 +3,7 @@ package servico;
 import dados.Dados;
 import modelo.Cor;
 import modelo.Proprietario;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import util.FormatadorUtil;
 import web.command.ProprietarioCommand;
@@ -12,11 +13,8 @@ import java.util.List;
 @Service
 public class ProprietarioServico {
 
-    private final Dados dados;
-
-    public ProprietarioServico(Dados dados) {
-        this.dados = dados;
-    }
+    @Autowired
+    private Dados dados;
 
     public Proprietario prepararProprietario(ProprietarioCommand command) {
         Proprietario proprietario;
@@ -51,18 +49,6 @@ public class ProprietarioServico {
         }
     }
 
-    public void deletar(Proprietario proprietario) {
-        if (validarProprietario(proprietario)) {
-            dados.deletar(proprietario);
-        } else {
-            throw new IllegalArgumentException("Dados do proprietário são inválidos.");
-        }
-    }
-
-    public boolean existeAlgumProprietario() {
-        return dados.existeAlgum(Proprietario.class);
-    }
-
     public Proprietario buscarPorCpf(String cpfBusca) {
         String cpfSemFormatacao = FormatadorUtil.removerFormatacaoCpf(cpfBusca);
         if (Proprietario.validarTamanhoCpf(cpfSemFormatacao)) {
@@ -94,8 +80,39 @@ public class ProprietarioServico {
         }
     }
 
+
     public List<Proprietario> listarTodos() {
         return dados.listarTodos(Proprietario.class);
+    }
+
+    public void deletar(Proprietario proprietario) {
+        if (validarProprietario(proprietario)) {
+            dados.deletar(proprietario);
+        } else {
+            throw new IllegalArgumentException("Dados do proprietário são inválidos.");
+        }
+    }
+
+    public boolean existeAlgumProprietario() {
+        return dados.existeAlgum(Proprietario.class);
+    }
+
+    public boolean cpfJaExiste(String cpf) {
+        String cpfNormalizado = FormatadorUtil.removerFormatacaoCpf(cpf);
+        if (!Proprietario.validarTamanhoCpf(cpfNormalizado)) {
+            return false;
+        }
+
+        return dados.existeAlgumComEsseCampo(Proprietario.class, "cpf", cpfNormalizado);
+    }
+
+    public boolean telefoneJaExiste(String telefone) {
+        String telefoneNormalizado = FormatadorUtil.removerFormatacaoTelefone(telefone);
+        if (!Proprietario.validarTamanhoTelefone(telefone)) {
+            return false;
+        }
+
+        return dados.existeAlgumComEsseCampo(Proprietario.class, "telefone", telefoneNormalizado);
     }
 
     public boolean cpfPertenceAOutroProprietario(Long idAtual, String cpf) {

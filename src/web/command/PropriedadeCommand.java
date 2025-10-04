@@ -2,6 +2,7 @@ package web.command;
 
 import modelo.Propriedade;
 import org.springframework.web.multipart.MultipartFile;
+import util.FormatadorUtil;
 
 public class PropriedadeCommand {
 
@@ -40,14 +41,6 @@ public class PropriedadeCommand {
         propriedade.setNome(nome);
     }
 
-    public String getPaginaOrigemRequisicao() {
-        return paginaOrigemRequisicao;
-    }
-
-    public void setPaginaOrigemRequisicao(String paginaOrigemRequisicao) {
-        this.paginaOrigemRequisicao = paginaOrigemRequisicao;
-    }
-
     public Long getIdProprietario() {
         return idProprietario;
     }
@@ -61,7 +54,15 @@ public class PropriedadeCommand {
     }
 
     public void setCpfProprietario(String cpfProprietario) {
-        this.cpfProprietario = cpfProprietario;
+        this.cpfProprietario = FormatadorUtil.removerFormatacaoCpf(cpfProprietario);
+    }
+
+    public String getPaginaOrigemRequisicao() {
+        return paginaOrigemRequisicao;
+    }
+
+    public void setPaginaOrigemRequisicao(String paginaOrigemRequisicao) {
+        this.paginaOrigemRequisicao = paginaOrigemRequisicao;
     }
 
     public String getTipoEntradaPoligono() {

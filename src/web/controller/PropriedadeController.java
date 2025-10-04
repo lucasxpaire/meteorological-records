@@ -1,7 +1,5 @@
 package web.controller;
 
-import dados.Dados;
-import modelo.Poligono;
 import modelo.Propriedade;
 import modelo.Proprietario;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +9,15 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import servico.PontoServico;
 import servico.PropriedadeServico;
+import servico.ProprietarioServico;
 import util.FormatadorUtil;
 import util.PoligonoUtil;
-import web.StringMultipartFile;
+import web.CoordenadasMultiPartFile;
 import web.command.PropriedadeCommand;
 import web.validator.PropriedadeValidator;
 
@@ -29,13 +29,13 @@ import java.util.List;
 public class PropriedadeController {
 
     @Autowired
-    private Dados dados;
-
-    @Autowired
     private PropriedadeServico propriedadeServico;
-
     @Autowired
     private PropriedadeValidator propriedadeValidator;
+    @Autowired
+    private PontoServico pontoServico;
+    @Autowired
+    private ProprietarioServico proprietarioServico;
 
     @InitBinder("PropriedadeCommand")
     void validator (WebDataBinder webDataBinder) {
@@ -49,7 +49,7 @@ public class PropriedadeController {
         Proprietario proprietario = null;
 
         if (idPropriedade != null) {
-            Propriedade propriedade = dados.buscarUnicoPorCampo(Propriedade.class, "id", idPropriedade);
+            Propriedade propriedade = propriedadeServico.buscarPorId(idPropriedade);
             command.setPropriedade(propriedade);
             proprietario = propriedade.getProprietario();
             mv.addObject("propriedade", propriedade);
@@ -60,10 +60,10 @@ public class PropriedadeController {
             if (tipoEntrada.equals(PoligonoUtil.TIPO_MANUAL)) {
                 command.setCoordenadasPorInsercaoManual(new String(propriedade.getArquivoPoligonos()));
             } else if (tipoEntrada.equals(PoligonoUtil.TIPO_ARQUIVO)){
-                command.setCoordenadasPorArquivo(new StringMultipartFile(Arrays.toString(propriedade.getArquivoPoligonos()), "coordenadas", "coordenadas.txt", "text/plain"));
+                command.setCoordenadasPorArquivo(new CoordenadasMultiPartFile(Arrays.toString(propriedade.getArquivoPoligonos()), "coordenadas", "coordenadas.txt", "text/plain"));
             }
         } else if (idProprietario != null) {
-            proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", idProprietario);
+            proprietario = proprietarioServico.buscarPorId(idProprietario);
 
         }
 
@@ -87,7 +87,7 @@ public class PropriedadeController {
     public ModelAndView listarPropriedadesDoProprietario(@RequestParam(value = "idProprietario") Long idProprietario, @RequestParam(value = "busca", required = false) String busca) {
         ModelAndView mv = new ModelAndView("gerenciarPropriedadesDoProprietario");
 
-        Proprietario proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", idProprietario);
+        Proprietario proprietario = proprietarioServico.buscarPorId(idProprietario);
         if (busca != null && !busca.trim().isEmpty()) {
             List<Propriedade> propriedadesFiltradas = propriedadeServico.buscarPorNome(busca)
                     .stream()
@@ -97,7 +97,7 @@ public class PropriedadeController {
             mv.addObject("proprietario", proprietario);
             return mv;
         } else {
-            List<Propriedade> propriedades = dados.buscarListaPorCampo(Propriedade.class, "proprietario.id", idProprietario);
+            List<Propriedade> propriedades = propriedadeServico.buscarPropriedadesDoProprietario(idProprietario);
             mv.addObject("propriedades", propriedades);
             mv.addObject("proprietario", proprietario);
             return mv;
@@ -122,43 +122,19 @@ public class PropriedadeController {
     public String salvar(@ModelAttribute("PropriedadeCommand") @Validated PropriedadeCommand command, BindingResult errors, Model model, RedirectAttributes redirectAttributes) throws IOException {
         if (errors.hasErrors()) {
             if (command.getId() != null) {
-                model.addAttribute("propriedade", dados.buscarUnicoPorCampo(Propriedade.class, "id", command.getId()));
+                model.addAttribute("propriedade", propriedadeServico.buscarPorId(command.getId()));
             }
             return "cadastroPropriedade";
         }
 
-        Propriedade propriedade;
         if (command.getId() != null) {
-            propriedade = dados.buscarUnicoPorCampo(Propriedade.class, "id", command.getId());
             redirectAttributes.addFlashAttribute("sucesso", "Propriedade atualizada com sucesso!");
         } else {
-            propriedade = command.getPropriedade();
             redirectAttributes.addFlashAttribute("sucesso", "Propriedade cadastrada com sucesso!");
         }
 
-        MultipartFile arquivoRecebido = null;
-        if (PoligonoUtil.TIPO_MANUAL.equals(command.getTipoEntradaPoligono())) {
-            String textoCoordenadas = command.getCoordenadasPorInsercaoManual();
-            arquivoRecebido = new StringMultipartFile(textoCoordenadas, "coordenadas", "coordenadas.txt", "text/plain");
-        } else if (PoligonoUtil.TIPO_ARQUIVO.equals(command.getTipoEntradaPoligono())) {
-            arquivoRecebido = command.getCoordenadasPorArquivo();
-        }
-
-        Poligono poligono = PoligonoUtil.criarPoligonoPorArquivo(arquivoRecebido);
-
-        propriedade.setTipoEntradaPoligono(command.getTipoEntradaPoligono());
-        if (arquivoRecebido != null) {
-            propriedade.setArquivoPoligonos(arquivoRecebido.getBytes());
-        }
-        propriedade.setNome(command.getNome());
-        propriedade.setPoligono(poligono);
-        propriedade.setCentroide(poligono.calcularCentroide());
-
-        if (command.getIdProprietario() != null) {
-            propriedade.setProprietario(dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getIdProprietario()));
-        } else if (command.getCpfProprietario() != null) {
-            propriedade.setProprietario(dados.buscarUnicoPorCampo(Proprietario.class, "cpf", FormatadorUtil.removerFormatacaoCpf(command.getCpfProprietario())));
-        }
+        Propriedade propriedade = propriedadeServico.prepapararPropriedade(command);
+        pontoServico.calcularEAdicionarTemperaturaAtual(propriedade.getCentroide());
 
         propriedadeServico.salvar(propriedade);
 
@@ -172,8 +148,8 @@ public class PropriedadeController {
 
     @GetMapping("/deletarPropriedade.html")
     public String deletar(@RequestParam(value = "idPropriedade") Long idPropriedade, @RequestParam(value = "paginaOrigemRequisicao", defaultValue = "gerenciarPropriedades") String paginaOrigemRequisicao, RedirectAttributes redirectAttributes) {
-        Propriedade propriedade = dados.buscarUnicoPorCampo(Propriedade.class, "id", idPropriedade);
-        dados.deletar(propriedade);
+        Propriedade propriedade = propriedadeServico.buscarPorId(idPropriedade);
+        propriedadeServico.deletar(propriedade);
 
         if (paginaOrigemRequisicao.equals("gerenciarPropriedadesDoProprietario")) {
             redirectAttributes.addAttribute("idProprietario", propriedade.getProprietario().getId());

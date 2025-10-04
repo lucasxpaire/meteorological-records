@@ -88,7 +88,7 @@
             tipoArquivoRadio.addEventListener('change', toggleCampos);
         })
     </script>
-    <script src="<c:url value='/js/mascarasCoordenadas.js'/>"></script>
+    <script src="<c:url value='/js/mascaraCoordenadas.js'/>"></script>
     <script>
         VMasker(document.getElementById("cpfProprietario")).maskPattern("999.999.999-99");
     </script>

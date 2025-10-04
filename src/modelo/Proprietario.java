@@ -109,7 +109,7 @@ public class Proprietario {
             return false;
         }
         String telefoneSemFormatacao = telefone.replaceAll(PONTOS_E_TRACOS, ESPACO_EM_BRANCO);
-        return telefoneSemFormatacao.length() == QUANTIDADE_DIGITOS_SEM_NOVE_NO_COMECO || telefoneSemFormatacao.length() == QUANTIDADE_DIGITOS_COM_NOVE_NO_COMECO;
+        return telefoneSemFormatacao.length() == QUANTIDADE_DIGITOS_COM_NOVE_NO_COMECO;
     }
 
     @Transient
