@@ -46,8 +46,9 @@ public class ProprietarioController {
         ProprietarioCommand command = new ProprietarioCommand();
 
         if (idProprietario != null) {
-            Proprietario proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", idProprietario);
+            Proprietario proprietario = proprietarioServico.buscarPorId(idProprietario);
             command.setProprietario(proprietario);
+            command.setCorId(proprietario.getCor().getId());
             mv.addObject("proprietario", proprietario);
         }
 
@@ -73,41 +74,33 @@ public class ProprietarioController {
     public String salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult errors, Model model, RedirectAttributes redirectAttributes) {
         if (errors.hasErrors()) {
             if (command.getId() != null) {
-                model.addAttribute("proprietario", dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getId()));
+                model.addAttribute("proprietario", proprietarioServico.buscarPorId(command.getId()));
             }
             return "cadastroProprietario";
         }
 
-        Proprietario proprietario;
         if (command.getId() != null) {
-            proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", command.getId());
             redirectAttributes.addFlashAttribute("sucesso", "Proprietário atualizado com sucesso!");
         } else {
-            proprietario = command.getProprietario();
-            redirectAttributes.addFlashAttribute("falha", "Proprietário cadastrado com sucesso!");
+            redirectAttributes.addFlashAttribute("sucesso", "Proprietário cadastrado com sucesso!");
         }
 
-        proprietario.setNome(command.getNome());
-        proprietario.setCpf(command.getCpf());
-        proprietario.setTelefone(command.getTelefone());
-        proprietario.setCor(dados.buscarUnicoPorCampo(Cor.class, "id", command.getCorId()));
-
-        dados.salvar(proprietario);
+        Proprietario proprietario = proprietarioServico.prepararProprietario(command);
+        proprietarioServico.salvar(proprietario);
 
         return "redirect:/gerenciarProprietarios.html";
     }
 
     @GetMapping("/deletarProprietario.html")
     public String deletar(@RequestParam("idProprietario") Long idProprietario, RedirectAttributes redirectAttributes) {
-        Proprietario proprietario = dados.buscarUnicoPorCampo(Proprietario.class, "id", idProprietario);
+        Proprietario proprietario = proprietarioServico.buscarPorId(idProprietario);
         if (proprietario.getPropriedades().isEmpty()) {
-            dados.deletar(proprietario);
+            proprietarioServico.deletar(proprietario);
             redirectAttributes.addFlashAttribute("sucesso", "Proprietário deletado com sucesso!");
-            return "redirect:/gerenciarProprietarios.html";
         } else {
             redirectAttributes.addFlashAttribute("falha", "Falha: Não é possível deletar proprietário com propriedades existentes!");
-            return  "redirect:/gerenciarProprietarios.html";
         }
+        return "redirect:/gerenciarProprietarios.html";
     }
 
 }

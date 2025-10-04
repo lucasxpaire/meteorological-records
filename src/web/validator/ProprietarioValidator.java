@@ -1,19 +1,19 @@
 package web.validator;
 
-import dados.Dados;
 import modelo.Proprietario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+import servico.ProprietarioServico;
 import web.command.ProprietarioCommand;
 
 @Component
 public class ProprietarioValidator implements Validator {
 
     @Autowired
-    private Dados dados;
+    private ProprietarioServico proprietarioServico;
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -31,27 +31,23 @@ public class ProprietarioValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "corId", "field.required","Falha: Não é possível cadastrar sem uma cor padrão");
 
         if (command.getCpf() != null && !command.getCpf().isEmpty()) {
-            if (!command.getCpf().matches("\\d{11}")) {
+            if (!Proprietario.validarTamanhoCpf(command.getCpf())) {
                 errors.rejectValue("cpf", "cpf.tamanhoInvalido", "Falha: CPF deve conter exatamente 11 dígitos numéricos");
-            } else if (dados.existeAlgumComEsseCampo(Proprietario.class, "cpf", command.getCpf())) {
-                Proprietario proprietarioExistente = dados.buscarUnicoPorCampo(Proprietario.class, "cpf", command.getCpf());
-                if (proprietarioExistente != null && !proprietarioExistente.getId().equals(command.getId())) {
+            } else {
+                if (proprietarioServico.cpfPertenceAOutroProprietario(command.getId(), command.getCpf())) {
                     errors.rejectValue("cpf", "cpf.jaExiste", "Falha: Esse CPF já pertence a outro proprietário");
                 }
             }
         }
 
         if (command.getTelefone() != null && !command.getTelefone().isEmpty()) {
-            if (!command.getTelefone().matches("\\d{10,11}")) {
+            if (!Proprietario.validarTamanhoTelefone(command.getTelefone())) {
                 errors.rejectValue("telefone", "telefone.tamanhoInvalido","Falha: Telefone deve conter 10 ou 11 dígitos numéricos");
-            }
-            else if (dados.existeAlgumComEsseCampo(Proprietario.class, "telefone", command.getTelefone())) {
-                Proprietario proprietarioExistente = dados.buscarUnicoPorCampo(Proprietario.class, "telefone", command.getTelefone());
-                if (proprietarioExistente != null && !proprietarioExistente.getId().equals(command.getId())) {
+            } else {
+                if (proprietarioServico.telefonePertenceAOutroProprietario(command.getId(), command.getTelefone())) {
                     errors.rejectValue("telefone", "telefone.jaExiste", "Falha: Esse telefone já pertence a outro proprietário");
                 }
             }
         }
-
     }
 }
