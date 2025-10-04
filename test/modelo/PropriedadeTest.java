@@ -22,7 +22,7 @@ public class PropriedadeTest {
 
     @Test
     public void verificarJsonDeEstacaoMeteorologicaEspecifica() throws JsonProcessingException {
-        Propriedade propriedade = dados.buscarUnicoPorCampo(Propriedade.class, "id", 21L);
+        Propriedade propriedade = dados.buscarUnicoPorCampo(Propriedade.class, "id", 29L);
         ObjectMapper conversorJson = new ObjectMapper();
         conversorJson.findAndRegisterModules();
         String propriedadeJson = conversorJson.writerWithDefaultPrettyPrinter().writeValueAsString(propriedade);
