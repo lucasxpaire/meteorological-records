@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import dados.Dados;
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import util.*;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,9 +29,9 @@ public class EstacaoMeteorologicaServico {
     public EstacaoMeteorologicaServico(Dados dados, CorServico corServico) {
         this.dados = dados;
         this.corServico = corServico;
-        inicializarEstacoesMeteorologicas();
     }
 
+    @PostConstruct
     public void inicializarEstacoesMeteorologicas() {
         if (listarTodos().isEmpty()) {
             List<String> urlsEstacoes = List.of(JsonUtil.URL_ESTACOES_MANUAIS, JsonUtil.URL_ESTACOES_AUTOMATICAS);

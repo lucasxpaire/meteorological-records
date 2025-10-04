@@ -12,6 +12,7 @@ import util.FormatadorUtil;
 import util.JsonUtil;
 import util.LeitorArquivoUtil;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -48,9 +49,9 @@ public class TemperaturaServico {
     public TemperaturaServico(Dados dados, EstacaoMeteorologicaServico estacaoMeteorologicaServico) {
         this.dados = dados;
         this.estacaoMeteorologicaServico = estacaoMeteorologicaServico;
-        inicializarServicos();
     }
 
+    @PostConstruct
     public void inicializarServicos() {
         popularHistoricosIniciaisSeNecessario();
         //iniciarRotinaDeAtualizacaoAutomatica();
@@ -261,7 +262,7 @@ public class TemperaturaServico {
 
     public void popularHistoricoInicialPara(EstacaoMeteorologica estacao) {
         try {
-            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS2 + estacao.getCodigoEstacao());
+            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS + estacao.getCodigoEstacao());
 
             List<Temperatura> historicoExistente = estacao.getLocalizacao().getHistoricoTemperaturas();
             Set<LocalDateTime> datasExistentes = historicoExistente.stream()

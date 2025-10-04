@@ -2,9 +2,12 @@ package servico;
 
 import dados.Dados;
 import modelo.Cor;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import util.CorUtil;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -17,9 +20,9 @@ public class CorServico {
 
     public CorServico(Dados dados) {
         this.dados = dados;
-        inicializarCores();
     }
 
+    @PostConstruct
     public void inicializarCores() {
         if (dados.existeAlgum(Cor.class)) {
             return;
@@ -33,7 +36,6 @@ public class CorServico {
             dados.desfazerTransacao();
             throw new RuntimeException("Falha: não foi possível inicializar cores.");
         }
-
     }
 
     private void carregarCoresDoProperties() {
