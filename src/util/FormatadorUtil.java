@@ -46,7 +46,7 @@ public class FormatadorUtil {
         if (valor == null) {
             return " ";
         }
-        return String.format("%.2f", valor).replace('.', ',');
+        return String.format("%.8f", valor).replace('.', ',');
     }
 
     public static String formatarString(String texto, String mascara) {
@@ -75,19 +75,17 @@ public class FormatadorUtil {
     }
 
     public static String removerFormatacaoCpf(String cpf) {
-        if (cpf == null || cpf.trim().isEmpty()) {
-            return " ";
+        if (cpf != null && !cpf.trim().isEmpty()) {
+            return cpf.replaceAll("\\D", "");
         }
-
-        return cpf.replaceAll("\\D", "");
+        return " ";
     }
 
     public static String removerFormatacaoTelefone(String telefone) {
-        if (telefone == null || telefone.trim().isEmpty()) {
-            return " ";
+        if (telefone != null && !telefone.trim().isEmpty()) {
+            return telefone.replaceAll("\\D", "");
         }
-
-        return telefone.replaceAll("\\D", "");
+        return " ";
     }
 
     public static String formatarDataParaComparacao(LocalDateTime dataHora) {

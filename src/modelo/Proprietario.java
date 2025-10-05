@@ -2,6 +2,7 @@ package modelo;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import util.FormatadorUtil;
 
 import javax.persistence.*;
 import java.util.LinkedHashSet;
@@ -16,7 +17,6 @@ public class Proprietario {
     public static final String PONTOS_E_TRACOS = "\\D";
     public static final String ESPACO_EM_BRANCO = "";
 
-    public static final int QUANTIDADE_DIGITOS_SEM_NOVE_NO_COMECO = 10;
     public static final int QUANTIDADE_DIGITOS_COM_NOVE_NO_COMECO = 11;
 
     private Long id;
@@ -84,11 +84,6 @@ public class Proprietario {
     }
 
     @Transient
-    public int obterNumeroTotalPropriedades() {
-        return getPropriedades().size();
-    }
-
-    @Transient
     public static boolean validarTamanhoCpf(String cpf) {
         if (cpf == null || cpf.trim().isEmpty()) {
             return false;
@@ -114,12 +109,17 @@ public class Proprietario {
 
     @Transient
     public String getCpfFormatado() {
-        return util.FormatadorUtil.formatarCpf(this.cpf);
+        return FormatadorUtil.formatarCpf(this.cpf);
     }
 
     @Transient
     public String getTelefoneFormatado() {
-        return util.FormatadorUtil.formatarTelefone(this.telefone);
+        return FormatadorUtil.formatarTelefone(this.telefone);
+    }
+
+    @Transient
+    public int obterNumeroTotalPropriedades() {
+        return getPropriedades().size();
     }
 
 }

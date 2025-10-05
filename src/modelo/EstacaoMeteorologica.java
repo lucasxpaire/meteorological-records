@@ -100,7 +100,7 @@ public class EstacaoMeteorologica {
         setSituacao(dadosEstacao.get("CD_SITUACAO").asText());
         setTipoEstacao(dadosEstacao.get("TP_ESTACAO").asText());
         Ponto ponto = new Ponto(dadosEstacao.get("VL_LATITUDE").asDouble(), dadosEstacao.get("VL_LONGITUDE").asDouble());
-        ponto.setFusoHorario(ponto.obterFusoHorario());
+        ponto.setFusoHorario(ponto.determinarFusoHorario());
         setLocalizacao(ponto);
         setCodigoEstacao(dadosEstacao.get("CD_ESTACAO").asText());
         setEstado(dadosEstacao.get("SG_ESTADO").asText());

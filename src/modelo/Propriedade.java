@@ -1,6 +1,7 @@
 package modelo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import util.FormatadorUtil;
 
 import javax.persistence.*;
 
@@ -98,6 +99,12 @@ public class Propriedade {
     }
 
     @Transient
+    @JsonProperty("corNome")
+    public String obterNomeCor() {
+        return proprietario.getCor().getNome();
+    }
+
+    @Transient
     @JsonProperty("nomeProprietario")
     public String obterNomeProprietario() {
         return proprietario.getNome();
@@ -106,7 +113,7 @@ public class Propriedade {
     @Transient
     @JsonProperty("cpfProprietario")
     public String obterCpfProprietario() {
-        return proprietario.getCpf();
+        return FormatadorUtil.formatarCpf(proprietario.getCpf());
     }
 }
 

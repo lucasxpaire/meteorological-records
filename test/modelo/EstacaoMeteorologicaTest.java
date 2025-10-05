@@ -21,7 +21,7 @@ public class EstacaoMeteorologicaTest {
     }
 
     @Test
-    public void verificarJsonDeEstacaoMeteorologicaEspecifica() throws JsonProcessingException {
+    public void verificarJsonDeEstacaoMeteorologicaEspecificaPorCodigo() throws JsonProcessingException {
         EstacaoMeteorologica estacao = dados.buscarUnicoPorCampo(EstacaoMeteorologica.class, "codigoEstacao", "A803");
         ObjectMapper conversorJson = new ObjectMapper();
         conversorJson.findAndRegisterModules();

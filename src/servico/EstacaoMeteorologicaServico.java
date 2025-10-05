@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import dados.Dados;
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import util.*;
 
 import javax.annotation.PostConstruct;
@@ -33,7 +31,7 @@ public class EstacaoMeteorologicaServico {
 
     @PostConstruct
     public void inicializarEstacoesMeteorologicas() {
-        if (listarTodos().isEmpty()) {
+        if (listarTodas().isEmpty()) {
             List<String> urlsEstacoes = List.of(JsonUtil.URL_ESTACOES_MANUAIS, JsonUtil.URL_ESTACOES_AUTOMATICAS);
             for (String url : urlsEstacoes) {
                dados.iniciarTransacao();
@@ -69,13 +67,17 @@ public class EstacaoMeteorologicaServico {
         }
     }
 
+    public Double calcularRaioDeBuscaEmGraus(Ponto ponto) {
+        EstacaoMeteorologica estacaoMaisProxima = dados.buscarEstacaoMaisProximaComDados(ponto);
+        double raioDeBuscaMetros = Math.min(ponto.distanciaAte(estacaoMaisProxima.getLocalizacao()), LIMITE_RAIO_BUSCA);
+        return raioDeBuscaMetros / METROS_PARA_GRAU;
+    }
+
     public List<EstacaoMeteorologica> buscarEstacoesRelevantes(Ponto ponto) {
         try {
-            EstacaoMeteorologica estacaoMaisProxima = dados.buscarEstacaoMaisProximaComDados(ponto);
-            double raioDeBuscaMetros = Math.min(ponto.distanciaAte(estacaoMaisProxima.getLocalizacao()), LIMITE_RAIO_BUSCA);
-            double raioDeBuscaGraus = raioDeBuscaMetros / METROS_PARA_GRAU;
+            ponto.setRaioRelevancia(calcularRaioDeBuscaEmGraus(ponto));
 
-            List<EstacaoMeteorologica> estacoesNoRaio = buscarEstacoesDentroDoRaio(ponto, raioDeBuscaGraus);
+            List<EstacaoMeteorologica> estacoesNoRaio = buscarEstacoesDentroDoRaio(ponto, ponto.getRaioRelevancia());
             Map<Integer, List<EstacaoMeteorologica>> quadrantes = classificarEstacoesPorQuadrante(estacoesNoRaio, ponto);
 
             for (int quadrante = Ponto.PRIMEIRO_QUADRANTE; quadrante <= Ponto.QUARTO_QUADRANTE; quadrante++) {
@@ -112,7 +114,7 @@ public class EstacaoMeteorologicaServico {
         return dados.buscarEstacaoMaisProximaDoQuadrante(ponto, condicaoQuadrante);
     }
 
-    public List<EstacaoMeteorologica> listarTodos() {
+    public List<EstacaoMeteorologica> listarTodas() {
         return dados.listarTodos(EstacaoMeteorologica.class);
     }
 

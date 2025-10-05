@@ -31,6 +31,8 @@ public class Ponto {
     private static final int NUMERADOR_PESO_PROXIMIDADE = 1;
 
     private static final int RAIO_DA_TERRA_EM_METROS = 6371000;
+    private static final double GRAU_PARA_METROS = 111320.0;
+
     public static final String TEMPERATURA_INDISPONIVEL = "Indisponível";
 
     private Long id;
@@ -39,6 +41,7 @@ public class Ponto {
     private List<Temperatura> historicoTemperaturas = new ArrayList<>();
     private List<EstacaoMeteorologica> estacoesMeteorologicas = new ArrayList<>();
     private String fusoHorario;
+    private Double raioRelevancia;
 
     private static final TimeZoneEngine timeZoneEngine = TimeZoneEngine.initialize();
 
@@ -112,6 +115,15 @@ public class Ponto {
 
     public void setFusoHorario(String fusoHorario) {
         this.fusoHorario = fusoHorario;
+    }
+
+    @Column(name = "RAIO_RELEVANCIA")
+    public Double getRaioRelevancia() {
+        return raioRelevancia;
+    }
+
+    public void setRaioRelevancia(Double raioRelevancia) {
+        this.raioRelevancia = raioRelevancia;
     }
 
     @Transient
@@ -301,7 +313,41 @@ public class Ponto {
     }
 
     @Transient
-    public String obterCentroideFormatado() {
-        return FormatadorUtil.formatarPontoDecimalParaVirgula(latitude) + FormatadorUtil.formatarPontoDecimalParaVirgula(longitude);
+    @JsonProperty("temperaturaRecenteParaLabel")
+    public String obterTemperaturaRecenteParaLabel() {
+        if (historicoTemperaturas.isEmpty()) {
+            return TEMPERATURA_INDISPONIVEL;
+        }
+
+        Temperatura temperatura = getHistoricoTemperaturas().stream().max(Comparator.comparing(Temperatura::getDataHora))
+                .orElse(null);
+
+        if (temperatura == null || temperatura.getTemperaturaReal() == null) {
+            return TEMPERATURA_INDISPONIVEL;
+        }
+
+        return FormatadorUtil.formatarTemperatura(temperatura.getTemperaturaReal());
     }
+
+    @Transient
+    @JsonProperty("latitudeFormatada")
+    public String getLatitudeFormatada() {
+        return FormatadorUtil.formatarPontoDecimalParaVirgula(latitude);
+    }
+
+    @Transient
+    @JsonProperty("longitudeFormatada")
+    public String getLongitudeFormatada() {
+        return FormatadorUtil.formatarPontoDecimalParaVirgula(longitude);
+    }
+
+    @Transient
+    @JsonProperty("raioRelevanciaEmMetros")
+    public Double getRaioRelevanciaEmMetros() {
+        if (this.raioRelevancia == null) {
+            return null;
+        }
+        return this.raioRelevancia * GRAU_PARA_METROS;
+    }
+
 }
