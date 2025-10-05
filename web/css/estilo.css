@@ -275,10 +275,6 @@ body {
     border: 1px solid #C3E6CB;
 }
 
-.is-invalid {
-    border-color: #DC3545 !important;
-}
-
 .botao-tabela {
     padding: 6px 12px;
     border-radius: 4px;
