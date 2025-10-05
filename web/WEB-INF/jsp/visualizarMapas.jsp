@@ -25,19 +25,18 @@
             <div class="menu-flutuante-grupo" id="grupo-busca">
                 <tags:inputGenerico id="input-busca" label="Termo de Busca" type="text" />
                 <tags:botao id="botao-buscar" css="botao" label="Buscar" />
+                <div id="busca-alerta-falha" class="alerta-erro-formulario" style="display: none;">Falha: Nenhuma propriedade encontrada.</div>
             </div>
 
             <div class="menu-flutuante-grupo">
                 <label>Exibir Camadas:</label>
                 <tags:checkbox id="checkbox-estacoes" label="Estações Meteorológicas" css="checkbox-label" type="checkbox" checked="true" />
                 <tags:checkbox id="checkbox-centroides" label="Centroides das Propriedades" css="checkbox-label" type="checkbox" checked="true" />
-                <tags:checkbox id="checkbox-raio-relevancia" label="Raio de Relevância" css="checkbox-label" type="checkbox" checked="true" />
             </div>
 
             <div class="menu-flutuante-grupo">
                 <tags:botao id="botao-resetar-zoom" label="Centralizar Visualização" css="botao" />
             </div>
-
         </div>
     </div>
 
