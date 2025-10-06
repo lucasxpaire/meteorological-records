@@ -26,7 +26,7 @@
     </ul>
 
     <div class="menu-lateral-rodape">
-        <h3>2025 Gerenciamento De Propriedades</h3>
-        <span>Todos os direitos reservados</span>
+        <h3>2025 GeoPropriedades</h3>
+        <span>© Todos os direitos reservados</span>
     </div>
 </nav>
