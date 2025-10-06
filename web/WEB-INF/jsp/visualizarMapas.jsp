@@ -35,7 +35,7 @@
             </div>
 
             <div class="menu-flutuante-grupo">
-                <tags:botao id="botao-resetar-zoom" label="Centralizar Visualização" css="botao" />
+                <tags:botao id="botao-ajustar-zoom" label="Centralizar Visualização" css="botao" />
             </div>
         </div>
     </div>

@@ -8,12 +8,22 @@ let propriedades;
 let propriedadeMaisRecente;
 let estacoes;
 
+const CENTRO_PADRAO_MAPA_BRASIL = { lat: -12.173683701367969, lng: -52.03651393308807 };
+const CENTRO_PADRAO_LOCAL = { lat: -29.6842, lng: -53.8069 };
+
+const CRITERIOS_DE_BUSCA = {
+    TODAS: 'todas',
+    RECENTE: 'recente',
+    NOME: 'nome',
+    CPF: 'cpf'
+};
+
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         mapTypeId: google.maps.MapTypeId.TERRAIN,
         disableDefaultUI: true,
         zoomControl: true,
-        center: { lat: -12.173683701367969, lng: -52.03651393308807 },
+        center: CENTRO_PADRAO_MAPA_BRASIL,
         zoom: 4
     });
 
@@ -23,7 +33,7 @@ function initMap() {
     propriedades = JSON.parse(document.getElementById('dados-propriedades').textContent);
     propriedadeMaisRecente = JSON.parse(document.getElementById('dados-propriedade-recente').textContent);
 
-    criarMarcadoresEstacoes(estacoes);
+    criarElementosEstacoes(estacoes);
     criarElementosPropriedades(propriedades);
 
     configurarControlesMenu();
@@ -32,7 +42,28 @@ function initMap() {
 }
 document.addEventListener('DOMContentLoaded', initMap);
 
-function criarMarcadoresEstacoes(estacoes) {
+function filtrarPropriedades(criterio, valor) {
+    const valorBusca = valor ? valor.toLowerCase().trim() : '';
+
+    switch (criterio) {
+        case CRITERIOS_DE_BUSCA.TODAS:
+            return propriedades;
+        case CRITERIOS_DE_BUSCA.NOME:
+            if (!valorBusca) {
+                return [];
+            }
+            return propriedades.filter(prop => prop.nome.toLowerCase().includes(valorBusca));
+        case CRITERIOS_DE_BUSCA.CPF:
+            if (!valorBusca) return [];
+            return propriedades.filter(prop => prop.cpfProprietario.includes(valorBusca));
+        case CRITERIOS_DE_BUSCA.RECENTE:
+            return propriedadeMaisRecente ? [propriedadeMaisRecente] : [];
+        default:
+            return [];
+    }
+}
+
+function criarElementosEstacoes(estacoes) {
     estacoes.forEach(estacao => {
         const marcador = new google.maps.Marker({
             position: {
@@ -47,7 +78,6 @@ function criarMarcadoresEstacoes(estacoes) {
                 labelOrigin: new google.maps.Point(8, -4)
             },
         });
-
 
         const infoWindow = new google.maps.InfoWindow({
             content: `
@@ -99,7 +129,7 @@ function criarElementosPropriedades(propriedades) {
             strokeWeight: 2,
             fillColor: propriedade.corCodigoHexadecimal,
             fillOpacity: 0.15,
-            radius: 50
+            radius: 200
         })
 
         const raioDeRelevancia = new google.maps.Circle({
@@ -108,7 +138,7 @@ function criarElementosPropriedades(propriedades) {
             strokeColor: propriedade.corCodigoHexadecimal,
             strokeOpacity: 0.5,
             strokeWeight: 1,
-            fillOpacity: 0.0,
+            fillOpacity: 0.2,
             map: map,
             visible: false
         });
@@ -126,12 +156,24 @@ function criarElementosPropriedades(propriedades) {
             content: descricaoPropriedade
         });
 
+        let listaEstacoesHtml = '';
+        if (propriedade.centroide.estacoesMeteorologicas && propriedade.centroide.estacoesMeteorologicas.length > 0) {
+            const tituloLista = '<p><strong>Estações Associadas:</strong></p>';
+
+            const itensLista = propriedade.centroide.estacoesMeteorologicas.map(estacao => `<li><p><strong> ${estacao.nome} (${estacao.codigoEstacao}): ${estacao.localizacao.temperaturaRecente}</strong></p></li>`).join('');
+
+            const listaUl = `<ul class="info-window-lista-estacoes">${itensLista}</ul>`;
+
+            listaEstacoesHtml = tituloLista + listaUl;
+        }
+
         const descricaoCentroide = `
             <div class="info-window-conteudo">
                 <h3>Centróide</h3>
                 <p><strong>Latitude: ${propriedade.centroide.latitudeFormatada}</strong></p>
                 <p><strong>Longitude: ${propriedade.centroide.longitudeFormatada}</strong></p>
                 <p><strong>Temperatura: ${propriedade.centroide.temperaturaRecente}</strong></p>
+                ${listaEstacoesHtml}
             </div>
         `;
 
@@ -236,7 +278,7 @@ function configurarControlesMenu() {
 
     const checkboxEstacoes = document.getElementById('checkbox-estacoes');
     const checkboxCentroides = document.getElementById('checkbox-centroides');
-    const botaoResetarZoom = document.getElementById('botao-resetar-zoom');
+    const botaoAjustarVisualizacao  = document.getElementById('botao-ajustar-zoom');
 
     checkboxEstacoes.addEventListener('change', () => {
         const visivel = checkboxEstacoes.checked;
@@ -246,39 +288,18 @@ function configurarControlesMenu() {
         atualizarVisualizacao();
     });
 
-    checkboxCentroides.addEventListener('change', () => {
+    checkboxCentroides.addEventListener('mouseover', () => {
         const visivel = checkboxCentroides.checked;
         for (const id in elementosMapa.propriedades) {
             elementosMapa.propriedades[id].centroide.setVisible(visivel);
         }
     });
 
-    botaoResetarZoom.addEventListener('click', () => {
+    botaoAjustarVisualizacao .addEventListener('click', () => {
         const opcaoVisualizarPropriedades = document.getElementById('select-propriedade').value;
-        const inputBusca = document.getElementById('input-busca');
-        let propriedadesVisiveis = [];
+        const inputBusca = document.getElementById('input-busca').value;
 
-        switch (opcaoVisualizarPropriedades) {
-            case 'todas':
-                propriedadesVisiveis = propriedades;
-                break;
-            case 'nome':
-                const nomeBusca = inputBusca.value.toLowerCase();
-                propriedadesVisiveis = nomeBusca ? propriedades.filter(prop => prop.nome.toLowerCase().includes(nomeBusca)) : [];
-                break;
-            case 'cpf':
-                const cpfBusca = inputBusca.value;
-                propriedadesVisiveis = cpfBusca ? propriedades.filter(prop => prop.cpfProprietario.includes(cpfBusca)) : [];
-                break;
-            case 'recente':
-                if (propriedadeMaisRecente) {
-                    propriedadesVisiveis.push(propriedadeMaisRecente);
-                }
-                break;
-            default:
-                propriedadesVisiveis = propriedades;
-                break;
-        }
+        const propriedadesVisiveis = filtrarPropriedades(opcaoVisualizarPropriedades, inputBusca);
 
         const novosBounds = new google.maps.LatLngBounds();
 
@@ -299,7 +320,7 @@ function configurarControlesMenu() {
         if (!novosBounds.isEmpty()) {
             map.fitBounds(novosBounds);
         } else {
-            map.setCenter({ lat: -29.6842, lng: -53.8069 });
+            map.setCenter(CENTRO_PADRAO_LOCAL);
             map.setZoom(12);
         }
     });
@@ -310,7 +331,7 @@ function configurarControlesMenu() {
     selectTipoBusca.addEventListener('change', () => {
         campoBusca.value = '';
 
-        if (selectTipoBusca.value === 'cpf') {
+        if (selectTipoBusca.value === CRITERIOS_DE_BUSCA.CPF) {
             VMasker(campoBusca).maskPattern("999.999.999-99");
         } else {
             VMasker(campoBusca).unMask();
@@ -328,46 +349,14 @@ function atualizarVisualizacao() {
 
     avisoFalha.style.display = 'none';
 
-    if (opcaoVisualizarPropriedades === 'nome' || opcaoVisualizarPropriedades === 'cpf') {
+    if (opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.NOME || opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.CPF) {
         grupoBusca.style.display = 'block';
     } else {
         grupoBusca.style.display = 'none';
     }
 
-    let propriedadesVisiveis = [];
-    const buscaAtivaComTermo = (opcaoVisualizarPropriedades === 'nome' || opcaoVisualizarPropriedades === 'cpf') && inputBusca.value;
-
-
-    switch (opcaoVisualizarPropriedades) {
-        case 'todas':
-            propriedadesVisiveis = propriedades;
-            break;
-        case 'nome':
-            const nomeBusca = inputBusca.value.toLowerCase();
-            if (nomeBusca) {
-                propriedadesVisiveis = propriedades.filter(prop => prop.nome.toLowerCase().includes(nomeBusca));
-            } else {
-                propriedadesVisiveis = [];
-            }
-            break;
-        case 'cpf':
-            const cpfBusca = inputBusca.value;
-            if (cpfBusca) {
-                propriedadesVisiveis = propriedades.filter(prop => prop.cpfProprietario.includes(cpfBusca));
-            } else {
-                propriedadesVisiveis = [];
-            }
-            break;
-        case 'recente':
-            if (propriedadeMaisRecente) {
-                propriedadesVisiveis.push(propriedadeMaisRecente);
-            }
-            break;
-        default:
-            propriedadesVisiveis = propriedades;
-            break;
-    }
-
+    const propriedadesVisiveis = filtrarPropriedades(opcaoVisualizarPropriedades, inputBusca.value);
+    const buscaAtivaComTermo = (opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.NOME || opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.CPF) && inputBusca.value;
     if (buscaAtivaComTermo && propriedadesVisiveis.length === 0) {
         avisoFalha.style.display = 'block';
     }
