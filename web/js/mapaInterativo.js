@@ -11,12 +11,127 @@ let estacoes;
 const CENTRO_PADRAO_MAPA_BRASIL = { lat: -12.173683701367969, lng: -52.03651393308807 };
 const CENTRO_PADRAO_LOCAL = { lat: -29.6842, lng: -53.8069 };
 
+const EXIBIR = 'block';
+const OCULTAR = 'none';
+const CAMPO_VAZIO = '';
+
 const CRITERIOS_DE_BUSCA = {
     TODAS: 'todas',
     RECENTE: 'recente',
     NOME: 'nome',
     CPF: 'cpf'
 };
+
+function gerarHtmlEstacoesAssociadas(propriedade) {
+    let html = '';
+    if (propriedade.centroide.estacoesMeteorologicas && propriedade.centroide.estacoesMeteorologicas.length > 0) {
+        const tituloLista = '<p><strong>Estações Associadas:</strong></p>';
+        const itensLista = propriedade.centroide.estacoesMeteorologicas.map(estacao => `<li><p><strong> ${estacao.nome} (${estacao.codigoEstacao}): ${estacao.localizacao.temperaturaRecente}</strong></p></li>`).join('');
+        const listaUl = `<ul class="info-window-lista-estacoes">${itensLista}</ul>`;
+        html = tituloLista + listaUl;
+    }
+    return html;
+}
+
+function criarLinhasPontilhadasParaEstacoes(propriedade) {
+    const linhas = [];
+    if (propriedade.centroide.estacoesMeteorologicas) {
+        propriedade.centroide.estacoesMeteorologicas.forEach(estacao => {
+            const linha = new google.maps.Polyline({
+                path: [
+                    { lat: propriedade.centroide.latitude, lng: propriedade.centroide.longitude },
+                    { lat: estacao.localizacao.latitude, lng: estacao.localizacao.longitude }
+                ],
+                geodesic: true,
+                strokeColor: '#000000',
+                strokeOpacity: 0,
+                strokeWeight: 2,
+                icons: [{
+                    icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 4 },
+                    offset: '0',
+                    repeat: '20px'
+                }],
+                map: map,
+                visible: false
+            });
+            linhas.push(linha);
+        });
+    }
+    return linhas;
+}
+
+function mostrarLabelsEstacoesAssociadas(propriedade) {
+    if (propriedade.centroide.estacoesMeteorologicas) {
+        propriedade.centroide.estacoesMeteorologicas.forEach(estacaoAssociada => {
+            const estacaoElemento = elementosMapa.estacoes[estacaoAssociada.id];
+            if (estacaoElemento) {
+                estacaoElemento.marcador.setLabel({
+                    text: estacaoAssociada.localizacao.temperaturaRecenteParaLabel,
+                    color: '#ffffff',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                });
+            }
+        });
+    }
+}
+
+function esconderLabelsEstacoesAssociadas(propriedade) {
+    if (propriedade.centroide.estacoesMeteorologicas) {
+        propriedade.centroide.estacoesMeteorologicas.forEach(estacaoAssociada => {
+            const estacaoElemento = elementosMapa.estacoes[estacaoAssociada.id];
+            if (estacaoElemento) {
+                estacaoElemento.marcador.setLabel(null);
+            }
+        });
+    }
+}
+
+function esconderTodasAsPropriedades() {
+    for (const id in elementosMapa.propriedades) {
+        elementosMapa.propriedades[id].poligono.setMap(null);
+        elementosMapa.propriedades[id].centroide.setMap(null);
+    }
+}
+
+function atualizarVisibilidadeBusca(criterio) {
+    const grupoBusca = document.getElementById('grupo-busca');
+    if (criterio === CRITERIOS_DE_BUSCA.NOME || criterio === CRITERIOS_DE_BUSCA.CPF) {
+        grupoBusca.style.display = EXIBIR;
+    } else {
+        grupoBusca.style.display = OCULTAR;
+    }
+}
+
+function mostrarPropriedadesNoMapa(propriedadesParaMostrar, mostrarCentroides) {
+    propriedadesParaMostrar.forEach(prop => {
+        if (elementosMapa.propriedades[prop.id]) {
+            elementosMapa.propriedades[prop.id].poligono.setMap(map);
+            if (mostrarCentroides) {
+                elementosMapa.propriedades[prop.id].centroide.setMap(map);
+            }
+        }
+    });
+}
+
+function calcularNovosLimitesDoMapa(propriedadesVisiveis, mostrarEstacoes) {
+    const novosBounds = new google.maps.LatLngBounds();
+
+    if (propriedadesVisiveis.length > 0) {
+        propriedadesVisiveis.forEach(prop => {
+            const elemento = elementosMapa.propriedades[prop.id];
+            if (elemento && elemento.vertices) {
+                elemento.vertices.forEach(vertice => novosBounds.extend(vertice));
+            }
+        });
+    } else if (mostrarEstacoes) {
+        for (const id in elementosMapa.estacoes) {
+            const estacao = elementosMapa.estacoes[id];
+            novosBounds.extend({ lat: estacao.localizacao.latitude, lng: estacao.localizacao.longitude });
+        }
+    }
+    return novosBounds;
+}
 
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
@@ -43,7 +158,12 @@ function initMap() {
 document.addEventListener('DOMContentLoaded', initMap);
 
 function filtrarPropriedades(criterio, valor) {
-    const valorBusca = valor ? valor.toLowerCase().trim() : '';
+    let valorBusca;
+    if (!valor) {
+        valorBusca = CAMPO_VAZIO;
+    } else {
+        valorBusca = valor.toLowerCase().trim();
+    }
 
     switch (criterio) {
         case CRITERIOS_DE_BUSCA.TODAS:
@@ -54,10 +174,15 @@ function filtrarPropriedades(criterio, valor) {
             }
             return propriedades.filter(prop => prop.nome.toLowerCase().includes(valorBusca));
         case CRITERIOS_DE_BUSCA.CPF:
-            if (!valorBusca) return [];
+            if (!valorBusca) {
+                return [];
+            }
             return propriedades.filter(prop => prop.cpfProprietario.includes(valorBusca));
         case CRITERIOS_DE_BUSCA.RECENTE:
-            return propriedadeMaisRecente ? [propriedadeMaisRecente] : [];
+            if (!propriedadeMaisRecente) {
+                return [];
+            }
+            return [propriedadeMaisRecente];
         default:
             return [];
     }
@@ -66,10 +191,7 @@ function filtrarPropriedades(criterio, valor) {
 function criarElementosEstacoes(estacoes) {
     estacoes.forEach(estacao => {
         const marcador = new google.maps.Marker({
-            position: {
-                lat: estacao.localizacao.latitude,
-                lng: estacao.localizacao.longitude
-            },
+            position: { lat: estacao.localizacao.latitude, lng: estacao.localizacao.longitude },
             map: map,
             title: estacao.nome,
             icon: {
@@ -93,13 +215,8 @@ function criarElementosEstacoes(estacoes) {
             `
         });
 
-        marcador.addListener('mouseover', () => {
-            infoWindow.open(map, marcador);
-        });
-
-        marcador.addListener('mouseout', () => {
-            infoWindow.close();
-        });
+        marcador.addListener('mouseover', () => { infoWindow.open(map, marcador); });
+        marcador.addListener('mouseout', () => { infoWindow.close(); });
 
         elementosMapa.estacoes[estacao.id] = {
             marcador: marcador,
@@ -130,7 +247,7 @@ function criarElementosPropriedades(propriedades) {
             fillColor: propriedade.corCodigoHexadecimal,
             fillOpacity: 0.15,
             radius: 200
-        })
+        });
 
         const raioDeRelevancia = new google.maps.Circle({
             center: { lat: propriedade.centroide.latitude, lng: propriedade.centroide.longitude },
@@ -143,80 +260,39 @@ function criarElementosPropriedades(propriedades) {
             visible: false
         });
 
-        const descricaoPropriedade = `
-            <div class="info-window-conteudo">
-                <h3>Propriedade: ${propriedade.nome}</h3>
-                <p><strong>Proprietário: ${propriedade.nomeProprietario}</strong></p>
-                <p><strong>CPF: ${propriedade.cpfProprietario}</strong></p>
-                <p><strong>Cor: ${propriedade.corNome}</strong></p>
-            </div>
-        `;
-
         const infoWindowDescricaoPropriedade = new google.maps.InfoWindow({
-            content: descricaoPropriedade
+            content: `
+                <div class="info-window-conteudo">
+                    <h3>Propriedade: ${propriedade.nome}</h3>
+                    <p><strong>Proprietário: ${propriedade.nomeProprietario}</strong></p>
+                    <p><strong>CPF: ${propriedade.cpfProprietario}</strong></p>
+                    <p><strong>Cor: ${propriedade.corNome}</strong></p>
+                </div>
+            `
         });
-
-        let listaEstacoesHtml = '';
-        if (propriedade.centroide.estacoesMeteorologicas && propriedade.centroide.estacoesMeteorologicas.length > 0) {
-            const tituloLista = '<p><strong>Estações Associadas:</strong></p>';
-
-            const itensLista = propriedade.centroide.estacoesMeteorologicas.map(estacao => `<li><p><strong> ${estacao.nome} (${estacao.codigoEstacao}): ${estacao.localizacao.temperaturaRecente}</strong></p></li>`).join('');
-
-            const listaUl = `<ul class="info-window-lista-estacoes">${itensLista}</ul>`;
-
-            listaEstacoesHtml = tituloLista + listaUl;
-        }
 
         const descricaoCentroide = `
             <div class="info-window-conteudo">
                 <h3>Centróide</h3>
                 <p><strong>Latitude: ${propriedade.centroide.latitudeFormatada}</strong></p>
                 <p><strong>Longitude: ${propriedade.centroide.longitudeFormatada}</strong></p>
+                ${gerarHtmlEstacoesAssociadas(propriedade)}
                 <p><strong>Temperatura: ${propriedade.centroide.temperaturaRecente}</strong></p>
-                ${listaEstacoesHtml}
             </div>
         `;
 
-        const infoWindowDescricaoCentroide = new google.maps.InfoWindow({
-            content: descricaoCentroide
-        });
+        const infoWindowDescricaoCentroide = new google.maps.InfoWindow({ content: descricaoCentroide });
+
+        const linhasPontilhadas = criarLinhasPontilhadasParaEstacoes(propriedade);
 
         centroide.addListener('mouseover', event => {
             infoWindowDescricaoCentroide.setPosition(event.latLng);
             infoWindowDescricaoCentroide.open(map);
-        })
-
-        centroide.addListener('mouseout', function() {
-            infoWindowDescricaoCentroide.close();
         });
 
-        const linhasPontilhadas  = [];
-        if (propriedade.centroide.estacoesMeteorologicas) {
-            propriedade.centroide.estacoesMeteorologicas.forEach(estacao => {
-                const linha = new google.maps.Polyline({
-                    path: [
-                        { lat: propriedade.centroide.latitude, lng: propriedade.centroide.longitude},
-                        { lat: estacao.localizacao.latitude, lng: estacao.localizacao.longitude }
-                    ],
-                    geodesic: true,
-                    strokeColor: '#000000',
-                    strokeOpacity: 0,
-                    strokeWeight: 2,
-                    icons: [{
-                        icon: {
-                            path: 'M 0,-1 0,1',
-                            strokeOpacity: 1,
-                            scale: 4
-                        },
-                        offset: '0',
-                        repeat: '20px'
-                    }],
-                    map: map,
-                    visible: false
-                });
-                linhasPontilhadas.push(linha);
-            });
-        }
+        centroide.addListener('mouseout', () => {
+            infoWindowDescricaoCentroide.close();
+        });
 
         poligono.addListener('click', event => {
             infoWindowDescricaoPropriedade.setPosition(event.latLng);
@@ -226,48 +302,26 @@ function criarElementosPropriedades(propriedades) {
         poligono.addListener('mouseover', () => {
             raioDeRelevancia.setVisible(true);
             linhasPontilhadas.forEach(linha => linha.setVisible(true));
-
-            if (propriedade.centroide.estacoesMeteorologicas) {
-                propriedade.centroide.estacoesMeteorologicas.forEach(estacaoAssociada => {
-                    const estacaoElemento = elementosMapa.estacoes[estacaoAssociada.id];
-                    if (estacaoElemento) {
-                        estacaoElemento.marcador.setLabel({
-                            text: estacaoAssociada.localizacao.temperaturaRecenteParaLabel,
-                            color: '#ffffff',
-                            fontSize: '12px',
-                            fontWeight: 'bold',
-                        });
-                    }
-                });
-            }
-        })
+            mostrarLabelsEstacoesAssociadas(propriedade);
+        });
 
         poligono.addListener('mouseout', () => {
             raioDeRelevancia.setVisible(false);
-
             linhasPontilhadas.forEach(linha => linha.setVisible(false));
-
-            if (propriedade.centroide.estacoesMeteorologicas) {
-                propriedade.centroide.estacoesMeteorologicas.forEach(estacaoAssociada => {
-                    const estacaoElemento = elementosMapa.estacoes[estacaoAssociada.id];
-                    if (estacaoElemento) {
-                        estacaoElemento.marcador.setLabel(null);
-                    }
-                });
-            }
+            esconderLabelsEstacoesAssociadas(propriedade);
         });
 
         poligono.setMap(map);
         centroide.setMap(map);
 
         elementosMapa.propriedades[propriedade.id] = {
-            poligono: poligono,
-            centroide: centroide,
-            raioDeRelevancia: raioDeRelevancia,
-            linhasPontilhadas: linhasPontilhadas,
+            poligono,
+            centroide,
+            raioDeRelevancia,
+            linhasPontilhadas,
             infoWindow: infoWindowDescricaoPropriedade,
             infoWindowDescricaoCentroide,
-            vertices: vertices
+            vertices
         };
     });
 }
@@ -288,19 +342,19 @@ function configurarControlesMenu() {
         atualizarVisualizacao();
     });
 
-    checkboxCentroides.addEventListener('mouseover', () => {
+    checkboxCentroides.addEventListener('change', () => {
         const visivel = checkboxCentroides.checked;
         for (const id in elementosMapa.propriedades) {
-            elementosMapa.propriedades[id].centroide.setVisible(visivel);
+            if (elementosMapa.propriedades[id].poligono.getMap()) {
+                elementosMapa.propriedades[id].centroide.setVisible(visivel);
+            }
         }
     });
 
-    botaoAjustarVisualizacao .addEventListener('click', () => {
+    botaoAjustarVisualizacao.addEventListener('click', () => {
         const opcaoVisualizarPropriedades = document.getElementById('select-propriedade').value;
         const inputBusca = document.getElementById('input-busca').value;
-
         const propriedadesVisiveis = filtrarPropriedades(opcaoVisualizarPropriedades, inputBusca);
-
         const novosBounds = new google.maps.LatLngBounds();
 
         if (propriedadesVisiveis.length > 0) {
@@ -330,7 +384,6 @@ function configurarControlesMenu() {
 
     selectTipoBusca.addEventListener('change', () => {
         campoBusca.value = '';
-
         if (selectTipoBusca.value === CRITERIOS_DE_BUSCA.CPF) {
             VMasker(campoBusca).maskPattern("999.999.999-99");
         } else {
@@ -341,57 +394,29 @@ function configurarControlesMenu() {
 
 function atualizarVisualizacao() {
     const opcaoVisualizarPropriedades = document.getElementById('select-propriedade').value;
-    const inputBusca = document.getElementById('input-busca');
-    const grupoBusca = document.getElementById('grupo-busca');
+    const inputBusca = document.getElementById('input-busca').value;
     const mostrarEstacoes = document.getElementById('checkbox-estacoes').checked;
-    const avisoFalha = document.getElementById('busca-alerta-falha');
+    const alertaFalha = document.getElementById('busca-alerta-falha');
     const mostrarCentroides = document.getElementById('checkbox-centroides').checked;
 
-    avisoFalha.style.display = 'none';
+    alertaFalha.style.display = OCULTAR;
 
-    if (opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.NOME || opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.CPF) {
-        grupoBusca.style.display = 'block';
-    } else {
-        grupoBusca.style.display = 'none';
-    }
+    atualizarVisibilidadeBusca(opcaoVisualizarPropriedades);
 
-    const propriedadesVisiveis = filtrarPropriedades(opcaoVisualizarPropriedades, inputBusca.value);
-    const buscaAtivaComTermo = (opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.NOME || opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.CPF) && inputBusca.value;
+    const propriedadesVisiveis = filtrarPropriedades(opcaoVisualizarPropriedades, inputBusca);
+    const buscaAtivaComTermo = (opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.NOME || opcaoVisualizarPropriedades === CRITERIOS_DE_BUSCA.CPF) && inputBusca;
     if (buscaAtivaComTermo && propriedadesVisiveis.length === 0) {
-        avisoFalha.style.display = 'block';
+        alertaFalha.style.display = EXIBIR;
     }
 
-    for (const id in elementosMapa.propriedades) {
-        elementosMapa.propriedades[id].poligono.setMap(null);
-        elementosMapa.propriedades[id].centroide.setMap(null);
-    }
+    esconderTodasAsPropriedades();
 
-    propriedadesVisiveis.forEach(prop => {
-        if (elementosMapa.propriedades[prop.id]) {
-            elementosMapa.propriedades[prop.id].poligono.setMap(map);
-            if (mostrarCentroides) {
-                elementosMapa.propriedades[prop.id].centroide.setMap(map);
-            }
-        }
-    });
+    mostrarPropriedadesNoMapa(propriedadesVisiveis, mostrarCentroides);
 
-    const novosBounds = new google.maps.LatLngBounds();
-
-    if (propriedadesVisiveis.length > 0) {
-        propriedadesVisiveis.forEach(prop => {
-            const elemento = elementosMapa.propriedades[prop.id];
-            if (elemento && elemento.vertices) {
-                elemento.vertices.forEach(vertice => novosBounds.extend(vertice));
-            }
-        });
-    } else if (mostrarEstacoes) {
-        for (const id in elementosMapa.estacoes) {
-            const estacao = elementosMapa.estacoes[id];
-            novosBounds.extend({lat: estacao.localizacao.latitude, lng: estacao.localizacao.longitude});
-        }
-    }
+    const novosBounds = calcularNovosLimitesDoMapa(propriedadesVisiveis, mostrarEstacoes);
 
     if (!novosBounds.isEmpty()) {
         map.fitBounds(novosBounds);
     }
+
 }
