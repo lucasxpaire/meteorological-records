@@ -140,10 +140,6 @@ public class PropriedadeServico {
         return dados.existeAlgum(Propriedade.class);
     }
 
-    public boolean existeComEsseNome(String nome) {
-        return dados.existeAlgumComEsseCampo(Propriedade.class, "nome", nome);
-    }
-
     private boolean validarPropriedade(Propriedade propriedade) {
         return propriedade != null && propriedade.getNome() != null && propriedade.getPoligono() != null && propriedade.getProprietario() != null;
     }

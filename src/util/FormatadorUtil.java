@@ -1,21 +1,13 @@
 package util;
 
-import modelo.Ponto;
-
 import javax.swing.text.MaskFormatter;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-
-import static util.LeitorArquivoUtil.CABECALHO_POLIGONOS_CSV;
-import static util.LeitorArquivoUtil.DUAS_COLUNAS;
 
 public class FormatadorUtil {
 
     public static final DateTimeFormatter FORMATADOR_DATAHORA_PARA_EXIBICAO_MAPA = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
-
-    public static final DateTimeFormatter FORMATADOR_DATA_PADRAO = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_EXIBICAO = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
     
@@ -29,17 +21,6 @@ public class FormatadorUtil {
 
     public static Double StringParaDouble(String valor) {
         return Double.parseDouble(valor.trim().replace(",", "."));
-    }
-
-    public static Ponto StringParaPonto(String linha, int numeroLinha) {
-        String[] partes = linha.split(";");
-        if (partes.length != DUAS_COLUNAS) {
-            throw new IllegalArgumentException("Linha " + numeroLinha + " do arquivo. Só deve existir duas colunas no formato: " + CABECALHO_POLIGONOS_CSV);
-        }
-        Ponto ponto = new Ponto();
-        ponto.setLatitude(FormatadorUtil.StringParaDouble(partes[0]));
-        ponto.setLongitude(FormatadorUtil.StringParaDouble(partes[1]));
-        return ponto;
     }
 
     public static String formatarPontoDecimalParaVirgula(Double valor) {
@@ -105,10 +86,4 @@ public class FormatadorUtil {
         return hora.replace(" UTC", "").trim();
     }
 
-    static String formatarCoordenadaParaExibicao(Double valor) {
-        if (valor == null) {
-            return "";
-        }
-        return String.format(Locale.US, "%.8f", valor).replace('.', ',');
-    }
 }

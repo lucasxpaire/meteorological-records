@@ -117,9 +117,4 @@ public class Proprietario {
         return FormatadorUtil.formatarTelefone(this.telefone);
     }
 
-    @Transient
-    public int obterNumeroTotalPropriedades() {
-        return getPropriedades().size();
-    }
-
 }

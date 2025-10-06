@@ -101,6 +101,7 @@ public class Dados {
         }
     }
 
+
     public <T> boolean existeAlgum(Class<T> classe) {
         Long count = entityManager.createQuery("SELECT COUNT(e) FROM " + classe.getSimpleName() + " e", Long.class).getSingleResult();
         return count > 0;
@@ -115,7 +116,8 @@ public class Dados {
 
     public <T> List<T> buscarComCampoNaoVazio(Class<T> classe, String campo) {
         try {
-            return entityManager.createQuery("SELECT e FROM " + classe.getSimpleName() + " e WHERE e." + campo + " IS EMPTY", classe).getResultList();
+            return entityManager.createQuery("SELECT e FROM " + classe.getSimpleName() + " e WHERE e." + campo + " IS EMPTY", classe)
+                    .getResultList();
         } catch (PersistenceException e) {
             throw new RuntimeException("Não foi possível listar as entidades: " + classe.getSimpleName(), e);
         }

@@ -2,9 +2,7 @@ package servico;
 
 import dados.Dados;
 import modelo.Cor;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import util.CorUtil;
 
 import javax.annotation.PostConstruct;

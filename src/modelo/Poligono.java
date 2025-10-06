@@ -107,11 +107,7 @@ public class Poligono {
         double orientacaoInicioArestaA = calcularOrientacaoGeometrica(inicioArestaB, fimArestaB, inicioArestaA);
         double orientacaoFimArestaA = calcularOrientacaoGeometrica(inicioArestaB, fimArestaB, fimArestaA);
 
-        if (orientacaoInicioArestaB * orientacaoFimArestaB < PRODUTO_ORIENTACAO_OPOSTAS && orientacaoInicioArestaA * orientacaoFimArestaA < 0) {
-            return true;
-        }
-
-        return false;
+        return orientacaoInicioArestaB * orientacaoFimArestaB < PRODUTO_ORIENTACAO_OPOSTAS && orientacaoInicioArestaA * orientacaoFimArestaA < 0;
     }
 
     @Transient

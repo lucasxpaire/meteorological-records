@@ -1,8 +1,5 @@
 package util;
 
-import modelo.Cor;
-
-import java.util.List;
 import java.util.Map;
 
 public class CorUtil {
@@ -39,26 +36,4 @@ public class CorUtil {
             Map.entry("TO", "AzulMarinho")
     );
 
-    public static void exibirCoresDisponiveis(List<Cor> coresDisponiveis) {
-        if (coresDisponiveis.isEmpty()) {
-            throw new IllegalArgumentException("Nenhuma cor disponível");
-        }
-
-        EscritorUtil.escreverEmNovaLinha("Cores disponíveis:");
-        for (int i = 0; i < coresDisponiveis.size(); i++) {
-            EscritorUtil.escreverEmNovaLinha((i + 1) + ". " + coresDisponiveis.get(i).getNome());
-        }
-    }
-
-    public static Cor obterCorPorEscolha(List<Cor> coresDisponiveis, int escolha) {
-        if (coresDisponiveis.isEmpty()) {
-            throw new IllegalArgumentException("Nenhuma cor disponível");
-        }
-
-        if (escolha < 1 || escolha > coresDisponiveis.size()) {
-            throw new IllegalArgumentException("Escolha inválida. Deve ser entre 1 e " + coresDisponiveis.size());
-        }
-
-        return coresDisponiveis.get(escolha - 1);
-    }
 }

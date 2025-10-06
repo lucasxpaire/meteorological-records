@@ -48,20 +48,19 @@ function criarMarcadoresEstacoes(estacoes) {
             },
         });
 
-        const conteudoInfoWindow = `
-            <div class="info-window-conteudo">
-                <h3>Estação Meteorológica: ${estacao.nome}</h3>
-                <p><strong>Latitude: ${estacao.localizacao.latitudeFormatada}</strong></p>
-                <p><strong>Longitude: ${estacao.localizacao.longitudeFormatada}</strong></p>
-                <p><strong>Código: ${estacao.codigoEstacao}</strong></p>
-                <p><strong>Situação: ${estacao.situacao}</strong></p>
-                <p><strong>Tipo: ${estacao.tipoEstacao}</strong></p>
-                <p><strong>Temperatura: ${estacao.localizacao.temperaturaRecente}</strong></p>
-            </div>
-        `;
 
         const infoWindow = new google.maps.InfoWindow({
-            content: conteudoInfoWindow
+            content: `
+                <div class="info-window-conteudo">
+                    <h3>Estação Meteorológica: ${estacao.nome}</h3>
+                    <p><strong>Latitude: ${estacao.localizacao.latitudeFormatada}</strong></p>
+                    <p><strong>Longitude: ${estacao.localizacao.longitudeFormatada}</strong></p>
+                    <p><strong>Código: ${estacao.codigoEstacao}</strong></p>
+                    <p><strong>Situação: ${estacao.situacao}</strong></p>
+                    <p><strong>Tipo: ${estacao.tipoEstacao}</strong></p>
+                    <p><strong>Temperatura: ${estacao.localizacao.temperaturaRecente}</strong></p>
+                </div>
+            `
         });
 
         marcador.addListener('mouseover', () => {

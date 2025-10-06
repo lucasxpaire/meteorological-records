@@ -25,4 +25,5 @@ public class PontoTest {
         String pontoJson = conversorJson.writerWithDefaultPrettyPrinter().writeValueAsString(ponto);
         System.out.println(pontoJson);
     }
+
 }
