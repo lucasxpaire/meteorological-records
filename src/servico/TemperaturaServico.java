@@ -5,6 +5,7 @@ import dados.Dados;
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
 import modelo.Temperatura;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import smile.timeseries.AR;
 import util.EscritorUtil;
@@ -41,15 +42,13 @@ public class TemperaturaServico {
     private static final int DIA_BISSEXTO = 29;
     private static final int DIA_NAO_BISSEXTO = 28;
 
-    private final Dados dados;
-    private final EstacaoMeteorologicaServico estacaoMeteorologicaServico;
+    @Autowired
+    private Dados dados;
+
+    @Autowired
+    private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
     private final ScheduledExecutorService agendador = Executors.newSingleThreadScheduledExecutor();
-
-    public TemperaturaServico(Dados dados, EstacaoMeteorologicaServico estacaoMeteorologicaServico) {
-        this.dados = dados;
-        this.estacaoMeteorologicaServico = estacaoMeteorologicaServico;
-    }
 
     @PostConstruct
     public void inicializarServicos() {

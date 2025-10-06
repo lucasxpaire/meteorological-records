@@ -1,7 +1,6 @@
 package modelo;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import util.FormatadorUtil;
 
 import javax.persistence.*;
@@ -10,7 +9,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "PROPRIETARIO")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Proprietario {
 
     public static final int QUANTIDADE_DIGITOS_VALIDOS_CPF = 11;
@@ -74,6 +72,7 @@ public class Proprietario {
         this.cor = corProprietario;
     }
 
+    @JsonIgnore
     @OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL, orphanRemoval = true)
     public Set<Propriedade> getPropriedades() {
         return propriedades;

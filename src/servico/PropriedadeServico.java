@@ -130,6 +130,8 @@ public class PropriedadeServico {
 
     public void deletar(Propriedade propriedade) {
         if (validarPropriedade(propriedade)) {
+            propriedade.getCentroide().getHistoricoTemperaturas().clear();
+            propriedade.getPoligono().getPontos().clear();
             dados.deletar(propriedade);
         } else {
             throw new IllegalArgumentException("Dados da propriedade são inválidos.");

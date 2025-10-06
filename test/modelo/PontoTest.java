@@ -2,16 +2,12 @@ package modelo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dados.Dados;
 import org.junit.Test;
-import servico.CorServico;
 import servico.EstacaoMeteorologicaServico;
 
 public class PontoTest {
 
-    private final Dados dados = new Dados();
-    private final CorServico corServico = new CorServico(dados);
-    private final EstacaoMeteorologicaServico estacaoMeteorologicaServico = new EstacaoMeteorologicaServico(dados, corServico);
+    private final EstacaoMeteorologicaServico estacaoMeteorologicaServico = new EstacaoMeteorologicaServico();
 
     @Test
     public void gerarFusoHorario() throws JsonProcessingException {

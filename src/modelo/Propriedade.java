@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import util.FormatadorUtil;
 
 import javax.persistence.*;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "PROPRIEDADE")

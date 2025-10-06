@@ -1,10 +1,7 @@
 package modelo;
 
-
-import dados.Dados;
 import org.junit.Test;
-import servico.CorServico;
-import servico.EstacaoMeteorologicaServico;
+
 import servico.TemperaturaServico;
 import util.FormatadorUtil;
 
@@ -15,10 +12,8 @@ public class TemperaturaTest {
 
     public static final double LATITUDE = -29.689734243074223;
     public static final double LONGITUDE = -53.78460970215507;
-    private final Dados dados = new Dados();
-    private final CorServico corServico = new CorServico(dados);
-    private final EstacaoMeteorologicaServico estacaoMeteorologicaServico = new EstacaoMeteorologicaServico(dados, corServico);
-    private final TemperaturaServico temperaturaServico = new TemperaturaServico(dados, estacaoMeteorologicaServico);
+
+    private final TemperaturaServico temperaturaServico = new TemperaturaServico();
 
     @Test
     public void gerarPrevisaoTemperatura() {

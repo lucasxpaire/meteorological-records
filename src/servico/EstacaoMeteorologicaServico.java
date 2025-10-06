@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import dados.Dados;
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import util.*;
 
@@ -21,13 +22,11 @@ public class EstacaoMeteorologicaServico {
     private static final double METROS_PARA_GRAU = 111320.0;
     private static final int LIMITE_RAIO_BUSCA = 100000;
 
-    private final Dados dados;
-    private final CorServico corServico;
+    @Autowired
+    private Dados dados;
 
-    public EstacaoMeteorologicaServico(Dados dados, CorServico corServico) {
-        this.dados = dados;
-        this.corServico = corServico;
-    }
+    @Autowired
+    private CorServico corServico;
 
     @PostConstruct
     public void inicializarEstacoesMeteorologicas() {

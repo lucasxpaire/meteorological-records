@@ -14,9 +14,7 @@ import static util.FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV;
 
 public class LeitorArquivoUtil {
 
-    public static final Set<String> CABECALHO_POLIGONOS_CSV = Set.of("latitude;longitude", "lat;long", "y;x");
     public static final Set<String> CABECALHO_VALIDO_DADOS_HISTORICOS = Set.of("Data;Hora UTC;PRECIPITAÇÃO TOTAL, HORÁRIO (mm);PRESSAO ATMOSFERICA AO NIVEL DA ESTACAO, HORARIA (mB);PRESSÃO ATMOSFERICA MAX.NA HORA ANT. (AUT) (mB);PRESSÃO ATMOSFERICA MIN. NA HORA ANT. (AUT) (mB);RADIACAO GLOBAL (Kj/m²);TEMPERATURA DO AR - BULBO SECO, HORARIA (°C);TEMPERATURA DO PONTO DE ORVALHO (°C);TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C);TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C);TEMPERATURA ORVALHO MAX. NA HORA ANT. (AUT) (°C);TEMPERATURA ORVALHO MIN. NA HORA ANT. (AUT) (°C);UMIDADE REL. MAX. NA HORA ANT. (AUT) (%);UMIDADE REL. MIN. NA HORA ANT. (AUT) (%);UMIDADE RELATIVA DO AR, HORARIA (%);VENTO, DIREÇÃO HORARIA (gr) (° (gr));VENTO, RAJADA MAXIMA (m/s);VENTO, VELOCIDADE HORARIA (m/s);");
-    public static final int DUAS_COLUNAS = 2;
 
     public static final int INTERVALO_DE_COMECO_DIA = 0;
     public static final String[] ANOS_VALIDOS = new String[]{"2020", "2021", "2022", "2023", "2024", "2025"};
@@ -122,6 +120,10 @@ public class LeitorArquivoUtil {
                         colunaTemperatura = colunas[idxTemp];
                     } else {
                         colunaTemperatura = null;
+                    }
+
+                    if (dataEsperadaDoArquivoAtual == null) {
+                        continue;
                     }
 
                     if (dataEsperadaDoArquivoAtual.contains(colunaData) && horaDeBusca.contains(colunaHora)) {

@@ -4,6 +4,7 @@ import dados.Dados;
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
 import modelo.Temperatura;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,13 +12,11 @@ import java.util.List;
 @Service
 public class PontoServico {
 
-    private final Dados dados;
-    private final EstacaoMeteorologicaServico estacaoMeteorologicaServico;
+    @Autowired
+    private Dados dados;
 
-    public PontoServico(Dados dados, EstacaoMeteorologicaServico estacaoMeteorologicaServico) {
-        this.dados = dados;
-        this.estacaoMeteorologicaServico = estacaoMeteorologicaServico;
-    }
+    @Autowired
+    private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
     public void calcularEAdicionarTemperaturaAtual(Ponto ponto) {
         List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
