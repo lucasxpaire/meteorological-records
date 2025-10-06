@@ -2,10 +2,11 @@ package modelo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import util.FormatadorUtil;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "TEMPERATURA")
@@ -80,4 +81,45 @@ public class Temperatura {
         this.ponto = ponto;
     }
 
+    @Transient
+    @JsonProperty("temperaturaFormatada")
+    public String getTemperaturaFormatada() {
+        if (this.temperaturaReal != null) {
+            String temperaturaFormatada = FormatadorUtil.formatarTemperatura(temperaturaReal);
+            String dataFormatada = dataHora.format(FormatadorUtil.FORMATADOR_DATAHORA_PARA_EXIBICAO_MAPA);
+
+            return String.format("<span class='temperatura-destaque'>%s</span> (%s)", temperaturaFormatada, dataFormatada);
+        }
+        if (this.temperaturaPrevista != null) {
+            String temperaturaFormatada = FormatadorUtil.formatarTemperatura(temperaturaPrevista);
+            String dataFormatada = dataHora.format(FormatadorUtil.FORMATADOR_DATAHORA_PARA_EXIBICAO_MAPA);
+
+            return String.format("<span class='temperatura-destaque'>%s (Prevista)</span> (%s)", temperaturaFormatada, dataFormatada);
+        }
+        return "Indisponível";
+    }
+
+    @Transient
+    @JsonProperty("latitudeFormatada")
+    public String getLatitudeFormatada() {
+        return this.ponto.getLatitudeFormatada();
+    }
+
+    @Transient
+    @JsonProperty("longitudeFormatada")
+    public String getLongitudeFormatada() {
+        return this.ponto.getLongitudeFormatada();
+    }
+
+    @Transient
+    @JsonProperty("latitude")
+    public Double getLatitude() {
+        return this.ponto.getLatitude();
+    }
+
+    @Transient
+    @JsonProperty("longitude")
+    public Double getLongitude() {
+        return this.ponto.getLongitude();
+    }
 }

@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 @Service
 public class TemperaturaServico {
 
-    public static final long ATRASO_INICIAL_PARA_EXECUCAO = 1L;
+    public static final long ATRASO_INICIAL_PARA_EXECUCAO = 0L;
     public static final long INTERVALO_PARA_EXECUTAR = 24L;
     public static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
 
@@ -54,7 +54,7 @@ public class TemperaturaServico {
     @PostConstruct
     public void inicializarServicos() {
         popularHistoricosIniciaisSeNecessario();
-        //iniciarRotinaDeAtualizacaoAutomatica();
+        iniciarRotinaDeAtualizacaoAutomatica();
     }
 
     public void iniciarRotinaDeAtualizacaoAutomatica() {

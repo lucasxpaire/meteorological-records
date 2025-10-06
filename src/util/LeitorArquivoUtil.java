@@ -1,12 +1,11 @@
 package util;
 
 import modelo.EstacaoMeteorologica;
-import modelo.Ponto;
 import modelo.Temperatura;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,99 +18,49 @@ public class LeitorArquivoUtil {
     public static final Set<String> CABECALHO_VALIDO_DADOS_HISTORICOS = Set.of("Data;Hora UTC;PRECIPITAÇÃO TOTAL, HORÁRIO (mm);PRESSAO ATMOSFERICA AO NIVEL DA ESTACAO, HORARIA (mB);PRESSÃO ATMOSFERICA MAX.NA HORA ANT. (AUT) (mB);PRESSÃO ATMOSFERICA MIN. NA HORA ANT. (AUT) (mB);RADIACAO GLOBAL (Kj/m²);TEMPERATURA DO AR - BULBO SECO, HORARIA (°C);TEMPERATURA DO PONTO DE ORVALHO (°C);TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C);TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C);TEMPERATURA ORVALHO MAX. NA HORA ANT. (AUT) (°C);TEMPERATURA ORVALHO MIN. NA HORA ANT. (AUT) (°C);UMIDADE REL. MAX. NA HORA ANT. (AUT) (%);UMIDADE REL. MIN. NA HORA ANT. (AUT) (%);UMIDADE RELATIVA DO AR, HORARIA (%);VENTO, DIREÇÃO HORARIA (gr) (° (gr));VENTO, RAJADA MAXIMA (m/s);VENTO, VELOCIDADE HORARIA (m/s);");
     public static final int DUAS_COLUNAS = 2;
 
-    public static final String CAMINHO_PASTA_RESOURCES = "resources/";
-    public static final String CAMINHO_PASTA_DADOS_HISTORICOS = "resources/dadosHistoricos/";
-    public static final int PRIMEIRA_LINHA = 1;
     public static final int INTERVALO_DE_COMECO_DIA = 0;
     public static final String[] ANOS_VALIDOS = new String[]{"2020", "2021", "2022", "2023", "2024", "2025"};
     public static final int TAMANHO_DATA_SEM_ANO = 6;
     public static final int NENHUM_ARQUIVO = 0;
 
-    public static String obterCaminhoArquivoDePontos() {
-        File pasta = new File(LeitorArquivoUtil.CAMINHO_PASTA_RESOURCES);
-        File[] arquivosCsv = pasta.listFiles((dir, name) -> name.toLowerCase().endsWith(".csv"));
-
-        if (arquivosCsv == null || arquivosCsv.length == 0) {
-            EscritorUtil.escreverEmNovaLinha("Falha: Nenhum arquivo CSV encontrado.");
-            return null;
-        }
-
-        EscritorUtil.escreverEmNovaLinha("Arquivos CSV disponíveis:");
-        for (int i = 0; i < arquivosCsv.length; i++) {
-            EscritorUtil.escreverEmNovaLinha((i + 1) + ". " + arquivosCsv[i].getName());
-        }
-
-        int escolha = LeitorUtil.lerInteiroComIntervalo("Escolha entre (" + 1 + "-" + arquivosCsv.length + "): " , 1, arquivosCsv.length);
-        return arquivosCsv[escolha - 1].getName();
-    }
-
-    static List<Ponto> lerPontosDoCSV(String caminhoArquivo) {
-        List<Ponto> pontos = new ArrayList<>();
-
-        try (Scanner arquivoCSV = new Scanner(new File(CAMINHO_PASTA_RESOURCES + caminhoArquivo))) {
-            int contadorLinhaAtual = PRIMEIRA_LINHA;
-
-            while (arquivoCSV.hasNextLine()) {
-                String linhaAtualArquivo = arquivoCSV.nextLine().trim();
-
-                if (CABECALHO_POLIGONOS_CSV.contains(linhaAtualArquivo)) {
-                    continue;
-                }
-
-                if (linhaAtualArquivo.isEmpty()) {
-                    continue;
-                }
-
-                if (linhaAtualArquivo.contains(".")) {
-                    throw new IllegalArgumentException("Formato inválido esperado, use ponto para separador decimal.");
-                }
-
-                try {
-                    contadorLinhaAtual++;
-                    Ponto ponto = FormatadorUtil.StringParaPonto(linhaAtualArquivo, contadorLinhaAtual);
-                    if (Ponto.validarLatitude(ponto.getLatitude()))  {
-                        if (Ponto.validarLongitude(ponto.getLongitude())) {
-                            pontos.add(ponto);
-                        } else {
-                            throw new IllegalArgumentException("longitude inválida. Digite um valor válido entre o intervalo -180 a 180 na linha: " + contadorLinhaAtual);
-                        }
-                    } else {
-                        throw new IllegalArgumentException("latitude inválida. Digite um valor válido entre o intervalo -90 a 90 na linha: " + contadorLinhaAtual);
-                    }
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Coordenadas inválidas na linha: " + contadorLinhaAtual);
-                }
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException("Não foi possível ler o arquivo CSV.");
-        }
-
-        if (pontos.isEmpty()) {
-            throw new IllegalArgumentException("Nenhum ponto encontrado no arquivo CSV.");
-        }
-
-        return pontos;
-    }
-
     public static List<String> listarCaminhosArquivosTemperaturasHistoricas(String codigoEstacao) {
-        File pastaRaiz = new File(CAMINHO_PASTA_DADOS_HISTORICOS);
+        try {
+            ClassLoader classLoader = LeitorArquivoUtil.class.getClassLoader();
+            URL resourceUrl = classLoader.getResource("dadosHistoricos");
 
-        List<String> caminhos = new ArrayList<>();
-        File[] subpastas = pastaRaiz.listFiles(File::isDirectory);
-
-        for (File subpasta : subpastas) {
-            File[] arquivos = subpasta.listFiles((dir, name) -> name.contains(codigoEstacao));
-            if (arquivos != null && arquivos.length > NENHUM_ARQUIVO) {
-                caminhos.add(arquivos[0].getPath());
+            if (resourceUrl == null) {
+                throw new IllegalArgumentException("Pasta de dados históricos não encontrada no classpath: dadosHistoricos/");
             }
-        }
 
-        if (caminhos.isEmpty()) {
-            throw new RuntimeException("Não foi encontrado nenhum arquivo de temperaturas históricas com o código de estação: " + codigoEstacao);
-        }
+            File pastaRaiz = new File(resourceUrl.toURI());
 
-        return caminhos;
+            if (!pastaRaiz.exists()) {
+                throw new IllegalArgumentException("Pasta de dados históricos não encontrada: " + pastaRaiz.getAbsolutePath());
+            }
+
+            List<String> caminhos = new ArrayList<>();
+            File[] subpastas = pastaRaiz.listFiles(File::isDirectory);
+
+            if (subpastas == null) {
+                return caminhos;
+            }
+
+            for (File subpasta : subpastas) {
+                File[] arquivos = subpasta.listFiles((dir, name) -> name.contains(codigoEstacao));
+                if (arquivos != null && arquivos.length > NENHUM_ARQUIVO) {
+                    caminhos.add(arquivos[0].getPath());
+                }
+            }
+
+            if (caminhos.isEmpty()) {
+                throw new RuntimeException("Não foi encontrado nenhum arquivo de temperaturas históricas com o código de estação: " + codigoEstacao);
+            }
+
+            return caminhos;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Falha: Não foi possível acessar pasta de dados históricos.");
+        }
     }
 
     public static List<Temperatura> lerTemperaturasHistoricasCsv(String dataDeBusca, String horaDeBusca, EstacaoMeteorologica estacaoMeteorologica) {
