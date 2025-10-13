@@ -2,8 +2,11 @@ package web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import modelo.Ponto;
 import modelo.Propriedade;
+import modelo.Temperatura;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -11,11 +14,13 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import servico.EstacaoMeteorologicaServico;
+import servico.PontoServico;
 import servico.PropriedadeServico;
 import servico.TemperaturaServico;
 import web.command.ControleMapaCommand;
 import web.validator.ControleMapaValidator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +45,11 @@ public class MapaController {
     private TemperaturaServico temperaturaServico;
 
     @Autowired
+    private PontoServico pontoServico;
+
+    @Autowired
     private ControleMapaValidator controleMapaValidator;
+
 
     @InitBinder("ControleMapaCommand")
     public void initBinder(WebDataBinder binder) {
@@ -91,48 +100,14 @@ public class MapaController {
         return mv;
     }
 
-//    @ResponseBody
-//    @GetMapping(value = "/estacoesMeteorologicas", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Transactional(readOnly = true)
-//    public List<EstacaoMeteorologica> listarEstacoesMeteorologicas() {
-//        return estacaoMeteorologicaServico.listarTodas();
-//    }
-//
-//    @ResponseBody
-//    @GetMapping(value = "/propriedades", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Transactional(readOnly = true)
-//    public List<Propriedade> buscarPropriedades(@RequestParam("opcaoSelecionada") Integer opcaoSelecionada, @RequestParam(value = "nomeBusca", required = false) String nomeBusca, @RequestParam(value = "cpfBusca", required = false) String cpfBusca) {
-//        String opcao = OPCOES_CONTROLE_MAPA.get(opcaoSelecionada);
-//
-//        if (opcao.equalsIgnoreCase(BUSCAR_TODAS_PROPRIEDADES)) {
-//            return propriedadeServico.listarTodas();
-//        }
-//
-//        if (opcao.equalsIgnoreCase(BUSCAR_PROPRIEDADE_MAIS_RECENTE)) {
-//            return List.of(propriedadeServico.buscarMaisRecente());
-//        }
-//
-//        if (opcao.equalsIgnoreCase(BUSCAR_PROPRIEDADES_POR_NOME) && nomeBusca != null && !nomeBusca.trim().isEmpty()) {
-//            return propriedadeServico.buscarPorNome(nomeBusca);
-//        }
-//
-//        if (opcao.equalsIgnoreCase(BUSCAR_PROPRIEDADES_POR_CPF) && cpfBusca != null && !cpfBusca.trim().isEmpty()) {
-//            return propriedadeServico.buscarPorCpfDoProprietario(cpfBusca);
-//        }
-//
-//        return null;
-//    }
-    
+    @ResponseBody
+    @GetMapping(value = "/preverTemperatura", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Temperatura calcularPrevisao(@RequestParam("idCentroide") Long idCentroide) {
+        Ponto centroide = pontoServico.buscarPorId(idCentroide);
 
-    // produces
-    // response body
-    // previsao temperatura
-    // web server
-
-//    @ResponseBody
-//    @GetMapping(value = "/previsaoTemperatura", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public Temperatura calcularPrevisao(@ModelAttribute("PrevisaoTemperaturaCommand") @Validated PrevisaoTemperaturaCommand command, BindingResult errors) {
-//        //return temperaturaServico.calcularPrevisao(command);
-//    }
+        LocalDateTime dataHoraAgora = LocalDateTime.now();
+        LocalDateTime dataHoraPrevista = dataHoraAgora.plusHours(1).withMinute(0).withSecond(0);
+        return temperaturaServico.preverTemperaturaParaPonto(centroide, dataHoraPrevista);
+    }
 
 }

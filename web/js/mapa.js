@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     iniciarMapa();
     criarElementosEstacoes();
     criarElementosPropriedades();
+    ajustarVisualizacaoParaPropriedades();
 });
 
 function inicializarControlesDoMapa() {
@@ -165,6 +166,9 @@ function criarRaioBusca(propriedade) {
 }
 
 function criarDescricaoPropriedade(propriedade) {
+    const idParagrafoTemperatura = `temperatura-propriedade-${propriedade.id}`;
+    const idBotaoPrevisao = `botao-previsao-${propriedade.id}`;
+
     return new google.maps.InfoWindow({
         content: `
             <div class="info-window-conteudo">
@@ -173,10 +177,31 @@ function criarDescricaoPropriedade(propriedade) {
                 <p><strong>CPF: ${propriedade.cpfProprietario}</strong></p>
                 <p><strong>Cor: ${propriedade.corNome}</strong></p>
                 ${gerarHtmlEstacoesAssociadas(propriedade)}
-                <p><strong>Temperatura: ${propriedade.centroide.temperaturaRecente}</strong></p>
+                <p id="${idParagrafoTemperatura}"><strong>Temperatura: ${propriedade.centroide.temperaturaRecente}</strong></p>
+                <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idParagrafoTemperatura}')" class="botao-tabela--visualizar">Prever temperatura</button>
             </div>
         `
     });
+}
+
+function preverTemperatura(idCentroide, idParagrafoTemperatura) {
+    const paragrafoTemperatura = document.getElementById(idParagrafoTemperatura);
+    const textoTemperatura = paragrafoTemperatura.querySelector('strong');
+
+    fetch(`${urlPrevisao}?idCentroide=${idCentroide}`)
+        .then(resposta => {
+            if (!resposta.ok) {
+                throw new Error(`Falha: ${response.status}`);
+            }
+            return resposta.json();
+        })
+        .then(data => {
+            textoTemperatura.innerHTML = `Temperatura: ${data.temperaturaFormatada}`;
+        })
+        .catch(error => {
+            console.error('Falha: Não foi possível prever temperatura.', error);
+            textoTemperatura.innerHTML = 'Indisponível';
+        });
 }
 
 function gerarHtmlEstacoesAssociadas(propriedade) {
@@ -258,4 +283,21 @@ function configurarVisibilidadeCamposDeBusca() {
         divNomeBusca.style.display = VISIVEL;
     }
 
+}
+
+function ajustarVisualizacaoParaPropriedades() {
+    const limites = new google.maps.LatLngBounds();
+
+    if (propriedades.length > 0) {
+        propriedades.forEach(propriedade => {
+            propriedade.poligono.pontos.forEach(ponto => {
+                limites.extend(new google.maps.LatLng(ponto.latitude, ponto.longitude));
+            })
+        })
+
+        mapa.fitBounds(limites);
+    } else {
+        mapa.setCenter(COORDENADA_CENTRAL_BRASIL);
+        mapa.setZoom(ZOOM_PADRAO);
+    }
 }

@@ -50,6 +50,10 @@ public class TemperaturaServico {
 
     private final ScheduledExecutorService agendador = Executors.newSingleThreadScheduledExecutor();
 
+    private LocalDateTime ultimaAtualizacaoEstacoesECentroides;
+    private LocalDateTime ultimaAtualizacaoPrevisoesReais;
+    private LocalDateTime inicioUltimaExecucao;
+
     @PostConstruct
     public void inicializarServicos() {
         popularHistoricosIniciaisSeNecessario();
@@ -62,14 +66,17 @@ public class TemperaturaServico {
     }
 
     public void executarAtualizacaoPeriodica() {
+        this.inicioUltimaExecucao = LocalDateTime.now();
         dados.iniciarTransacao();
         try {
             atualizarTemperaturasDeEstacoesEPontosAssociados();
+            ultimaAtualizacaoEstacoesECentroides = LocalDateTime.now();
             preencherTemperaturasReaisNasPrevisoes();
+            ultimaAtualizacaoPrevisoesReais = LocalDateTime.now();
             dados.confirmarTransacao();
         } catch (Exception e) {
             dados.desfazerTransacao();
-            EscritorUtil.escreverEmNovaLinha("ROTINA AGENDADA: Ocorreu um erro durante a execução da tarefa agendada: " + e.getMessage());
+            EscritorUtil.escreverEmNovaLinha("Falha: Ocorreu um erro durante a execução da tarefa agendada: " + e.getMessage());
         }
     }
 
@@ -149,11 +156,7 @@ public class TemperaturaServico {
         }
 
         Map<EstacaoMeteorologica, Temperatura> temperaturasPrevistasPorEstacao = preverTemperaturasParaEstacoes(historicoTemperaturasPorEstacao, dataHoraPrevista);
-        Temperatura temperaturaPrevita = ponto.preverTemperatura(dataHoraPrevista, temperaturasPrevistasPorEstacao);
-        if (temperaturaPrevita != null) {
-            ponto.getHistoricoTemperaturas().add(temperaturaPrevita);
-        }
-        return temperaturaPrevita;
+        return ponto.preverTemperatura(dataHoraPrevista, temperaturasPrevistasPorEstacao);
     }
 
     public List<Temperatura> listarTodasAsPrevisoes() {
@@ -312,7 +315,27 @@ public class TemperaturaServico {
         }
     }
 
+    public LocalDateTime getUltimaAtualizacaoEstacoesECentroides() {
+        return ultimaAtualizacaoEstacoesECentroides;
+    }
+
+    public LocalDateTime getUltimaAtualizacaoPrevisoesReais() {
+        return ultimaAtualizacaoPrevisoesReais;
+    }
+
+    public LocalDateTime getProximaExecucaoAgendada() {
+        if (inicioUltimaExecucao != null) {
+            return inicioUltimaExecucao.plus(INTERVALO_PARA_EXECUTAR, UNIDADE_DE_TEMPO_DO_INTERVALO.toChronoUnit());
+        }
+        return null;
+    }
+
     private boolean validarTemperatura(Temperatura temperatura) {
         return temperatura != null && temperatura.getPonto() != null;
     }
+
+    public List<Ponto> listarTodosPontosDePrevisao() {
+        return dados.buscarPontosDePrevisao();
+    }
+
 }

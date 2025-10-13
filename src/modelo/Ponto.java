@@ -1,6 +1,5 @@
 package modelo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.iakovlev.timeshape.TimeZoneEngine;
 import util.FormatadorUtil;
@@ -58,7 +57,6 @@ public class Ponto {
 
     public Ponto() {}
 
-    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_PONTO")

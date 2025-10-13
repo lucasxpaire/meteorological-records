@@ -20,15 +20,19 @@ public class PontoServico {
 
     public void calcularEAdicionarTemperaturaAtual(Ponto ponto) {
         List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
-        if (estacoesRelevantes.isEmpty()) {
-            return;
-        }
-
         ponto.setFusoHorario(ponto.determinarFusoHorario());
         ponto.setEstacoesMeteorologicas(estacoesRelevantes);
         Temperatura temperaturaCalculada = ponto.interpolarTemperaturaAtual(ponto.getEstacoesMeteorologicas());
         ponto.getHistoricoTemperaturas().add(temperaturaCalculada);
 
+    }
+
+    public Ponto buscarPorId(Long id) {
+        if (dados.existeAlgumComEsseCampo(Ponto.class, "id", id)) {
+            return dados.buscarUnicoPorCampo(Ponto.class, "id", id);
+        } else {
+            throw new IllegalArgumentException("Falha: Não existe nenhum ponto com esse id.");
+        }
     }
 
     public void salvar(Ponto ponto) {
