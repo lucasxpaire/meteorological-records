@@ -15,7 +15,7 @@ import util.FormatadorUtil;
 import java.time.LocalDateTime;
 
 @Controller
-@RequestMapping("/index.html")
+@RequestMapping(value = {"/index.html", "/"})
 public class IndexController {
 
     @Autowired

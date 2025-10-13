@@ -1,4 +1,4 @@
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const textarea = document.getElementById('coordenadaPorInsercaoManual');
 
     if (!textarea) {

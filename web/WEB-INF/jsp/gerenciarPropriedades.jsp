@@ -8,8 +8,8 @@
         <tags:barraLateral paginaAtiva="propriedades" />
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
-                <h1>Gerenciar Propriedades</h1>
-                <a href="cadastroPropriedade.html" class="botao botao-novo">Nova Propriedade</a>
+                <h1>Gerenciar propriedades</h1>
+                <a href="cadastroPropriedade.html" class="botao botao-novo">Nova propriedade</a>
             </div>
 
             <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />

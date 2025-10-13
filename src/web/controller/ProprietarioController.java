@@ -1,7 +1,5 @@
 package web.controller;
 
-import dados.Dados;
-import modelo.Cor;
 import modelo.Proprietario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +10,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import servico.CorServico;
 import servico.ProprietarioServico;
 import web.validator.ProprietarioValidator;
 import web.command.ProprietarioCommand;
@@ -22,10 +21,10 @@ import java.util.List;
 public class ProprietarioController {
 
     @Autowired
-    private Dados dados;
+    private ProprietarioServico proprietarioServico;
 
     @Autowired
-    private ProprietarioServico proprietarioServico;
+    private CorServico corServico;
 
     @Autowired
     private ProprietarioValidator proprietarioValidator;
@@ -33,11 +32,6 @@ public class ProprietarioController {
     @InitBinder("ProprietarioCommand")
     void validator(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(proprietarioValidator);
-    }
-
-    @ModelAttribute("cores")
-    public List<Cor> todasAsCores() {
-        return dados.listarTodos(Cor.class);
     }
 
     @GetMapping(value = {"/cadastroProprietario.html", "/alterarProprietario.html"})
@@ -51,6 +45,8 @@ public class ProprietarioController {
             command.setCorId(proprietario.getCor().getId());
             mv.addObject("proprietario", proprietario);
         }
+
+        mv.addObject("cores", corServico.listarTodos());
 
         mv.addObject("ProprietarioCommand", command);
         return mv;

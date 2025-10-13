@@ -93,10 +93,6 @@ public class EstacaoMeteorologicaServico {
         }
     }
 
-    public EstacaoMeteorologica buscarEstacaoMaisProximaComDados(Ponto ponto) {
-        return dados.buscarEstacaoMaisProximaComDados(ponto);
-    }
-
     public List<EstacaoMeteorologica> buscarEstacoesDentroDoRaio(Ponto ponto, Double raioEmGraus) {
         return dados.buscarEstacoesDentroDoRaio(ponto, raioEmGraus);
     }

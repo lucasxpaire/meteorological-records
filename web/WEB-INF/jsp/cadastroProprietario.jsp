@@ -6,7 +6,7 @@
         <tags:barraLateral paginaAtiva="proprietarios"/>
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
-                <tags:conteudoCondicional condicao="${not empty proprietario}" textoCondicaoVerdadeira="Edição de Proprietário" textoCondicaoFalsa="Cadastro de Proprietário" tagHtml="h1" />
+                <tags:conteudoCondicional condicao="${not empty proprietario}" textoCondicaoVerdadeira="Edição de proprietário" textoCondicaoFalsa="Cadastro de proprietário" tagHtml="h1" />
                 <a href="gerenciarProprietarios.html" class="botao botao-novo">Voltar</a>
             </div>
 

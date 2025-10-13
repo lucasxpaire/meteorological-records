@@ -9,8 +9,8 @@
         <tags:barraLateral paginaAtiva="proprietarios"/>
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
-                <h1>Gerenciar Proprietários</h1>
-                <a href="cadastroProprietario.html" class="botao botao-novo">Novo Proprietário</a>
+                <h1>Gerenciar proprietários</h1>
+                <a href="cadastroProprietario.html" class="botao botao-novo">Novo proprietário</a>
             </div>
 
             <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
@@ -18,7 +18,7 @@
 
             <div class="busca-container">
                 <form action="gerenciarProprietarios.html" method="get" class="formulario-busca">
-                    <input type="text" name="busca" id="campo-busca" placeholder="Buscar por nome ou CPF..." class="campo-busca" value="${param.busca}">
+                    <input type="text" name="busca" id="campo-busca" placeholder="Buscar por nome ou CPF" class="campo-busca" value="${param.busca}">
                     <button type="submit" class="botao-busca">Buscar</button>
                 </form>
             </div>

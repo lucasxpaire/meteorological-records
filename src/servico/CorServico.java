@@ -68,7 +68,11 @@ public class CorServico {
     }
 
     public List<Cor> listarTodos() {
-        return dados.listarTodos(Cor.class);
+        if (dados.existeAlgum(Cor.class)) {
+            return dados.listarTodos(Cor.class);
+        } else {
+            throw new IllegalArgumentException("Falha: Não existe nenhuma cor.");
+        }
     }
 
     private boolean validarCor(Cor cor) {

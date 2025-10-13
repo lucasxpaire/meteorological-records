@@ -8,7 +8,7 @@
 
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
-                <tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Edição de Propriedade" textoCondicaoFalsa="Cadastro de Propriedade" tagHtml="h1" />
+                <tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Edição de propriedade" textoCondicaoFalsa="Cadastro de propriedade" tagHtml="h1" />
                 <a href="gerenciarProprietarios.html" class="botao botao-novo">Voltar</a>
             </div>
 
@@ -18,20 +18,18 @@
                 <form:form modelAttribute="PropriedadeCommand" method="post" action="cadastroPropriedade.html" enctype="multipart/form-data">
                     <form:hidden path="id" />
 
-                    <tags:inputFormulario path="cpfProprietario" label="Cpf do Proprietário" placeholder="Digite o CPF do proprietário" />
+                    <tags:inputFormulario path="cpfProprietario" label="CPF do proprietário" placeholder="Digite o CPF do proprietário" />
 
                     <tags:inputFormulario path="nome" label="Nome" placeholder="Digite o nome da propriedade" />
 
-                    <h4>Definição do Polígono</h4>
+                    <h4>Definição do polígono</h4>
 
                     <div class="radio-group">
                         <label for="tipoManual">
-                            <form:radiobutton path="tipoEntradaPoligono" id="tipoManual" value="manual" checked="true" />
-                            Inserção Manual
+                            <form:radiobutton path="tipoEntradaPoligono" id="tipoManual" value="manual" checked="true" /> Inserção manual
                         </label>
                         <label for="tipoArquivo">
-                            <form:radiobutton path="tipoEntradaPoligono" id="tipoArquivo" value="arquivo" />
-                            Arquivo CSV
+                            <form:radiobutton path="tipoEntradaPoligono" id="tipoArquivo" value="arquivo" /> Arquivo CSV
                         </label>
                     </div>
 

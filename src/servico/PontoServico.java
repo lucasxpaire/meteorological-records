@@ -35,16 +35,4 @@ public class PontoServico {
         }
     }
 
-    public void salvar(Ponto ponto) {
-        if (validarPonto(ponto)) {
-            dados.salvar(ponto);
-        } else {
-            throw new IllegalArgumentException("Dados do ponto são inválidos.");
-        }
-    }
-
-    private boolean validarPonto(Ponto ponto) {
-        return ponto != null && ponto.getLatitude() != null && ponto.getLongitude() != null;
-    }
-
 }

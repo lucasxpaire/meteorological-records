@@ -12,19 +12,19 @@
 
         <div class="menu-flutuante">
             <form:form modelAttribute="ControleMapaCommand" action="visualizarMapa.html" method="get">
-                <h3>Controles do mapa</h3>
+                <h3>Controle do mapa</h3>
 
                 <div class="menu-flutuante-grupo">
                     <div class="menu-flutuante-grupo">
-                        <tags:selectFormulario path="opcaoSelecionada" label="Visualizar propriedades" items="${opcoesControleMapa}" descricao="Selecione uma opção" />
+                        <tags:selectFormulario path="opcaoSelecionada" label="Opções de busca" items="${opcoesControleMapa}" descricao="Selecione uma opção" />
                     </div>
 
                     <div class="menu-flutuante-grupo-escondido">
-                        <tags:inputFormulario path="cpfBusca" label="CPF do proprietário" />
+                        <tags:inputFormulario path="cpfBusca" label="CPF do proprietário:" />
                     </div>
 
                     <div class="menu-flutuante-grupo-escondido">
-                        <tags:inputFormulario path="nomeBusca" label="Nome de propriedade" />
+                        <tags:inputFormulario path="nomeBusca" label="Nome de propriedade:" />
                     </div>
                     
                     <div class="menu-flutuante-grupo">

@@ -159,10 +159,6 @@ public class TemperaturaServico {
         return ponto.preverTemperatura(dataHoraPrevista, temperaturasPrevistasPorEstacao);
     }
 
-    public List<Temperatura> listarTodasAsPrevisoes() {
-        return dados.listarTodasAsPrevisoes();
-    }
-
     private List<Temperatura> buscarECombinarHistoricoParaPrevisao(EstacaoMeteorologica estacao, List<LocalDateTime> datasNecessarias) {
         List<Temperatura> temperaturasDoBanco = buscarTemperaturasHistoricas(estacao.getLocalizacao(), datasNecessarias);
         Set<LocalDateTime> datasDoBanco = temperaturasDoBanco.stream()
@@ -332,10 +328,6 @@ public class TemperaturaServico {
 
     private boolean validarTemperatura(Temperatura temperatura) {
         return temperatura != null && temperatura.getPonto() != null;
-    }
-
-    public List<Ponto> listarTodosPontosDePrevisao() {
-        return dados.buscarPontosDePrevisao();
     }
 
 }

@@ -76,10 +76,6 @@ public class PropriedadeServico {
         }
     }
 
-    public List<Propriedade> buscarPropriedadesDoProprietario(Long idProprietario) {
-        return dados.buscarListaPorCampo(Propriedade.class, "proprietario.id", idProprietario);
-    }
-
     public List<Propriedade> buscarPorCpfDoProprietario(String cpfBusca) {
         String cpfSemFormatacao = FormatadorUtil.removerFormatacaoCpf(cpfBusca);
         if (Proprietario.validarTamanhoCpf(cpfSemFormatacao)) {
