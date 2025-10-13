@@ -14,7 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import servico.PontoServico;
 import servico.PropriedadeServico;
-import servico.ProprietarioServico;
 import util.FormatadorUtil;
 import util.PoligonoUtil;
 import web.CoordenadasMultiPartFile;
@@ -30,12 +29,12 @@ public class PropriedadeController {
 
     @Autowired
     private PropriedadeServico propriedadeServico;
+
     @Autowired
     private PropriedadeValidator propriedadeValidator;
+
     @Autowired
     private PontoServico pontoServico;
-    @Autowired
-    private ProprietarioServico proprietarioServico;
 
     @InitBinder("PropriedadeCommand")
     void validator (WebDataBinder webDataBinder) {
@@ -43,7 +42,7 @@ public class PropriedadeController {
     }
 
     @GetMapping(value = {"/cadastroPropriedade.html", "/alterarPropriedade.html"})
-    public ModelAndView exibirFormulario(@RequestParam(value = "idPropriedade", required = false) Long idPropriedade, @RequestParam(value = "idProprietario", required = false) Long idProprietario) {
+    public ModelAndView exibirFormulario(@RequestParam(value = "idPropriedade", required = false) Long idPropriedade) {
         ModelAndView mv = new ModelAndView("cadastroPropriedade");
         PropriedadeCommand command = new PropriedadeCommand();
         Proprietario proprietario = null;
@@ -62,9 +61,6 @@ public class PropriedadeController {
             } else if (tipoEntrada.equals(PoligonoUtil.TIPO_ARQUIVO)){
                 command.setCoordenadasPorArquivo(new CoordenadasMultiPartFile(Arrays.toString(propriedade.getArquivoPoligonos()), "coordenadas", "coordenadas.txt", "text/plain"));
             }
-        } else if (idProprietario != null) {
-            proprietario = proprietarioServico.buscarPorId(idProprietario);
-
         }
 
         if (proprietario != null) {
@@ -73,35 +69,8 @@ public class PropriedadeController {
             mv.addObject("proprietario", proprietario);
         }
 
-        if (idProprietario != null) {
-            command.setPaginaOrigemRequisicao("gerenciarPropriedadesDoProprietario");
-        } else {
-            command.setPaginaOrigemRequisicao("gerenciarPropriedades");
-        }
-
         mv.addObject("PropriedadeCommand", command);
         return mv;
-    }
-
-    @GetMapping("/gerenciarPropriedadesDoProprietario.html")
-    public ModelAndView listarPropriedadesDoProprietario(@RequestParam(value = "idProprietario") Long idProprietario, @RequestParam(value = "busca", required = false) String busca) {
-        ModelAndView mv = new ModelAndView("gerenciarPropriedadesDoProprietario");
-
-        Proprietario proprietario = proprietarioServico.buscarPorId(idProprietario);
-        if (busca != null && !busca.trim().isEmpty()) {
-            List<Propriedade> propriedadesFiltradas = propriedadeServico.buscarPorNome(busca)
-                    .stream()
-                    .filter(p -> p.getProprietario().getId().equals(idProprietario))
-                    .toList();
-            mv.addObject("propriedades", propriedadesFiltradas);
-            mv.addObject("proprietario", proprietario);
-            return mv;
-        } else {
-            List<Propriedade> propriedades = propriedadeServico.buscarPropriedadesDoProprietario(idProprietario);
-            mv.addObject("propriedades", propriedades);
-            mv.addObject("proprietario", proprietario);
-            return mv;
-        }
     }
 
     @GetMapping("/gerenciarPropriedades.html")
@@ -138,27 +107,16 @@ public class PropriedadeController {
 
         propriedadeServico.salvar(propriedade);
 
-        if (command.getPaginaOrigemRequisicao().equals("gerenciarPropriedadesDoProprietario")) {
-            redirectAttributes.addAttribute("idProprietario", command.getIdProprietario());
-            return "redirect:/gerenciarPropriedadesDoProprietario.html";
-        } else {
-            return "redirect:/gerenciarPropriedades.html";
-        }
+        return "redirect:/gerenciarPropriedades.html";
     }
 
     @GetMapping("/deletarPropriedade.html")
-    public String deletar(@RequestParam(value = "idPropriedade") Long idPropriedade, @RequestParam(value = "paginaOrigemRequisicao", defaultValue = "gerenciarPropriedades") String paginaOrigemRequisicao, RedirectAttributes redirectAttributes) {
+    public String deletar(@RequestParam(value = "idPropriedade") Long idPropriedade, RedirectAttributes redirectAttributes) {
         Propriedade propriedade = propriedadeServico.buscarPorId(idPropriedade);
         propriedadeServico.deletar(propriedade);
 
-        if (paginaOrigemRequisicao.equals("gerenciarPropriedadesDoProprietario")) {
-            redirectAttributes.addAttribute("idProprietario", propriedade.getProprietario().getId());
-            redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");
-            return "redirect:/gerenciarPropriedadesDoProprietario.html";
-        } else {
-            redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");
-            return "redirect:/gerenciarPropriedades.html";
-        }
+        redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");
+        return "redirect:/gerenciarPropriedades.html";
     }
 
 }

@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import servico.EstacaoMeteorologicaServico;
 import servico.PropriedadeServico;
 import servico.ProprietarioServico;
+import servico.TemperaturaServico;
+import util.FormatadorUtil;
+
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/index.html")
@@ -23,6 +27,8 @@ public class IndexController {
     @Autowired
     private EstacaoMeteorologicaServico estacaoServico;
 
+    @Autowired
+    private TemperaturaServico temperaturaServico;
 
     @GetMapping
     public String index(Model model) {
@@ -36,6 +42,28 @@ public class IndexController {
             model.addAttribute("propriedadeMaisRecente", maisRecente);
         } catch (IllegalArgumentException e) {
             model.addAttribute("propriedadeMaisRecente", null);
+        }
+
+        LocalDateTime ultimaAtualizacaoEstacoesECentroides = temperaturaServico.getUltimaAtualizacaoEstacoesECentroides();
+        LocalDateTime ultimaAtualizacaoPrevisoes = temperaturaServico.getUltimaAtualizacaoPrevisoesReais();
+        LocalDateTime proximaAtualizacao = temperaturaServico.getProximaExecucaoAgendada();
+
+        if (ultimaAtualizacaoEstacoesECentroides == null) {
+            model.addAttribute("ultimaAtualizacaoEstacoesECentroides", "Aguardando execução");
+        } else {
+            model.addAttribute("ultimaAtualizacaoEstacoesECentroides", ultimaAtualizacaoEstacoesECentroides.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO));
+        }
+
+        if (ultimaAtualizacaoPrevisoes == null) {
+            model.addAttribute("ultimaAtualizacaoPrevisoes", "Aguardando execução");
+        } else {
+            model.addAttribute("ultimaAtualizacaoPrevisoes", ultimaAtualizacaoPrevisoes.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO));
+        }
+
+        if (proximaAtualizacao == null) {
+            model.addAttribute("proximaAtualizacao", "Aguardando primeira execução");
+        } else {
+            model.addAttribute("proximaAtualizacao", proximaAtualizacao.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO));
         }
 
         return "index";

@@ -67,6 +67,7 @@ body {
 .menu-lateral-cabecalho h3 {
     color: #FFFFFF;
     font-weight: 700;
+    text-align: center;
 }
 
 .menu-lateral-cabecalho span {
@@ -529,4 +530,27 @@ body {
 
 .info-window-lista-estacoes li {
     margin-bottom: 5px;
+}
+
+.info-window-conteudo .botao-tabela--visualizar {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.routine-card h2 {
+    font-size: 1em;
+    color: #343A40;
+}
+
+.routine-card span {
+    font-size: 2.0em;
+    color: #6C757D;
+    font-weight: 500;
 }

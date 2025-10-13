@@ -34,7 +34,7 @@ public class ProprietarioValidator implements Validator {
             if (!Proprietario.validarTamanhoCpf(command.getCpf())) {
                 errors.rejectValue("cpf", "cpf.tamanhoInvalido", "Falha: CPF deve conter exatamente 11 dígitos numéricos");
             } else {
-                if (proprietarioServico.cpfJaExiste(command.getCpf())) {
+                if (proprietarioServico.existeComEsseCpf(command.getCpf())) {
                     if (proprietarioServico.cpfPertenceAOutroProprietario(command.getId(), command.getCpf())) {
                         errors.rejectValue("cpf", "cpf.jaExiste", "Falha: Esse CPF já pertence a outro proprietário");
                     }
@@ -46,7 +46,7 @@ public class ProprietarioValidator implements Validator {
             if (!Proprietario.validarTamanhoTelefone(command.getTelefone())) {
                 errors.rejectValue("telefone", "telefone.tamanhoInvalido","Falha: Telefone deve conter 11 dígitos numéricos");
             } else {
-                if (proprietarioServico.telefoneJaExiste(command.getTelefone())) {
+                if (proprietarioServico.existeComEsseTelefone(command.getTelefone())) {
                     if (proprietarioServico.telefonePertenceAOutroProprietario(command.getId(), command.getTelefone())) {
                         errors.rejectValue("telefone", "telefone.jaExiste", "Falha: Esse telefone já pertence a outro proprietário");
                     }

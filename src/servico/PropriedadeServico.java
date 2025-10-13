@@ -7,6 +7,7 @@ import modelo.Proprietario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import util.FormatadorUtil;
 import util.PoligonoUtil;
 import web.CoordenadasMultiPartFile;
 import web.command.PropriedadeCommand;
@@ -63,7 +64,7 @@ public class PropriedadeServico {
         if (validarPropriedade(propriedade)) {
             dados.salvar(propriedade);
         } else {
-            throw new IllegalArgumentException("Dados da propriedade são inválidos.");
+            throw new IllegalArgumentException("Falha: Dados da propriedade são inválidos.");
         }
     }
 
@@ -79,11 +80,20 @@ public class PropriedadeServico {
         return dados.buscarListaPorCampo(Propriedade.class, "proprietario.id", idProprietario);
     }
 
+    public List<Propriedade> buscarPorCpfDoProprietario(String cpfBusca) {
+        String cpfSemFormatacao = FormatadorUtil.removerFormatacaoCpf(cpfBusca);
+        if (Proprietario.validarTamanhoCpf(cpfSemFormatacao)) {
+            return dados.buscarListaPorCampo(Propriedade.class, "proprietario.cpf", cpfSemFormatacao);
+        } else {
+            throw new IllegalArgumentException("Falha: CPF de busca é inválido.");
+        }
+    }
+
     public List<Propriedade> buscarPorNome(String nome) {
         if (Propriedade.validarNome(nome)) {
             return dados.buscarListaPorCampo(Propriedade.class, "nome", nome);
         } else {
-            throw new IllegalArgumentException("Nome de busca é inválido.");
+            throw new IllegalArgumentException("Falha: Nome de busca é inválido.");
         }
     }
 
@@ -134,12 +144,21 @@ public class PropriedadeServico {
             propriedade.getPoligono().getPontos().clear();
             dados.deletar(propriedade);
         } else {
-            throw new IllegalArgumentException("Dados da propriedade são inválidos.");
+            throw new IllegalArgumentException("Falha: Dados da propriedade são inválidos.");
         }
     }
 
     public boolean existeAlgumaPropriedade() {
         return dados.existeAlgum(Propriedade.class);
+    }
+
+    public boolean existePropriedadesNesseCpf(String cpfBusca) {
+        String cpfSemFormatacao = FormatadorUtil.removerFormatacaoCpf(cpfBusca);
+        return dados.existeAlgumComEsseCampo(Propriedade.class, "proprietario.cpf", cpfSemFormatacao);
+    }
+
+    public boolean existePropriedadesNesseNome(String nomeBusca) {
+        return dados.existeAlgumComEsseCampo(Propriedade.class, "nome", nomeBusca);
     }
 
     private boolean validarPropriedade(Propriedade propriedade) {

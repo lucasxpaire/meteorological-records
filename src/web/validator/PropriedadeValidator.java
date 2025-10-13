@@ -36,7 +36,7 @@ public class PropriedadeValidator implements Validator {
             if (!Proprietario.validarTamanhoCpf(command.getCpfProprietario())) {
                 errors.rejectValue("cpfProprietario", "cpf.tamanhoInvalido", "Falha: CPF deve conter exatamente 11 dígitos numéricos");
             } else {
-                if (!proprietarioServico.cpfJaExiste(command.getCpfProprietario())) {
+                if (!proprietarioServico.existeComEsseCpf(command.getCpfProprietario())) {
                     errors.rejectValue("cpfProprietario", "cpf.naoExiste", "Falha: Nenhum proprietário encontrado com esse CPF.");
                 }
             }

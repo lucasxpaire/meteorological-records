@@ -39,7 +39,6 @@
                             <td>${proprietario.telefoneFormatado}</td>
                             <td>${proprietario.cor.nome}</td>
                             <td>
-                                <a href="gerenciarPropriedadesDoProprietario.html?idProprietario=${proprietario.id}" class="botao-tabela botao-tabela--adicionar">Gerenciar Propriedades</a>
                                 <a href="alterarProprietario.html?idProprietario=${proprietario.id}" class="botao-tabela botao-tabela--alterar">Alterar</a>
                                 <a href="deletarProprietario.html?idProprietario=${proprietario.id}" class="botao-tabela botao-tabela--deletar">Deletar</a>
                             </td>

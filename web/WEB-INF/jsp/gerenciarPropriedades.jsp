@@ -36,7 +36,7 @@
                         <td>${propriedade.proprietario.nome}</td>
                         <td>
                             <a href="alterarPropriedade.html?idPropriedade=${propriedade.id}" class="botao-tabela botao-tabela--alterar">Alterar</a>
-                            <a href="deletarPropriedade.html?idPropriedade=${propriedade.id}&paginaOrigemRequisicao=gerenciarPropriedades" class="botao-tabela botao-tabela--deletar">Deletar</a>
+                            <a href="deletarPropriedade.html?idPropriedade=${propriedade.id}" class="botao-tabela botao-tabela--deletar">Deletar</a>
                         </td>
                     </tr>
                 </c:forEach>

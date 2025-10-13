@@ -17,16 +17,8 @@
 
                 <form:form modelAttribute="PropriedadeCommand" method="post" action="cadastroPropriedade.html" enctype="multipart/form-data">
                     <form:hidden path="id" />
-                    <form:hidden path="paginaOrigemRequisicao" />
 
-                    <c:choose>
-                        <c:when test="${not empty param.idProprietario}">
-                            <form:hidden path="idProprietario" />
-                        </c:when>
-                        <c:otherwise>
-                            <tags:inputFormulario path="cpfProprietario" label="Cpf do Proprietário" placeholder="Digite o CPF do proprietário" />
-                        </c:otherwise>
-                    </c:choose>
+                    <tags:inputFormulario path="cpfProprietario" label="Cpf do Proprietário" placeholder="Digite o CPF do proprietário" />
 
                     <tags:inputFormulario path="nome" label="Nome" placeholder="Digite o nome da propriedade" />
 

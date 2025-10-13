@@ -11,8 +11,6 @@ public class PropriedadeCommand {
     private Long idProprietario;
     private String cpfProprietario;
 
-    private String paginaOrigemRequisicao;
-
     private String tipoEntradaPoligono;
     private String coordenadasPorInsercaoManual;
     private MultipartFile coordenadasPorArquivo;
@@ -55,14 +53,6 @@ public class PropriedadeCommand {
 
     public void setCpfProprietario(String cpfProprietario) {
         this.cpfProprietario = FormatadorUtil.removerFormatacaoCpf(cpfProprietario);
-    }
-
-    public String getPaginaOrigemRequisicao() {
-        return paginaOrigemRequisicao;
-    }
-
-    public void setPaginaOrigemRequisicao(String paginaOrigemRequisicao) {
-        this.paginaOrigemRequisicao = paginaOrigemRequisicao;
     }
 
     public String getTipoEntradaPoligono() {

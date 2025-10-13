@@ -3,30 +3,26 @@
 
 <nav class="menu-lateral">
     <div class="menu-lateral-cabecalho">
-        <h3>GeoPropriedades</h3>
-        <span>Sistema de Gerenciamento</span>
+        <h3>Gerenciamento de propriedades</h3>
     </div>
 
     <ul class="menu-lateral-lista">
         <li>
-            <a href="index.html" class="${paginaAtiva == 'inicio' ? 'active' : ''}">Início</a>
+            <a href="index.html" class="${paginaAtiva == 'painelcontrole' ? 'active' : ''}">Painel de controle</a>
         </li>
         <li>
-            <a href="gerenciarProprietarios.html" class="${paginaAtiva == 'proprietarios' ? 'active' : ''}">Gerenciar Proprietários</a>
+            <a href="gerenciarProprietarios.html" class="${paginaAtiva == 'proprietarios' ? 'active' : ''}">Gerenciar proprietários</a>
         </li>
         <li>
-            <a href="gerenciarPropriedades.html" class="${paginaAtiva == 'propriedades' ? 'active' : ''}">Gerenciar Propriedades</a>
+            <a href="gerenciarPropriedades.html" class="${paginaAtiva == 'propriedades' ? 'active' : ''}">Gerenciar propriedades</a>
         </li>
         <li>
-            <a href="visualizarMapas.html" class="${paginaAtiva == 'mapas' ? 'active' : ''}">Visualizar Mapas</a>
-        </li>
-        <li>
-            <a href="previsaoTemperatura.html" class="${paginaAtiva == 'previsao' ? 'active' : ''}">Previsão de Temperatura</a>
+            <a href="visualizarMapa.html" class="${paginaAtiva == 'mapa' ? 'active' : ''}">Visualizar mapa</a>
         </li>
     </ul>
 
     <div class="menu-lateral-rodape">
-        <h3>2025 GeoPropriedades</h3>
+        <h3>Gerenciamento de propriedades</h3>
         <span>© Todos os direitos reservados</span>
     </div>
 </nav>

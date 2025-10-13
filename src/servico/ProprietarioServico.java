@@ -97,7 +97,7 @@ public class ProprietarioServico {
         return dados.existeAlgum(Proprietario.class);
     }
 
-    public boolean cpfJaExiste(String cpf) {
+    public boolean existeComEsseCpf(String cpf) {
         String cpfNormalizado = FormatadorUtil.removerFormatacaoCpf(cpf);
         if (!Proprietario.validarTamanhoCpf(cpfNormalizado)) {
             return false;
@@ -106,7 +106,7 @@ public class ProprietarioServico {
         return dados.existeAlgumComEsseCampo(Proprietario.class, "cpf", cpfNormalizado);
     }
 
-    public boolean telefoneJaExiste(String telefone) {
+    public boolean existeComEsseTelefone(String telefone) {
         String telefoneNormalizado = FormatadorUtil.removerFormatacaoTelefone(telefone);
         if (!Proprietario.validarTamanhoTelefone(telefone)) {
             return false;
