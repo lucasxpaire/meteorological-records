@@ -209,4 +209,10 @@ public class Dados {
         }
     }
 
+    public List<Ponto> buscarPontosDePrevisao() {
+        return entityManager.createQuery(
+                        "SELECT DISTINCT t.ponto FROM Temperatura t WHERE t.temperaturaPrevista IS NOT NULL", Ponto.class)
+                .getResultList();
+    }
+
 }
