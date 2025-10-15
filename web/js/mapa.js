@@ -9,9 +9,15 @@ let elementosMapa = {
 const COORDENADA_CENTRAL_BRASIL = { lat: -12.173683701367969, lng: -52.03651393308807 };
 const ZOOM_PADRAO = 4;
 
+const VISIVEL = 'block';
+const ESCONDIDO = 'none';
+
+const BUSCA_POR_NOME = '3';
+const BUSCA_POR_CPF = '4';
+
 document.addEventListener('DOMContentLoaded', () => {
-    inicializarControlesDoMapa();
     iniciarMapa();
+    inicializarControlesDoMapa();
     criarElementosEstacoes();
     criarElementosPropriedades();
     ajustarVisualizacaoParaPropriedades();
@@ -84,7 +90,6 @@ function criarElementosPropriedades() {
     propriedades.forEach(propriedade => {
         const poligono = criarPoligono(propriedade);
         const centroide = criarCentroide(propriedade);
-        const raioBusca = criarRaioBusca(propriedade);
         const descricaoPropriedade = criarDescricaoPropriedade(propriedade);
         const descricaoCentroide = criarDescricaoCentroide(propriedade);
         const linhasTracejadas = criarLinhasTracejadasEntreCentroideEEstacoes(propriedade);
@@ -116,7 +121,6 @@ function criarElementosPropriedades() {
         elementosMapa.propriedades[propriedade.id] = {
             poligono: poligono,
             centroide: centroide,
-            raioBusca: raioBusca,
             descricaoPropriedade: descricaoPropriedade,
             descricaoCentroide: descricaoCentroide,
             linhasTracejadas: linhasTracejadas
@@ -152,19 +156,6 @@ function criarCentroide(propriedade) {
     });
 }
 
-function criarRaioBusca(propriedade) {
-    return new google.maps.Circle({
-        center: { lat: propriedade.centroide.latitude, lng: propriedade.centroide.longitude },
-        radius: propriedade.centroide.raioRelevanciaEmMetros,
-        strokeColor: propriedade.corCodigoHexadecimal,
-        strokeOpacity: 0.5,
-        strokeWeight: 1,
-        fillOpacity: 0.2,
-        clickable: false,
-        map: mapa,
-    });
-}
-
 function criarDescricaoPropriedade(propriedade) {
     const idParagrafoTemperatura = `temperatura-propriedade-${propriedade.id}`;
     const idBotaoPrevisao = `botao-previsao-${propriedade.id}`;
@@ -178,30 +169,10 @@ function criarDescricaoPropriedade(propriedade) {
                 <p><strong>Cor: ${propriedade.corNome}</strong></p>
                 ${gerarHtmlEstacoesAssociadas(propriedade)}
                 <p id="${idParagrafoTemperatura}"><strong>Temperatura: ${propriedade.centroide.temperaturaRecente}</strong></p>
-                <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idParagrafoTemperatura}')" class="botao-tabela--visualizar">Prever temperatura</button>
+                <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idParagrafoTemperatura}')" class="botao botao-tabela--visualizar">Prever temperatura</button>
             </div>
         `
     });
-}
-
-function preverTemperatura(idCentroide, idParagrafoTemperatura) {
-    const paragrafoTemperatura = document.getElementById(idParagrafoTemperatura);
-    const textoTemperatura = paragrafoTemperatura.querySelector('strong');
-
-    fetch(`${urlPrevisao}?idCentroide=${idCentroide}`)
-        .then(resposta => {
-            if (!resposta.ok) {
-                throw new Error(`Falha: ${response.status}`);
-            }
-            return resposta.json();
-        })
-        .then(data => {
-            textoTemperatura.innerHTML = `Temperatura: ${data.temperaturaFormatada}`;
-        })
-        .catch(error => {
-            console.error('Falha: Não foi possível prever temperatura.', error);
-            textoTemperatura.innerHTML = 'Indisponível';
-        });
 }
 
 function gerarHtmlEstacoesAssociadas(propriedade) {
@@ -261,13 +232,27 @@ function criarLabelTemperaturaEstacao(estacao) {
     }
 }
 
+function preverTemperatura(idCentroide, idParagrafoTemperatura) {
+    const paragrafoTemperatura = document.getElementById(idParagrafoTemperatura);
+    const textoTemperatura = paragrafoTemperatura.querySelector('strong');
+
+    fetch(`${urlPrevisao}?idCentroide=${idCentroide}`)
+        .then(resposta => {
+            if (!resposta.ok) {
+                throw new Error(`Falha: ${response.status}`);
+            }
+            return resposta.json();
+        })
+        .then(data => {
+            textoTemperatura.innerHTML = `Temperatura: ${data.temperaturaFormatada}`;
+        })
+        .catch(error => {
+            console.error('Falha: Não foi possível prever temperatura.', error);
+            textoTemperatura.innerHTML = 'Indisponível';
+        });
+}
+
 function configurarVisibilidadeCamposDeBusca() {
-    const VISIVEL = 'block';
-    const ESCONDIDO = 'none';
-
-    const BUSCA_POR_NOME = '3';
-    const BUSCA_POR_CPF = '4';
-
     const opcaoSelecionada = document.getElementById('opcaoSelecionada').value;
     const divCpfBusca  = document.getElementById('cpfBusca').parentElement;
     const divNomeBusca  = document.getElementById('nomeBusca').parentElement;
@@ -295,7 +280,9 @@ function ajustarVisualizacaoParaPropriedades() {
             })
         })
 
-        mapa.fitBounds(limites);
+        google.maps.event.addListenerOnce(mapa, 'idle', () => {
+            mapa.fitBounds(limites);
+        });
     } else {
         mapa.setCenter(COORDENADA_CENTRAL_BRASIL);
         mapa.setZoom(ZOOM_PADRAO);

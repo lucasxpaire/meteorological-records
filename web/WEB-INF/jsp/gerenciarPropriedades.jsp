@@ -35,6 +35,7 @@
                         <td>${propriedade.proprietario.cor.nome}</td>
                         <td>${propriedade.proprietario.nome}</td>
                         <td>
+                            <a href="visualizarPropriedade.html?idPropriedade=${propriedade.id}" class="botao-tabela botao-tabela--visualizar">Ver no mapa</a>
                             <a href="alterarPropriedade.html?idPropriedade=${propriedade.id}" class="botao-tabela botao-tabela--alterar">Alterar</a>
                             <a href="deletarPropriedade.html?idPropriedade=${propriedade.id}" class="botao-tabela botao-tabela--deletar">Deletar</a>
                         </td>

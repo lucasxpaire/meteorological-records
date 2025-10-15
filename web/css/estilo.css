@@ -554,3 +554,24 @@ body {
     color: #6C757D;
     font-weight: 500;
 }
+
+.input-com-icones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-com-icones input[type="file"] {
+    flex-grow: 1;
+}
+
+.icone-arquivo {
+    display: block;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.icone-arquivo:hover {
+    opacity: 1;
+}

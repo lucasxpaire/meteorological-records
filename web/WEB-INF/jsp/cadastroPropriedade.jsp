@@ -41,7 +41,18 @@
 
                     <div id="campoArquivo" class="formulario">
                         <label for="coordenadaPorArquivo">Arquivo CSV:</label>
-                        <form:input path="coordenadasPorArquivo" type="file" id="coordenadaPorArquivo" />
+
+                        <div class="input-com-icones">
+                            <form:input path="coordenadasPorArquivo" type="file" id="coordenadaPorArquivo" />
+
+                            <a id="visualizarArquivo" class="icone-arquivo" title="Visualizar conteúdo do arquivo">
+                                <img src="https://img.icons8.com/ios/50/view-file.png" alt="Visualizar" width="20" height="20"/>
+                            </a>
+                            <a id="downloadArquivo" class="icone-arquivo" title="Baixar arquivo selecionado">
+                                <img src="https://img.icons8.com/small/16/download--v1.png" alt="Download" width="20" height="20"/>
+                            </a>
+                        </div>
+
                         <form:errors path="coordenadasPorArquivo" cssClass="alerta-erro-formulario" />
                     </div>
 

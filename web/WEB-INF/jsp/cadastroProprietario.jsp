@@ -17,7 +17,7 @@
                     <form:hidden path="id"/>
 
                     <tags:inputFormulario path="nome" label="Nome" placeholder="Digite o nome completo" />
-                    <tags:inputFormulario path="cpf" label="Cpf" placeholder="Digite o cpf" />
+                    <tags:inputFormulario path="cpf" label="CPF" placeholder="Digite o CPF" />
                     <tags:inputFormulario path="telefone" label="Telefone" placeholder="Digite o telefone" />
                     <tags:selectFormulario path="corId" label="Cor" items="${cores}" itemValue="id" itemLabel="nome" descricao="Selecione uma cor" />
 

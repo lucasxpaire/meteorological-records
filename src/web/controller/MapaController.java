@@ -17,6 +17,7 @@ import servico.EstacaoMeteorologicaServico;
 import servico.PontoServico;
 import servico.PropriedadeServico;
 import servico.TemperaturaServico;
+import util.JsonUtil;
 import web.command.ControleMapaCommand;
 import web.validator.ControleMapaValidator;
 
@@ -31,7 +32,7 @@ public class MapaController {
     public static final String BUSCAR_TODAS_PROPRIEDADES = "Todas as propriedades";
     public static final String BUSCAR_PROPRIEDADE_MAIS_RECENTE = "Propriedade mais recente";
     public static final String BUSCAR_PROPRIEDADES_POR_NOME = "Buscar por nome";
-    public static final String BUSCAR_PROPRIEDADES_POR_CPF = "Buscar por cpf";
+    public static final String BUSCAR_PROPRIEDADES_POR_CPF = "Buscar por CPF";
 
     public static final Map<Integer, String> OPCOES_CONTROLE_MAPA = Map.of(1, BUSCAR_TODAS_PROPRIEDADES, 2, BUSCAR_PROPRIEDADE_MAIS_RECENTE, 3, BUSCAR_PROPRIEDADES_POR_NOME, 4, BUSCAR_PROPRIEDADES_POR_CPF);
 
@@ -95,6 +96,25 @@ public class MapaController {
         } catch (JsonProcessingException e) {
             mv.addObject("propriedadesJson", "[]");
             mv.addObject("estacoesJson", "[]");
+        }
+
+        return mv;
+    }
+
+    @GetMapping("/visualizarPropriedade.html")
+    public ModelAndView visualizarPropriedade(@RequestParam("idPropriedade") Long idPropriedade) {
+        ModelAndView mv = new ModelAndView("visualizarMapa");
+
+        mv.addObject("exibirFormulario", false);
+
+        if (idPropriedade != null) {
+            try {
+
+                mv.addObject("propriedadesJson", JsonUtil.converterObjetoParaJson(propriedadeServico.buscarPorId(idPropriedade)));
+            } catch (JsonProcessingException e) {
+                mv.addObject("propriedadesJson", "[]");
+                mv.addObject("falha", "Falha: Não foi possível visualizar a propriedade");
+            }
         }
 
         return mv;

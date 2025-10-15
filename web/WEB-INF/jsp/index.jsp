@@ -3,12 +3,13 @@
 
 <tags:corpo>
     <div class="estrutura-pagina">
-        <tags:barraLateral paginaAtiva="painelcontrole"/>
+        <tags:barraLateral paginaAtiva="inicio"/>
         <main class="estrutura-pagina-conteudo">
-            <h1>Painel de controle</h1>
+            <h1>Início</h1>
             <p>Visualize as estatísticas, atualizações de temperaturas e ações rápidas.</p>
 
             <div class="dashboard-container">
+                <h2>Estatísticas</h2>
                 <div class="dashboard-stats">
                     <div class="stat-card">
                         <h2>${totalProprietarios}</h2>
@@ -24,6 +25,7 @@
                     </div>
                 </div>
 
+                <h2>Atualização de temperaturas</h2>
                 <div class="dashboard-stats">
                     <div class="stat-card routine-card">
                         <h2>Última atualização de temperaturas</h2>
@@ -33,7 +35,7 @@
 
                 <div class="dashboard-stats">
                     <div class="stat-card routine-card">
-                        <h2>Próxima atualização agendada</h2>
+                        <h2>Próxima atualização de temperaturas</h2>
                         <span>${proximaAtualizacao}</span>
                     </div>
                 </div>

@@ -113,6 +113,10 @@ public class PropriedadeController {
     @GetMapping("/deletarPropriedade.html")
     public String deletar(@RequestParam(value = "idPropriedade") Long idPropriedade, RedirectAttributes redirectAttributes) {
         Propriedade propriedade = propriedadeServico.buscarPorId(idPropriedade);
+
+        propriedade.getCentroide().getHistoricoTemperaturas().clear();
+        propriedade.getPoligono().getPontos().clear();
+
         propriedadeServico.deletar(propriedade);
 
         redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");
