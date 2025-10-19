@@ -13,8 +13,8 @@ import java.util.List;
 @Repository
 public class Dados {
 
-    protected final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("dados");
-    public EntityManager entityManager = entityManagerFactory.createEntityManager();
+    private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("dados");
+    private final EntityManager entityManager = entityManagerFactory.createEntityManager();
 
     public void iniciarTransacao() {
         if (!entityManager.getTransaction().isActive()) {
@@ -158,15 +158,6 @@ public class Dados {
                 .getResultList();
     }
 
-    public List<Temperatura> listarTodasAsPrevisoes() {
-        try {
-            return entityManager.createQuery("SELECT t FROM Temperatura t WHERE t.temperaturaPrevista IS NOT NULL", Temperatura.class)
-                    .getResultList();
-        } catch (PersistenceException e) {
-            throw new RuntimeException("Não foi possível listar as previsões de temperatura.");
-        }
-    }
-
     public EstacaoMeteorologica buscarEstacaoMaisProximaComDados(Ponto ponto) {
         return entityManager.createQuery(
                         "SELECT e FROM EstacaoMeteorologica e " +
@@ -208,11 +199,4 @@ public class Dados {
             return null;
         }
     }
-
-    public List<Ponto> buscarPontosDePrevisao() {
-        return entityManager.createQuery(
-                        "SELECT DISTINCT t.ponto FROM Temperatura t WHERE t.temperaturaPrevista IS NOT NULL", Ponto.class)
-                .getResultList();
-    }
-
 }

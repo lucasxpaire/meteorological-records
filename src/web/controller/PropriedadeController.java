@@ -15,13 +15,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import servico.PontoServico;
 import servico.PropriedadeServico;
 import util.FormatadorUtil;
-import util.PoligonoUtil;
-import web.CoordenadasMultiPartFile;
 import web.command.PropriedadeCommand;
 import web.validator.PropriedadeValidator;
 
-import java.io.*;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -53,18 +49,11 @@ public class PropriedadeController {
             proprietario = propriedade.getProprietario();
             mv.addObject("propriedade", propriedade);
 
-            String tipoEntrada = propriedade.getTipoEntradaPoligono();
-            command.setTipoEntradaPoligono(tipoEntrada);
-
-            if (tipoEntrada.equals(PoligonoUtil.TIPO_MANUAL)) {
-                command.setCoordenadasPorInsercaoManual(new String(propriedade.getArquivoPoligonos()));
-            } else if (tipoEntrada.equals(PoligonoUtil.TIPO_ARQUIVO)){
-                command.setCoordenadasPorArquivo(new CoordenadasMultiPartFile(Arrays.toString(propriedade.getArquivoPoligonos()), "coordenadas", "coordenadas.txt", "text/plain"));
-            }
+            command.setNomeArquivoPontos(propriedade.getArquivoPontos().getNomeOriginal());
+            command.setPontos(new String(propriedade.getArquivoPontos().getConteudo()));
         }
 
         if (proprietario != null) {
-            command.setIdProprietario(proprietario.getId());
             command.setCpfProprietario(FormatadorUtil.formatarCpf(proprietario.getCpf()));
             mv.addObject("proprietario", proprietario);
         }
@@ -88,7 +77,7 @@ public class PropriedadeController {
     }
 
     @PostMapping("/cadastroPropriedade.html")
-    public String salvar(@ModelAttribute("PropriedadeCommand") @Validated PropriedadeCommand command, BindingResult errors, Model model, RedirectAttributes redirectAttributes) throws IOException {
+    public String salvar(@ModelAttribute("PropriedadeCommand") @Validated PropriedadeCommand command, BindingResult errors, Model model, RedirectAttributes redirectAttributes) {
         if (errors.hasErrors()) {
             if (command.getId() != null) {
                 model.addAttribute("propriedade", propriedadeServico.buscarPorId(command.getId()));
@@ -113,10 +102,6 @@ public class PropriedadeController {
     @GetMapping("/deletarPropriedade.html")
     public String deletar(@RequestParam(value = "idPropriedade") Long idPropriedade, RedirectAttributes redirectAttributes) {
         Propriedade propriedade = propriedadeServico.buscarPorId(idPropriedade);
-
-        propriedade.getCentroide().getHistoricoTemperaturas().clear();
-        propriedade.getPoligono().getPontos().clear();
-
         propriedadeServico.deletar(propriedade);
 
         redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");

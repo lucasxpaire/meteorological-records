@@ -575,3 +575,24 @@ body {
 .icone-arquivo:hover {
     opacity: 1;
 }
+
+.formulario-acoes-arquivo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.botao-com-icone {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.botao-com-icone img {
+    width: 16px;
+    height: 16px;
+    filter: invert(100%) brightness(50);
+}

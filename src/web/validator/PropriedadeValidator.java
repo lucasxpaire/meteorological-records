@@ -29,9 +29,9 @@ public class PropriedadeValidator implements Validator {
         PropriedadeCommand command = (PropriedadeCommand) o;
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nome", "field.required", "Falha: Não é possível cadastrar sem um nome.");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "tipoEntradaPoligono", "field.required", "Falha: Selecione um método para a definição do polígono.");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "pontos", "field.required", "Falha: As coordenadas não podem estar vazias.");
 
-        if (command.getIdProprietario() == null && command.getCpfProprietario() != null) {
+        if (command.getCpfProprietario() != null) {
             ValidationUtils.rejectIfEmptyOrWhitespace(errors, "cpfProprietario", "field.required", "Falha: Não é possível cadastrar sem um cpf");
             if (!Proprietario.validarTamanhoCpf(command.getCpfProprietario())) {
                 errors.rejectValue("cpfProprietario", "cpf.tamanhoInvalido", "Falha: CPF deve conter exatamente 11 dígitos numéricos");
@@ -46,7 +46,7 @@ public class PropriedadeValidator implements Validator {
             try {
                 propriedadeServico.validarPoligono(command);
             } catch (IllegalArgumentException e) {
-                errors.rejectValue("tipoEntradaPoligono", "poligono.invalido", e.getMessage());
+                errors.rejectValue("pontos", "poligono.invalido", e.getMessage());
             }
         }
     }

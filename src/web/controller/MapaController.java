@@ -1,7 +1,6 @@
 package web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import modelo.Ponto;
 import modelo.Propriedade;
 import modelo.Temperatura;
@@ -67,6 +66,7 @@ public class MapaController {
         ModelAndView mv = new ModelAndView("visualizarMapa");
 
         List<Propriedade> propriedadesEncontradas = new ArrayList<>();
+        mv.addObject("exibirControleMapa", true);
 
         if (!erros.hasErrors() && command.getOpcaoSelecionada() != null) {
             String acao = OPCOES_CONTROLE_MAPA.get(command.getOpcaoSelecionada());
@@ -84,13 +84,11 @@ public class MapaController {
             mv.addObject("ControleMapaCommand", command);
         }
 
-        ObjectMapper conversorJson = new ObjectMapper();
-        conversorJson.findAndRegisterModules();
         try {
-            String estacoesJson = conversorJson.writerWithDefaultPrettyPrinter().writeValueAsString(estacaoMeteorologicaServico.listarTodas());
+            String estacoesJson = JsonUtil.converterObjetoParaJson(estacaoMeteorologicaServico.listarTodas());
             mv.addObject("estacoesJson", estacoesJson);
 
-            String propriedadesJson = conversorJson.writerWithDefaultPrettyPrinter().writeValueAsString(propriedadesEncontradas);
+            String propriedadesJson = JsonUtil.converterObjetoParaJson(propriedadesEncontradas);
             mv.addObject("propriedadesJson", propriedadesJson);
 
         } catch (JsonProcessingException e) {
@@ -105,15 +103,15 @@ public class MapaController {
     public ModelAndView visualizarPropriedade(@RequestParam("idPropriedade") Long idPropriedade) {
         ModelAndView mv = new ModelAndView("visualizarMapa");
 
-        mv.addObject("exibirFormulario", false);
+        mv.addObject("exibirControleMapa", false);
 
         if (idPropriedade != null) {
             try {
-
-                mv.addObject("propriedadesJson", JsonUtil.converterObjetoParaJson(propriedadeServico.buscarPorId(idPropriedade)));
+                mv.addObject("estacoesJson", JsonUtil.converterObjetoParaJson(estacaoMeteorologicaServico.listarTodas()));
+                mv.addObject("propriedadesJson", JsonUtil.converterObjetoParaJson(List.of(propriedadeServico.buscarPorId(idPropriedade))));
             } catch (JsonProcessingException e) {
                 mv.addObject("propriedadesJson", "[]");
-                mv.addObject("falha", "Falha: Não foi possível visualizar a propriedade");
+                mv.addObject("estacoesJson", "[]");
             }
         }
 

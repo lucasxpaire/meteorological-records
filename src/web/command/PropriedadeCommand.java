@@ -1,19 +1,16 @@
 package web.command;
 
 import modelo.Propriedade;
-import org.springframework.web.multipart.MultipartFile;
 import util.FormatadorUtil;
 
 public class PropriedadeCommand {
 
     Propriedade propriedade = new Propriedade();
 
-    private Long idProprietario;
     private String cpfProprietario;
 
-    private String tipoEntradaPoligono;
-    private String coordenadasPorInsercaoManual;
-    private MultipartFile coordenadasPorArquivo;
+    private String pontos;
+    private String nomeArquivoPontos;
 
     public Propriedade getPropriedade() {
         return propriedade;
@@ -39,14 +36,6 @@ public class PropriedadeCommand {
         propriedade.setNome(nome);
     }
 
-    public Long getIdProprietario() {
-        return idProprietario;
-    }
-
-    public void setIdProprietario(Long idProprietario) {
-        this.idProprietario = idProprietario;
-    }
-
     public String getCpfProprietario() {
         return cpfProprietario;
     }
@@ -55,28 +44,20 @@ public class PropriedadeCommand {
         this.cpfProprietario = FormatadorUtil.removerFormatacaoCpf(cpfProprietario);
     }
 
-    public String getTipoEntradaPoligono() {
-        return tipoEntradaPoligono;
+    public String getPontos() {
+        return pontos;
     }
 
-    public void setTipoEntradaPoligono(String tipoEntradaPoligono) {
-        this.tipoEntradaPoligono = tipoEntradaPoligono;
+    public void setPontos(String pontos) {
+        this.pontos = pontos;
     }
 
-    public String getCoordenadasPorInsercaoManual() {
-        return coordenadasPorInsercaoManual;
+    public String getNomeArquivoPontos() {
+        return nomeArquivoPontos;
     }
 
-    public void setCoordenadasPorInsercaoManual(String coordenadasPorInsercaoManual) {
-        this.coordenadasPorInsercaoManual = coordenadasPorInsercaoManual;
-    }
-
-    public MultipartFile getCoordenadasPorArquivo() {
-        return coordenadasPorArquivo;
-    }
-
-    public void setCoordenadasPorArquivo(MultipartFile coordenadasPorArquivo) {
-        this.coordenadasPorArquivo = coordenadasPorArquivo;
+    public void setNomeArquivoPontos(String nomeArquivoPontos) {
+        this.nomeArquivoPontos = nomeArquivoPontos;
     }
 
 }

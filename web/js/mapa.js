@@ -26,9 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function inicializarControlesDoMapa() {
     const opcaoSelecionada = document.getElementById('opcaoSelecionada');
 
-    opcaoSelecionada.addEventListener('change', configurarVisibilidadeCamposDeBusca);
-
-    configurarVisibilidadeCamposDeBusca();
+    if (opcaoSelecionada) {
+        opcaoSelecionada.addEventListener('change', configurarVisibilidadeCamposDeBusca);
+        configurarVisibilidadeCamposDeBusca();
+    }
 }
 
 function iniciarMapa() {
@@ -169,7 +170,7 @@ function criarDescricaoPropriedade(propriedade) {
                 <p><strong>Cor: ${propriedade.corNome}</strong></p>
                 ${gerarHtmlEstacoesAssociadas(propriedade)}
                 <p id="${idParagrafoTemperatura}"><strong>Temperatura: ${propriedade.centroide.temperaturaRecente}</strong></p>
-                <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idParagrafoTemperatura}')" class="botao botao-tabela--visualizar">Prever temperatura</button>
+                <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idParagrafoTemperatura}', '${idBotaoPrevisao}')" class="botao botao-tabela--visualizar">Prever temperatura</button>
             </div>
         `
     });
@@ -232,24 +233,27 @@ function criarLabelTemperaturaEstacao(estacao) {
     }
 }
 
-function preverTemperatura(idCentroide, idParagrafoTemperatura) {
+async function preverTemperatura(idCentroide, idParagrafoTemperatura, idBotaoPrevisao) {
     const paragrafoTemperatura = document.getElementById(idParagrafoTemperatura);
     const textoTemperatura = paragrafoTemperatura.querySelector('strong');
+    const botaoPrevisao = document.getElementById(idBotaoPrevisao);
 
-    fetch(`${urlPrevisao}?idCentroide=${idCentroide}`)
-        .then(resposta => {
-            if (!resposta.ok) {
-                throw new Error(`Falha: ${response.status}`);
-            }
-            return resposta.json();
-        })
-        .then(data => {
-            textoTemperatura.innerHTML = `Temperatura: ${data.temperaturaFormatada}`;
-        })
-        .catch(error => {
-            console.error('Falha: Não foi possível prever temperatura.', error);
-            textoTemperatura.innerHTML = 'Indisponível';
-        });
+    botaoPrevisao.disabled = true;
+    botaoPrevisao.innerHTML = 'Carregando...';
+
+    try {
+        const resposta = await fetch(`${urlPrevisao}?idCentroide=${idCentroide}`);
+        if (!resposta.ok) {
+            throw new Error(`Falha na requisição: ${resposta.status}`);
+        }
+        const json = await resposta.json();
+        textoTemperatura.innerHTML = `Temperatura: ${json.temperaturaFormatada}`;
+    } catch (error) {
+        textoTemperatura.innerHTML = 'Indisponível';
+    } finally {
+        botaoPrevisao.disabled = false;
+        botaoPrevisao.innerHTML = 'Prever temperatura';
+    }
 }
 
 function configurarVisibilidadeCamposDeBusca() {
