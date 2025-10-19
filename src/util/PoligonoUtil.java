@@ -1,10 +1,11 @@
 package util;
 
+import modelo.Arquivo;
 import modelo.Poligono;
 import modelo.Ponto;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -12,20 +13,18 @@ import java.util.List;
 
 public class PoligonoUtil {
 
-    public static final String TIPO_MANUAL = "manual";
-    public static final String TIPO_ARQUIVO = "arquivo";
     public static final int DUAS_PARTES = 2;
     public static final String CABECALHO_VALIDO = "lat;long";
     public static final int LATITUDE = 0;
     public static final int LONGITUDE = 1;
 
-    public static Poligono criarPoligonoPorArquivo(MultipartFile arquivo) {
-        if (arquivo == null || arquivo.isEmpty()) {
+    public static Poligono criarPoligonoPorArquivo(Arquivo arquivo) {
+        if (arquivo == null) {
             throw new IllegalArgumentException("Falha: Nenhuma coordenada ou arquivo foi fornecido.");
         }
 
         List<Ponto> pontos = new ArrayList<>();
-        try (BufferedReader leitor = new BufferedReader(new InputStreamReader(arquivo.getInputStream()))) {
+        try (BufferedReader leitor = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(arquivo.getConteudo())))) {
             String linha;
             int numeroLinha = 0;
 
