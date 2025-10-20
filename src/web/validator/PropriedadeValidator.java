@@ -44,7 +44,7 @@ public class PropriedadeValidator implements Validator {
 
         if (!errors.hasErrors()) {
             try {
-                propriedadeServico.validarPoligono(command);
+                propriedadeServico.validarFormatoPoligono(command);
             } catch (IllegalArgumentException e) {
                 errors.rejectValue("pontos", "poligono.invalido", e.getMessage());
             }

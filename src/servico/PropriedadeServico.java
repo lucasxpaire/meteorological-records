@@ -22,8 +22,7 @@ public class PropriedadeServico {
     @Autowired
     private ProprietarioServico proprietarioServico;
 
-
-    public Propriedade prepapararPropriedade(PropriedadeCommand command) {
+    public Propriedade prepararPropriedade(PropriedadeCommand command) {
         Propriedade propriedade;
 
         if (command.getId() != null) {
@@ -102,7 +101,7 @@ public class PropriedadeServico {
         return dados.listarTodos(Propriedade.class);
     }
 
-    public void validarPoligono(PropriedadeCommand command) {
+    public void validarFormatoPoligono(PropriedadeCommand command) {
         String textoPontos = command.getPontos();
         if (textoPontos == null || textoPontos.trim().isEmpty()) {
             throw new IllegalArgumentException("Falha: As coordenadas são obrigatórias.");

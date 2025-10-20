@@ -8,7 +8,6 @@ import modelo.Temperatura;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import smile.timeseries.AR;
-import util.EscritorUtil;
 import util.FormatadorUtil;
 import util.JsonUtil;
 import util.LeitorArquivoUtil;
@@ -50,9 +49,7 @@ public class TemperaturaServico {
 
     private final ScheduledExecutorService agendador = Executors.newSingleThreadScheduledExecutor();
 
-    private LocalDateTime ultimaAtualizacaoEstacoesECentroides;
-    private LocalDateTime ultimaAtualizacaoPrevisoesReais;
-    private LocalDateTime inicioUltimaExecucao;
+    private LocalDateTime ultimaAtualizacaoDeTemperaturas;
 
     @PostConstruct
     public void inicializarServicos() {
@@ -66,18 +63,15 @@ public class TemperaturaServico {
     }
 
     public void executarAtualizacaoPeriodica() {
-        this.inicioUltimaExecucao = LocalDateTime.now();
         dados.iniciarTransacao();
         try {
             atualizarTemperaturasDeEstacoesEPontosAssociados();
-            ultimaAtualizacaoEstacoesECentroides = LocalDateTime.now();
             preencherTemperaturasReaisNasPrevisoes();
-            ultimaAtualizacaoPrevisoesReais = LocalDateTime.now();
             dados.confirmarTransacao();
         } catch (Exception e) {
             dados.desfazerTransacao();
-            EscritorUtil.escreverEmNovaLinha("Falha: Ocorreu um erro durante a execução da tarefa agendada: " + e.getMessage());
         }
+        ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
     }
 
     private void popularHistoricosIniciaisSeNecessario() {
@@ -93,7 +87,8 @@ public class TemperaturaServico {
                 popularHistoricoInicialPara(estacao);
                 dados.salvar(estacao);
             } catch (Exception e) {
-                EscritorUtil.escreverEmNovaLinha("Falha: estação " + estacao.getCodigoEstacao() + ", não possui histórico de temperaturas.");
+                throw new IllegalArgumentException("Falha: Não foi possível executar a atualização de temperaturas da estação: " + estacao.getCodigoEstacao());
+
             }
         }
         dados.confirmarTransacao();
@@ -311,17 +306,13 @@ public class TemperaturaServico {
         }
     }
 
-    public LocalDateTime getUltimaAtualizacaoEstacoesECentroides() {
-        return ultimaAtualizacaoEstacoesECentroides;
+    public LocalDateTime obterUltimaAtualizacaoDeTemperaturas() {
+        return ultimaAtualizacaoDeTemperaturas;
     }
 
-    public LocalDateTime getUltimaAtualizacaoPrevisoesReais() {
-        return ultimaAtualizacaoPrevisoesReais;
-    }
-
-    public LocalDateTime getProximaExecucaoAgendada() {
-        if (inicioUltimaExecucao != null) {
-            return inicioUltimaExecucao.plus(INTERVALO_PARA_EXECUTAR, UNIDADE_DE_TEMPO_DO_INTERVALO.toChronoUnit());
+    public LocalDateTime obterProximaAtualizacaoDeTemperaturas() {
+        if (ultimaAtualizacaoDeTemperaturas != null) {
+            return ultimaAtualizacaoDeTemperaturas.plus(INTERVALO_PARA_EXECUTAR, UNIDADE_DE_TEMPO_DO_INTERVALO.toChronoUnit());
         }
         return null;
     }

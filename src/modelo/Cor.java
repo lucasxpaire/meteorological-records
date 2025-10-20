@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Table(name = "COR")
 public class Cor {
 
-    public static final String FORMATO_CODIGO_HEXADECIMAL_VALIDO = "^#[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$";
+    private static final String REGEX_CODIGO_HEXADECIMAL_VALIDO = "^#[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$";
 
     private Long id;
     private String nome;
@@ -43,7 +43,7 @@ public class Cor {
 
     @Transient
     public static boolean validarCodigoHexadecimal(String codigo) {
-        return codigo != null && codigo.matches(FORMATO_CODIGO_HEXADECIMAL_VALIDO);
+        return codigo != null && codigo.matches(REGEX_CODIGO_HEXADECIMAL_VALIDO);
     }
     @Transient
     public static boolean validarNome(String nome) {

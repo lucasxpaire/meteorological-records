@@ -49,8 +49,8 @@ public class PoligonoUtil {
                 }
 
                 try {
-                    Double latitude = FormatadorUtil.StringParaDouble(partes[LATITUDE]);
-                    Double longitude = FormatadorUtil.StringParaDouble(partes[LONGITUDE]);
+                    Double latitude = FormatadorUtil.converterStringParaDouble(partes[LATITUDE]);
+                    Double longitude = FormatadorUtil.converterStringParaDouble(partes[LONGITUDE]);
 
                     if (!Ponto.validarLatitude(latitude)) {
                         throw new IllegalArgumentException("Falha: Na linha " + numeroLinha + ". A Latitude deve estar entre -90 e 90.");

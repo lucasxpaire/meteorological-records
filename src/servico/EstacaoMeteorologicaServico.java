@@ -74,9 +74,7 @@ public class EstacaoMeteorologicaServico {
 
     public List<EstacaoMeteorologica> buscarEstacoesRelevantes(Ponto ponto) {
         try {
-            ponto.setRaioRelevancia(calcularRaioDeBuscaEmGraus(ponto));
-
-            List<EstacaoMeteorologica> estacoesNoRaio = buscarEstacoesDentroDoRaio(ponto, ponto.getRaioRelevancia());
+            List<EstacaoMeteorologica> estacoesNoRaio = buscarEstacoesDentroDoRaio(ponto, calcularRaioDeBuscaEmGraus(ponto));
             Map<Integer, List<EstacaoMeteorologica>> quadrantes = classificarEstacoesPorQuadrante(estacoesNoRaio, ponto);
 
             for (int quadrante = Ponto.PRIMEIRO_QUADRANTE; quadrante <= Ponto.QUARTO_QUADRANTE; quadrante++) {

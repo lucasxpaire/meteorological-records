@@ -9,7 +9,7 @@ import java.util.List;
 public class Poligono {
 
     public static final int QUANTIDADE_MINIMA_DE_PONTOS = 3;
-    private static final int PRODUTO_ORIENTACAO_OPOSTAS = 0;
+    private static final int PRODUTO_DA_ORIENTACAO_OPOSTA = 0;
 
     private Long id;
     private List<Ponto> pontos = new ArrayList<>();
@@ -107,7 +107,7 @@ public class Poligono {
         double orientacaoInicioArestaA = calcularOrientacaoGeometrica(inicioArestaB, fimArestaB, inicioArestaA);
         double orientacaoFimArestaA = calcularOrientacaoGeometrica(inicioArestaB, fimArestaB, fimArestaA);
 
-        return orientacaoInicioArestaB * orientacaoFimArestaB < PRODUTO_ORIENTACAO_OPOSTAS && orientacaoInicioArestaA * orientacaoFimArestaA < 0;
+        return orientacaoInicioArestaB * orientacaoFimArestaB < PRODUTO_DA_ORIENTACAO_OPOSTA && orientacaoInicioArestaA * orientacaoFimArestaA < 0;
     }
 
     @Transient

@@ -40,7 +40,6 @@ public class Ponto {
     private List<Temperatura> historicoTemperaturas = new ArrayList<>();
     private List<EstacaoMeteorologica> estacoesMeteorologicas = new ArrayList<>();
     private String fusoHorario;
-    private Double raioRelevancia;
 
     private static final TimeZoneEngine timeZoneEngine = TimeZoneEngine.initialize();
 
@@ -113,15 +112,6 @@ public class Ponto {
 
     public void setFusoHorario(String fusoHorario) {
         this.fusoHorario = fusoHorario;
-    }
-
-    @Column(name = "RAIO_RELEVANCIA")
-    public Double getRaioRelevancia() {
-        return raioRelevancia;
-    }
-
-    public void setRaioRelevancia(Double raioRelevancia) {
-        this.raioRelevancia = raioRelevancia;
     }
 
     @Transient
@@ -337,15 +327,6 @@ public class Ponto {
     @JsonProperty("longitudeFormatada")
     public String getLongitudeFormatada() {
         return FormatadorUtil.formatarPontoDecimalParaVirgula(longitude);
-    }
-
-    @Transient
-    @JsonProperty("raioRelevanciaEmMetros")
-    public Double getRaioRelevanciaEmMetros() {
-        if (this.raioRelevancia == null) {
-            return null;
-        }
-        return this.raioRelevancia * GRAU_PARA_METROS;
     }
 
 }

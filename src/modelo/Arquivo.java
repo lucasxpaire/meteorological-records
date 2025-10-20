@@ -49,4 +49,5 @@ public class Arquivo {
     public void setConteudo(byte[] conteudo) {
         this.conteudo = conteudo;
     }
+
 }

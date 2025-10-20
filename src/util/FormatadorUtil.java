@@ -19,7 +19,7 @@ public class FormatadorUtil {
         return String.format("%.2f°C", temperatura).replace('.', ',');
     }
 
-    public static Double StringParaDouble(String valor) {
+    public static Double converterStringParaDouble(String valor) {
         return Double.parseDouble(valor.trim().replace(",", "."));
     }
 

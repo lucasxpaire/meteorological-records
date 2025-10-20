@@ -1,7 +1,6 @@
 package web.controller;
 
 import modelo.Propriedade;
-import modelo.Proprietario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,21 +40,16 @@ public class PropriedadeController {
     public ModelAndView exibirFormulario(@RequestParam(value = "idPropriedade", required = false) Long idPropriedade) {
         ModelAndView mv = new ModelAndView("cadastroPropriedade");
         PropriedadeCommand command = new PropriedadeCommand();
-        Proprietario proprietario = null;
 
         if (idPropriedade != null) {
             Propriedade propriedade = propriedadeServico.buscarPorId(idPropriedade);
             command.setPropriedade(propriedade);
-            proprietario = propriedade.getProprietario();
-            mv.addObject("propriedade", propriedade);
-
             command.setNomeArquivoPontos(propriedade.getArquivoPontos().getNomeOriginal());
             command.setPontos(new String(propriedade.getArquivoPontos().getConteudo()));
-        }
+            command.setCpfProprietario(FormatadorUtil.formatarCpf(propriedade.getProprietario().getCpf()));
 
-        if (proprietario != null) {
-            command.setCpfProprietario(FormatadorUtil.formatarCpf(proprietario.getCpf()));
-            mv.addObject("proprietario", proprietario);
+            mv.addObject("proprietario", propriedade.getProprietario());
+            mv.addObject("propriedade", propriedade);
         }
 
         mv.addObject("PropriedadeCommand", command);
@@ -91,7 +85,7 @@ public class PropriedadeController {
             redirectAttributes.addFlashAttribute("sucesso", "Propriedade cadastrada com sucesso!");
         }
 
-        Propriedade propriedade = propriedadeServico.prepapararPropriedade(command);
+        Propriedade propriedade = propriedadeServico.prepararPropriedade(command);
         pontoServico.calcularEAdicionarTemperaturaAtual(propriedade.getCentroide());
 
         propriedadeServico.salvar(propriedade);
@@ -102,9 +96,13 @@ public class PropriedadeController {
     @GetMapping("/deletarPropriedade.html")
     public String deletar(@RequestParam(value = "idPropriedade") Long idPropriedade, RedirectAttributes redirectAttributes) {
         Propriedade propriedade = propriedadeServico.buscarPorId(idPropriedade);
-        propriedadeServico.deletar(propriedade);
+        try {
+            propriedadeServico.deletar(propriedade);
+            redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("falha", "Falha: Não foi possível deletar a propriedade.");
+        }
 
-        redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");
         return "redirect:/gerenciarPropriedades.html";
     }
 

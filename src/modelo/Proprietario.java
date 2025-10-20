@@ -11,11 +11,11 @@ import java.util.Set;
 @Table(name = "PROPRIETARIO")
 public class Proprietario {
 
-    public static final int QUANTIDADE_DIGITOS_VALIDOS_CPF = 11;
-    public static final String PONTOS_E_TRACOS = "\\D";
-    public static final String ESPACO_EM_BRANCO = "";
+    private static final int QUANTIDADE_DIGITOS_VALIDOS_CPF = 11;
+    private static final int QUANTIDADE_DIGITOS_VALIDOS_TELEFONE = 11;
 
-    public static final int QUANTIDADE_DIGITOS_COM_NOVE_NO_COMECO = 11;
+    private static final String REGEX_NAO_DIGITO = "\\D";
+    private static final String STRING_VAZIA = "";
 
     private Long id;
     private String nome;
@@ -88,7 +88,7 @@ public class Proprietario {
             return false;
         }
 
-        String cpfSemFormatacao = cpf.replaceAll(PONTOS_E_TRACOS, ESPACO_EM_BRANCO);
+        String cpfSemFormatacao = cpf.replaceAll(REGEX_NAO_DIGITO, STRING_VAZIA);
         return cpfSemFormatacao.length() == QUANTIDADE_DIGITOS_VALIDOS_CPF;
     }
 
@@ -102,18 +102,18 @@ public class Proprietario {
         if (telefone == null) {
             return false;
         }
-        String telefoneSemFormatacao = telefone.replaceAll(PONTOS_E_TRACOS, ESPACO_EM_BRANCO);
-        return telefoneSemFormatacao.length() == QUANTIDADE_DIGITOS_COM_NOVE_NO_COMECO;
+        String telefoneSemFormatacao = telefone.replaceAll(REGEX_NAO_DIGITO, STRING_VAZIA);
+        return telefoneSemFormatacao.length() == QUANTIDADE_DIGITOS_VALIDOS_TELEFONE;
     }
 
     @Transient
     public String getCpfFormatado() {
-        return FormatadorUtil.formatarCpf(this.cpf);
+        return FormatadorUtil.formatarCpf(cpf);
     }
 
     @Transient
     public String getTelefoneFormatado() {
-        return FormatadorUtil.formatarTelefone(this.telefone);
+        return FormatadorUtil.formatarTelefone(telefone);
     }
 
 }

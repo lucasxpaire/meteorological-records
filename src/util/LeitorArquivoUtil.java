@@ -131,7 +131,7 @@ public class LeitorArquivoUtil {
                         if (colunaTemperatura == null) {
                             temperatura.setTemperaturaReal(null);
                         } else {
-                            temperatura.setTemperaturaReal(FormatadorUtil.StringParaDouble(colunaTemperatura));
+                            temperatura.setTemperaturaReal(FormatadorUtil.converterStringParaDouble(colunaTemperatura));
                         }
 
                         LocalDateTime dataHora = LocalDateTime.parse(dataEsperadaDoArquivoAtual + " " +  horaDeBusca.substring(0, 2) + ":" + horaDeBusca.substring(2, 4), FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);

@@ -13,6 +13,8 @@ import java.util.List;
 @Service
 public class ProprietarioServico {
 
+    private static final String REGEX_APENAS_NUMEROS = "^[0-9]+$";
+
     @Autowired
     private Dados dados;
 
@@ -73,7 +75,7 @@ public class ProprietarioServico {
         }
 
         String termoNormalizado = FormatadorUtil.removerFormatacaoCpf(termo);
-        if (!termoNormalizado.isEmpty() && termoNormalizado.matches("^[0-9]+$")) {
+        if (!termoNormalizado.isEmpty() && termoNormalizado.matches(REGEX_APENAS_NUMEROS)) {
             return dados.buscarListaPorCampo(Proprietario.class, "cpf", termoNormalizado);
         } else {
             return dados.buscarPorCampoContendo(Proprietario.class, "nome", termo);
