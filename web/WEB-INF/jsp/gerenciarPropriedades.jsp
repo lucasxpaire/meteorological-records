@@ -2,6 +2,7 @@
 <%@ include file="cabecalho.jspf" %>
 
 <%--@elvariable id="sucesso" type="java.lang.String"--%>
+<%--@elvariable id="falha" type="java.lang.String"--%>
 
 <tags:corpo>
     <div class="estrutura-pagina">
@@ -13,6 +14,7 @@
             </div>
 
             <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
+            <tags:alerta css="alerta-falha" alerta="${falha}" />
 
             <div class="busca-container">
                 <form action="gerenciarPropriedades.html" method="get" class="formulario-busca">

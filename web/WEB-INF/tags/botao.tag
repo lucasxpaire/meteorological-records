@@ -7,11 +7,4 @@
 
 <%@ include file="../jsp/cabecalho.jspf"%>
 
-<c:choose>
-    <c:when test="${not empty href}">
-        <a href="<c:url value='${href}'/>" class="${css}">${label}</a>
-    </c:when>
-    <c:otherwise>
-        <button id="${id}" class="${css}">${label}</button>
-    </c:otherwise>
-</c:choose>
+<button id="${id}" class="${css}">${label}</button>

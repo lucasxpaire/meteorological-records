@@ -7,5 +7,5 @@
 <%@ attribute name="placeholder" required="false" type="java.lang.String" %>
 
 <form:label path="${path}">${label}</form:label>
-<form:input path="${path}" placeholder="${placeholder}" />
+<form:input path="${path}" placeholder="${placeholder}" cssClass="input-padrao" />
 <form:errors path="${path}" cssClass="alerta-erro-formulario"/>

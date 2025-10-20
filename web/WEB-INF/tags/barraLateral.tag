@@ -8,7 +8,7 @@
 
     <ul class="menu-lateral-lista">
         <li>
-            <a href="index.html" class="${paginaAtiva == 'inicio' ? 'active' : ''}">Início</a>
+            <a href="inicio.html" class="${paginaAtiva == 'inicio' ? 'active' : ''}">Início</a>
         </li>
         <li>
             <a href="gerenciarProprietarios.html" class="${paginaAtiva == 'proprietarios' ? 'active' : ''}">Gerenciar proprietários</a>

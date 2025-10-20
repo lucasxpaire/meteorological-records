@@ -9,7 +9,7 @@
 <%@ attribute name="descricao" required="true" type="java.lang.String" %>
 
 <form:label path="${path}">${label}:</form:label>
-<form:select path="${path}" id="${path}" cssClass="form-control">
+<form:select path="${path}" id="${path}" cssClass="input-padrao">
     <form:option value="" label="${descricao}" disabled="true" />
 
     <c:choose>
