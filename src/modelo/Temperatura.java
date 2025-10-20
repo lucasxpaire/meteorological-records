@@ -21,7 +21,7 @@ public class Temperatura {
 
     @JsonIgnore
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_TEMPERATURA")
     public Long getId() {
         return id;

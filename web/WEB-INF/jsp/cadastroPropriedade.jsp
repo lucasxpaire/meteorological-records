@@ -31,7 +31,7 @@
 
                     <div class="formulario-acoes-arquivo">
                         <input type="file" id="seletorDeArquivo" accept=".txt,.csv" style="display: none">
-                        <a href="#" id="linkSelecionarArquivo" class="botao botao-novo botao-com-icone">Selecionar Arquivo</a>
+                        <button type="button" id="linkSelecionarArquivo" class="botao botao-novo botao-com-icone">Selecionar Arquivo</button>
 
                         <c:if test="${not empty propriedade && not empty propriedade.arquivoPontos}">
                             <a href="<c:url value='/arquivo/baixar/${propriedade.arquivoPontos.id}' />" title="Baixar arquivo" class="botao botao-novo botao-com-icone">

@@ -73,7 +73,7 @@ public class Proprietario {
     }
 
     @JsonIgnore
-    @OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "proprietario", orphanRemoval = true)
     public Set<Propriedade> getPropriedades() {
         return propriedades;
     }

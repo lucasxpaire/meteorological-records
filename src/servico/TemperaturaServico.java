@@ -63,13 +63,13 @@ public class TemperaturaServico {
     }
 
     public void executarAtualizacaoPeriodica() {
+        ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
         try {
             atualizarTemperaturasDeEstacoesEPontosAssociados();
             preencherTemperaturasReaisNasPrevisoes();
         } catch (Exception e) {
             throw new IllegalArgumentException("Falha: Não foi possível executar a atualizacao.");
         }
-        ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
     }
 
     private void popularHistoricosIniciaisSeNecessario() {
@@ -251,7 +251,7 @@ public class TemperaturaServico {
 
     public void popularHistoricoInicialPara(EstacaoMeteorologica estacao) {
         try {
-            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS + estacao.getCodigoEstacao());
+            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS2 + estacao.getCodigoEstacao());
 
             List<Temperatura> historicoExistente = estacao.getLocalizacao().getHistoricoTemperaturas();
             Set<LocalDateTime> datasExistentes = historicoExistente.stream()
