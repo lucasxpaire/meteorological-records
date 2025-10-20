@@ -1,5 +1,6 @@
 package web.controller;
 
+import modelo.Ponto;
 import modelo.Propriedade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -81,7 +82,8 @@ public class PropriedadeController {
         }
 
         Propriedade propriedade = propriedadeServico.prepararPropriedade(command);
-        pontoServico.calcularEAdicionarTemperaturaAtual(propriedade.getCentroide());
+        Ponto centroide = pontoServico.calcularEAdicionarTemperaturaAtual(propriedade.getCentroide());
+        propriedade.setCentroide(centroide);
         propriedadeServico.salvar(propriedade);
 
         if (command.getId() != null) {

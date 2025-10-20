@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "PONTO")
@@ -165,10 +164,8 @@ public class Ponto {
         }
 
         return temperaturas.stream()
-                .collect(Collectors.groupingBy(Temperatura::getDataHora, Collectors.counting()))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
+                .map(Temperatura::getDataHora)
+                .max(Comparator.naturalOrder())
                 .orElse(null);
     }
 

@@ -18,13 +18,14 @@ public class PontoServico {
     @Autowired
     private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
-    public void calcularEAdicionarTemperaturaAtual(Ponto ponto) {
+    public Ponto calcularEAdicionarTemperaturaAtual(Ponto ponto) {
         List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
         ponto.setFusoHorario(ponto.determinarFusoHorario());
         ponto.setEstacoesMeteorologicas(estacoesRelevantes);
         Temperatura temperaturaCalculada = ponto.interpolarTemperaturaAtual(ponto.getEstacoesMeteorologicas());
         ponto.getHistoricoTemperaturas().add(temperaturaCalculada);
 
+        return ponto;
     }
 
     public Ponto buscarPorId(Long id) {

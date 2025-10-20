@@ -34,9 +34,9 @@ public class Dados {
         }
     }
 
-    public <T> T salvar(T objeto) {
+    public <T> void salvar(T objeto) {
         try {
-            return entityManager.merge(objeto);
+            entityManager.merge(objeto);
         } catch (PersistenceException e) {
             throw new RuntimeException("Não foi possível salvar o objeto: " + objeto.getClass().getSimpleName(), e);
         }

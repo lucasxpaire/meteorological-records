@@ -58,6 +58,8 @@ public class PropriedadeServico {
         propriedade.setPoligono(poligono);
         propriedade.setCentroide(poligono.calcularCentroide());
 
+        dados.salvar(poligono.calcularCentroide());
+
         return propriedade;
     }
 
@@ -124,8 +126,6 @@ public class PropriedadeServico {
 
     public void deletar(Propriedade propriedade) {
         if (validarPropriedade(propriedade)) {
-            propriedade.getCentroide().getHistoricoTemperaturas().clear();
-            propriedade.getPoligono().getPontos().clear();
             dados.deletar(propriedade);
         } else {
             throw new IllegalArgumentException("Falha: Dados da propriedade são inválidos.");
