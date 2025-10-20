@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const textarea = document.getElementById('coordenadaPorInsercaoManual');
+    const textarea = document.getElementById('pontos');
 
     if (!textarea) {
         return;

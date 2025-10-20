@@ -25,22 +25,21 @@
                     <h4>Definição do polígono</h4>
                     <form:hidden path="nomeArquivoPontos" />
 
-                    <div id="campoManual" >
-                        <label for="pontos">Coordenadas no formato: XX,XXXX;XX,XXXX</label>
-                        <form:textarea path="pontos" id="pontos" placeholder="Digite as coordenadas (XX,XXXX;XX,XXXX) uma por linha, OU ARRASTE SEU ARQUIVO .txt/.csv aqui." cssStyle="width: 700px; height: 200px;"/>
-                        <form:errors path="pontos" cssClass="alerta-erro-formulario" />
+                    <label for="pontos">Coordenadas no formato: XX,XXXX;XX,XXXX</label>
+                    <form:textarea path="pontos" id="pontos" placeholder="Digite as coordenadas (XX,XXXX;XX,XXXX) uma por linha, OU ARRASTE SEU ARQUIVO .txt/.csv aqui." cssStyle="width: 700px; height: 200px;"/>
+                    <form:errors path="pontos" cssClass="alerta-erro-formulario" />
 
-                        <div class="formulario-acoes-arquivo">
-                            <input type="file" id="seletorDeArquivo" accept=".txt,.csv" style="display: none">
-                            <a href="#" id="linkSelecionarArquivo" class="botao botao-novo botao-com-icone">Selecionar Arquivo</a>
+                    <div class="formulario-acoes-arquivo">
+                        <input type="file" id="seletorDeArquivo" accept=".txt,.csv" style="display: none">
+                        <a href="#" id="linkSelecionarArquivo" class="botao botao-novo botao-com-icone">Selecionar Arquivo</a>
 
-                            <c:if test="${not empty propriedade && not empty propriedade.arquivoPontos}">
-                                <a href="<c:url value='/arquivo/baixar/${propriedade.arquivoPontos.id}' />" title="Baixar arquivo" class="botao botao-novo botao-com-icone">
-                                    <img src="https://img.icons8.com/small/16/download--v1.png" alt="Baixar arquivo"/>Baixar arquivo
-                                </a>
-                            </c:if>
-                        </div>
+                        <c:if test="${not empty propriedade && not empty propriedade.arquivoPontos}">
+                            <a href="<c:url value='/arquivo/baixar/${propriedade.arquivoPontos.id}' />" title="Baixar arquivo" class="botao botao-novo botao-com-icone">
+                                <img src="https://img.icons8.com/small/16/download--v1.png" alt="Baixar arquivo"/>Baixar arquivo
+                            </a>
+                        </c:if>
                     </div>
+
                     <div class="formulario-acoes">
                         <input type="submit" value="<tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Alterar" textoCondicaoFalsa="Cadastrar" />" class="botao botao-novo"/>
                     </div>

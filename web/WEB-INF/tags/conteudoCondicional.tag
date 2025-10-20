@@ -16,9 +16,9 @@
 
 <c:choose>
     <c:when test="${not empty tagHtml}">
-        <${tagHtml}>${fn:escapeXml(textoFinal)}</${tagHtml}>
+        <${tagHtml}>${textoFinal}</${tagHtml}>
     </c:when>
     <c:otherwise>
-        ${fn:escapeXml(textoFinal)}
+        ${textoFinal}
     </c:otherwise>
 </c:choose>

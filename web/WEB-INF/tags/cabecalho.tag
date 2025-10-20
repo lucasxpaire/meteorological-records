@@ -12,7 +12,6 @@
 
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/estilo.css'/>">
     <script src="<c:url value='/js/vanilla-masker.min.js'/>"></script>
-
 </head>
 <body>
 <header class="cabecalho">

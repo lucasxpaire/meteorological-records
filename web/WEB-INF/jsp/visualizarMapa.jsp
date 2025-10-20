@@ -29,7 +29,7 @@
                         </div>
 
                         <div class="menu-flutuante-grupo">
-                            <tags:botao id="botaoBuscarPropriedades" label="Buscar" css="botao" />
+                            <tags:botao label="Buscar" css="botao" />
                         </div>
                     </div>
 

@@ -63,19 +63,16 @@ public class TemperaturaServico {
     }
 
     public void executarAtualizacaoPeriodica() {
-        dados.iniciarTransacao();
         try {
             atualizarTemperaturasDeEstacoesEPontosAssociados();
             preencherTemperaturasReaisNasPrevisoes();
-            dados.confirmarTransacao();
         } catch (Exception e) {
-            dados.desfazerTransacao();
+            throw new IllegalArgumentException("Falha: Não foi possível executar a atualizacao.");
         }
         ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
     }
 
     private void popularHistoricosIniciaisSeNecessario() {
-        dados.iniciarTransacao();
         List<EstacaoMeteorologica> estacoesSemHistorico = dados.buscarComCampoNaoVazio(EstacaoMeteorologica.class, "localizacao.historicoTemperaturas");
 
         if (estacoesSemHistorico.isEmpty()) {
@@ -91,7 +88,6 @@ public class TemperaturaServico {
 
             }
         }
-        dados.confirmarTransacao();
     }
 
     public void salvar(Temperatura temperatura) {

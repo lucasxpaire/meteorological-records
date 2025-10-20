@@ -7,6 +7,6 @@
 
 <c:if test="${not empty alerta}">
     <div class="${css}">
-            ${fn:escapeXml(alerta)}
+            ${alerta}
     </div>
 </c:if>
