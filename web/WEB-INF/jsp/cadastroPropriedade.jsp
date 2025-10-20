@@ -2,6 +2,8 @@
 <%@ taglib prefix="ftags" uri="http://www.springframework.org/tags/form" %>
 <%@ include file="cabecalho.jspf" %>
 
+<%--@elvariable id="sucesso" type="java.lang.String"--%>
+
 <tags:corpo>
     <div>
         <tags:barraLateral paginaAtiva="propriedades" />
@@ -9,11 +11,13 @@
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
                 <tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Edição de propriedade" textoCondicaoFalsa="Cadastro de propriedade" tagHtml="h1" />
-                <a href="gerenciarProprietarios.html" class="botao botao-novo">Voltar</a>
+                <a href="gerenciarPropriedades.html" class="botao botao-novo">Voltar</a>
             </div>
 
             <div class="formulario-container">
                 <tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Altere os dados necessários de propriedade" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar uma propriedade" tagHtml="h3" />
+
+                <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
 
                 <form:form modelAttribute="PropriedadeCommand" method="post" action="cadastroPropriedade.html">
                     <form:hidden path="id" />
@@ -25,8 +29,8 @@
                     <h4>Definição do polígono</h4>
                     <form:hidden path="nomeArquivoPontos" />
 
-                    <label for="pontos">Coordenadas no formato: XX,XXXX;XX,XXXX</label>
-                    <form:textarea path="pontos" id="pontos" placeholder="Digite as coordenadas (XX,XXXX;XX,XXXX) uma por linha, OU ARRASTE SEU ARQUIVO .txt/.csv aqui." cssStyle="width: 700px; height: 200px;"/>
+                    <label for="pontos">Coordenadas</label>
+                    <form:textarea path="pontos" id="pontos" placeholder="Digite as coordenadas (XX,XXXX;XX,XXXX) uma por linha, ou arraste seu arquivo .txt/.csv aqui." cssStyle="width: 700px; height: 200px;"/>
                     <form:errors path="pontos" cssClass="alerta-erro-formulario" />
 
                     <div class="formulario-acoes-arquivo">
@@ -48,7 +52,7 @@
         </main>
     </div>
     <script src="<c:url value='/js/insercaoCoordenadas.js' />"></script>
-    <script src="<c:url value='/js/mascaraCoordenadas.js'/>"></script>
+<%--    <script src="<c:url value='/js/mascaraCoordenadas.js'/>"></script>--%>
     <script>
         VMasker(document.getElementById("cpfProprietario")).maskPattern("999.999.999-99");
     </script>

@@ -6,6 +6,7 @@ import modelo.Poligono;
 import modelo.Propriedade;
 import modelo.Proprietario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import util.FormatadorUtil;
 import util.PoligonoUtil;
@@ -48,7 +49,7 @@ public class PropriedadeServico {
             arquivo.setNomeOriginal(command.getNome() + ".csv");
         }
 
-        arquivo.setTipoConteudo("text/plain");
+        arquivo.setTipoConteudo(MediaType.TEXT_PLAIN_VALUE);
         arquivo.setConteudo(command.getPontos().getBytes());
         propriedade.setArquivoPontos(arquivo);
 
@@ -109,7 +110,7 @@ public class PropriedadeServico {
 
         Arquivo arquivoPontos = new Arquivo();
         arquivoPontos.setNomeOriginal(command.getNomeArquivoPontos());
-        arquivoPontos.setTipoConteudo("text/plain");
+        arquivoPontos.setTipoConteudo(MediaType.TEXT_PLAIN_VALUE);
         arquivoPontos.setConteudo(command.getPontos().getBytes());
 
         Poligono poligono = PoligonoUtil.criarPoligonoPorArquivo(arquivoPontos);

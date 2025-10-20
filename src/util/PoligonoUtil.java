@@ -13,10 +13,12 @@ import java.util.List;
 
 public class PoligonoUtil {
 
-    public static final int DUAS_PARTES = 2;
-    public static final String CABECALHO_VALIDO = "lat;long";
-    public static final int LATITUDE = 0;
-    public static final int LONGITUDE = 1;
+    private static final int DUAS_PARTES = 2;
+    private static final String CABECALHO_VALIDO = "lat;long";
+    private static final int LATITUDE = 0;
+    private static final int LONGITUDE = 1;
+    private static final String PONTO = ".";
+    private static final String PONTO_E_VIRGULA = ";";
 
     public static Poligono criarPoligonoPorArquivo(Arquivo arquivo) {
         if (arquivo == null) {
@@ -35,7 +37,15 @@ public class PoligonoUtil {
                     continue;
                 }
 
-                String[] partes = linha.split(";");
+                if (linha.matches(".*\\p{L}.*")) {
+                    throw new IllegalArgumentException("Falha: Na linha " + numeroLinha + ". Digite apenas números.");
+                }
+
+                if (linha.contains(PONTO)) {
+                    throw new IllegalArgumentException("Falha: Na linha " + numeroLinha + ". Use vírgula ao invés de ponto como separador decimal.");
+                }
+
+                String[] partes = linha.split(PONTO_E_VIRGULA);
                 if (partes.length < DUAS_PARTES) {
                     throw new IllegalArgumentException("Falha: Na linha " + numeroLinha + ". Formato inválido. Use o formato 'latitude;longitude' (ex: -29,7181;-53,8225).");
                 }

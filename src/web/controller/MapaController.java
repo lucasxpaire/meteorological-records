@@ -66,7 +66,6 @@ public class MapaController {
         ModelAndView mv = new ModelAndView("visualizarMapa");
 
         List<Propriedade> propriedadesEncontradas = new ArrayList<>();
-        mv.addObject("exibirControleMapa", true);
 
         if (!erros.hasErrors() && command.getOpcaoSelecionada() != null) {
             String acao = OPCOES_CONTROLE_MAPA.get(command.getOpcaoSelecionada());
@@ -100,10 +99,8 @@ public class MapaController {
     }
 
     @GetMapping("/visualizarPropriedade.html")
-    public ModelAndView visualizarPropriedade(@RequestParam("idPropriedade") Long idPropriedade) {
+    public ModelAndView visualizarPropriedade(@ModelAttribute("ControleMapaCommand") @Validated ControleMapaCommand command, BindingResult erros, @RequestParam("idPropriedade") Long idPropriedade) {
         ModelAndView mv = new ModelAndView("visualizarMapa");
-
-        mv.addObject("exibirControleMapa", false);
 
         if (idPropriedade != null) {
             try {
@@ -114,6 +111,8 @@ public class MapaController {
                 mv.addObject("estacoesJson", "[]");
             }
         }
+
+        mv.addObject("ControleMapaCommand", command);
 
         return mv;
     }

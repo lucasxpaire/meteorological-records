@@ -47,7 +47,6 @@ public class ProprietarioController {
         }
 
         mv.addObject("cores", corServico.listarTodos());
-
         mv.addObject("ProprietarioCommand", command);
         return mv;
     }
@@ -67,7 +66,10 @@ public class ProprietarioController {
     }
 
     @PostMapping("/cadastroProprietario.html")
-    public String salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult errors, Model model, RedirectAttributes redirectAttributes) {
+    public String salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult errors, RedirectAttributes redirectAttributes, Model model) {
+
+        model.addAttribute("cores", corServico.listarTodos());
+
         if (errors.hasErrors()) {
             if (command.getId() != null) {
                 model.addAttribute("proprietario", proprietarioServico.buscarPorId(command.getId()));
@@ -75,16 +77,17 @@ public class ProprietarioController {
             return "cadastroProprietario";
         }
 
-        if (command.getId() != null) {
-            redirectAttributes.addFlashAttribute("sucesso", "Proprietário atualizado com sucesso!");
-        } else {
-            redirectAttributes.addFlashAttribute("sucesso", "Proprietário cadastrado com sucesso!");
-        }
-
         Proprietario proprietario = proprietarioServico.prepararProprietario(command);
         proprietarioServico.salvar(proprietario);
 
-        return "redirect:/gerenciarProprietarios.html";
+        if (command.getId() != null) {
+            model.addAttribute("sucesso", "Proprietário atualizado com sucesso!");
+            model.addAttribute("proprietario", proprietario);
+        } else {
+            model.addAttribute("sucesso", "Proprietário cadastrado com sucesso!");
+        }
+
+        return "cadastroProprietario";
     }
 
     @GetMapping("/deletarProprietario.html")

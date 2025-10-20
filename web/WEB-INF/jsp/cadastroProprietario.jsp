@@ -1,6 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ include file="cabecalho.jspf" %>
 
+<%--@elvariable id="sucesso" type="java.lang.String"--%>
+<%--@elvariable id="falha" type="java.lang.String"--%>
+
 <tags:corpo>
     <div class="estrutura-pagina">
         <tags:barraLateral paginaAtiva="proprietarios"/>
@@ -12,6 +15,8 @@
 
             <div class="formulario-container">
                 <tags:conteudoCondicional condicao="${not empty proprietario}" textoCondicaoVerdadeira="Altere os dados necessários do proprietário" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar um proprietário" tagHtml="h3" />
+
+                <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
 
                 <form:form modelAttribute="ProprietarioCommand" method="post" action="cadastroProprietario.html">
                     <form:hidden path="id"/>

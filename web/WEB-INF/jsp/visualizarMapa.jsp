@@ -10,32 +10,30 @@
             <div id="mapa"></div>
         </div>
 
-        <c:if test="${exibirControleMapa}">
-            <div class="menu-flutuante">
-                <form:form modelAttribute="ControleMapaCommand" action="visualizarMapa.html" method="get">
-                    <h3>Controle do mapa</h3>
+        <div class="menu-flutuante">
+            <form:form modelAttribute="ControleMapaCommand" action="visualizarMapa.html" method="get">
+                <h3>Controle do mapa</h3>
 
+                <div class="menu-flutuante-grupo">
                     <div class="menu-flutuante-grupo">
-                        <div class="menu-flutuante-grupo">
-                            <tags:selectFormulario path="opcaoSelecionada" label="Opções de busca" items="${opcoesControleMapa}" descricao="Selecione uma opção" />
-                        </div>
-
-                        <div class="menu-flutuante-grupo-escondido">
-                            <tags:inputFormulario path="cpfBusca" label="CPF do proprietário:" />
-                        </div>
-
-                        <div class="menu-flutuante-grupo-escondido">
-                            <tags:inputFormulario path="nomeBusca" label="Nome de propriedade:" />
-                        </div>
-
-                        <div class="menu-flutuante-grupo">
-                            <tags:botao label="Buscar" css="botao" />
-                        </div>
+                        <tags:selectFormulario path="opcaoSelecionada" label="Opções de busca" items="${opcoesControleMapa}" descricao="Selecione uma opção" />
                     </div>
 
-                </form:form>
-            </div>
-        </c:if>
+                    <div class="menu-flutuante-grupo-escondido">
+                        <tags:inputFormulario path="cpfBusca" label="CPF do proprietário:" />
+                    </div>
+
+                    <div class="menu-flutuante-grupo-escondido">
+                        <tags:inputFormulario path="nomeBusca" label="Nome de propriedade:" />
+                    </div>
+
+                    <div class="menu-flutuante-grupo">
+                        <tags:botao label="Buscar" css="botao" />
+                    </div>
+                </div>
+
+            </form:form>
+        </div>
     </div>
     <script>
         const propriedades = ${propriedadesJson};

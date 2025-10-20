@@ -72,6 +72,7 @@ public class PropriedadeController {
 
     @PostMapping("/cadastroPropriedade.html")
     public String salvar(@ModelAttribute("PropriedadeCommand") @Validated PropriedadeCommand command, BindingResult errors, Model model, RedirectAttributes redirectAttributes) {
+
         if (errors.hasErrors()) {
             if (command.getId() != null) {
                 model.addAttribute("propriedade", propriedadeServico.buscarPorId(command.getId()));
@@ -79,18 +80,18 @@ public class PropriedadeController {
             return "cadastroPropriedade";
         }
 
-        if (command.getId() != null) {
-            redirectAttributes.addFlashAttribute("sucesso", "Propriedade atualizada com sucesso!");
-        } else {
-            redirectAttributes.addFlashAttribute("sucesso", "Propriedade cadastrada com sucesso!");
-        }
-
         Propriedade propriedade = propriedadeServico.prepararPropriedade(command);
         pontoServico.calcularEAdicionarTemperaturaAtual(propriedade.getCentroide());
-
         propriedadeServico.salvar(propriedade);
 
-        return "redirect:/gerenciarPropriedades.html";
+        if (command.getId() != null) {
+            model.addAttribute("sucesso", "Propriedade atualizada com sucesso!");
+            model.addAttribute("propriedade", propriedade);
+        } else {
+            model.addAttribute("sucesso", "Propriedade cadastrada com sucesso!");
+        }
+
+        return "cadastroPropriedade";
     }
 
     @GetMapping("/deletarPropriedade.html")
@@ -98,7 +99,7 @@ public class PropriedadeController {
         Propriedade propriedade = propriedadeServico.buscarPorId(idPropriedade);
         try {
             propriedadeServico.deletar(propriedade);
-            redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso");
+            redirectAttributes.addFlashAttribute("sucesso", "Propriedade deletada com sucesso!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("falha", "Falha: Não foi possível deletar a propriedade.");
         }
