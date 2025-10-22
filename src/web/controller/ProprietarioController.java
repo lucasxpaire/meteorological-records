@@ -66,7 +66,7 @@ public class ProprietarioController {
     }
 
     @PostMapping("/cadastroProprietario.html")
-    public String salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult errors, RedirectAttributes redirectAttributes, Model model) {
+    public String salvar(@ModelAttribute("ProprietarioCommand") @Validated ProprietarioCommand command, BindingResult errors, Model model) {
 
         model.addAttribute("cores", corServico.listarTodos());
 

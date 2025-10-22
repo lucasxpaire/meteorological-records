@@ -99,7 +99,7 @@ public class MapaController {
     }
 
     @GetMapping("/visualizarPropriedade.html")
-    public ModelAndView visualizarPropriedade(@ModelAttribute("ControleMapaCommand") @Validated ControleMapaCommand command, BindingResult erros, @RequestParam("idPropriedade") Long idPropriedade) {
+    public ModelAndView visualizarPropriedade(@ModelAttribute("ControleMapaCommand") @Validated ControleMapaCommand command, @RequestParam("idPropriedade") Long idPropriedade) {
         ModelAndView mv = new ModelAndView("visualizarMapa");
 
         if (idPropriedade != null) {
