@@ -31,7 +31,7 @@ public class Ponto {
     private static final int RAIO_DA_TERRA_EM_METROS = 6371000;
     private static final double GRAU_PARA_METROS = 111320.0;
 
-    public static final String TEMPERATURA_INDISPONIVEL = "Indisponível";
+    public static final String INDISPONIVEL = "Indisponível";
 
     private Long id;
     private Double latitude;
@@ -278,40 +278,49 @@ public class Ponto {
     }
 
     @Transient
-    @JsonProperty("temperaturaRecente")
-    public String obterTemperaturaRecenteFormatada() {
-        if (historicoTemperaturas.isEmpty()) {
-            return TEMPERATURA_INDISPONIVEL;
-        }
-
-        Temperatura temperatura = getHistoricoTemperaturas().stream().max(Comparator.comparing(Temperatura::getDataHora))
-                .orElse(null);
-
-        if (temperatura == null || temperatura.getTemperaturaReal() == null || temperatura.getDataHora() == null) {
-            return TEMPERATURA_INDISPONIVEL;
-        }
-
-        String temperaturaFormatada = FormatadorUtil.formatarTemperatura(temperatura.getTemperaturaReal());
-        String dataFormatada = temperatura.getDataHora().format(FormatadorUtil.FORMATADOR_DATAHORA_PARA_EXIBICAO_MAPA);
-
-        return String.format("<span class='temperatura-destaque'>%s</span> (%s)", temperaturaFormatada, dataFormatada);
+    private Optional<Temperatura> obterTemperaturaMedidaMaisRecente() {
+        return getHistoricoTemperaturas().stream()
+                .filter(t -> t != null && t.getTemperaturaReal() != null && t.getDataHora() != null)
+                .max(Comparator.comparing(Temperatura::getDataHora));
     }
 
     @Transient
-    @JsonProperty("temperaturaRecenteParaLabel")
-    public String obterTemperaturaRecenteParaLabel() {
-        if (historicoTemperaturas.isEmpty()) {
-            return TEMPERATURA_INDISPONIVEL;
-        }
+    private Optional<Temperatura> obterTemperaturaPrevistaMaisRecente() {
+        return getHistoricoTemperaturas().stream()
+                .filter(t -> t != null && t.getTemperaturaPrevista() != null && t.getDataHora() != null)
+                .max(Comparator.comparing(Temperatura::getDataHora));
+    }
 
-        Temperatura temperatura = getHistoricoTemperaturas().stream().max(Comparator.comparing(Temperatura::getDataHora))
-                .orElse(null);
+    @Transient
+    @JsonProperty("temperaturaMedida")
+    private String obterTemperaturaMedida() {
+        return obterTemperaturaMedidaMaisRecente()
+                .map(t -> FormatadorUtil.formatarTemperatura(t.getTemperaturaReal()))
+                .orElse(INDISPONIVEL);
+    }
 
-        if (temperatura == null || temperatura.getTemperaturaReal() == null) {
-            return TEMPERATURA_INDISPONIVEL;
-        }
+    @Transient
+    @JsonProperty("dataHoraTemperaturaMedida")
+    private String obterDataHoraTemperaturaMedida() {
+        return obterTemperaturaMedidaMaisRecente()
+                .map(t -> String.format("(%s)", t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO)))
+                .orElse(INDISPONIVEL);
+    }
 
-        return FormatadorUtil.formatarTemperatura(temperatura.getTemperaturaReal());
+    @Transient
+    @JsonProperty("temperaturaPrevista")
+    private String obterTemperaturaPrevista() {
+        return obterTemperaturaPrevistaMaisRecente()
+                .map(t -> FormatadorUtil.formatarTemperatura(t.getTemperaturaPrevista()))
+                .orElse(INDISPONIVEL);
+    }
+
+    @Transient
+    @JsonProperty("dataHoraTemperaturaPrevista")
+    public String obterDataHoraTemperaturaPrevista() {
+        return obterTemperaturaPrevistaMaisRecente()
+                .map(t -> String.format("(%s)", t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO)))
+                .orElse(INDISPONIVEL);
     }
 
     @Transient

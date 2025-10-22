@@ -7,8 +7,6 @@ import java.time.format.DateTimeFormatter;
 
 public class FormatadorUtil {
 
-    public static final DateTimeFormatter FORMATADOR_DATAHORA_PARA_EXIBICAO_MAPA = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
-
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_EXIBICAO = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
     
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");

@@ -81,7 +81,7 @@ function criarDescricaoEstacao(estacao) {
                 <p><strong>Código: ${estacao.codigoEstacao}</strong></p>
                 <p><strong>Situação: ${estacao.situacao}</strong></p>
                 <p><strong>Tipo: ${estacao.tipoEstacao}</strong></p>
-                <p><strong>Temperatura: ${estacao.localizacao.temperaturaRecente}</strong></p>
+                <p><strong>Temperatura: <span class="temperatura-destaque">${estacao.localizacao.temperaturaMedida}</span> ${estacao.localizacao.dataHoraTemperaturaMedida}</strong></p>
             </div>
         `
     });
@@ -158,7 +158,8 @@ function criarCentroide(propriedade) {
 }
 
 function criarDescricaoPropriedade(propriedade) {
-    const idParagrafoTemperatura = `temperatura-propriedade-${propriedade.id}`;
+    const idTemperaturaMedida = `temperatura-medida-propriedade-${propriedade.id}`;
+    const idTemperaturaPrevista = `temperatura-prevista-propriedade-${propriedade.id}`;
     const idBotaoPrevisao = `botao-previsao-${propriedade.id}`;
 
     return new google.maps.InfoWindow({
@@ -169,8 +170,9 @@ function criarDescricaoPropriedade(propriedade) {
                 <p><strong>CPF: ${propriedade.cpfProprietario}</strong></p>
                 <p><strong>Cor: ${propriedade.corNome}</strong></p>
                 ${gerarHtmlEstacoesAssociadas(propriedade)}
-                <p id="${idParagrafoTemperatura}"><strong>Temperatura: ${propriedade.centroide.temperaturaRecente}</strong></p>
-                <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idParagrafoTemperatura}', '${idBotaoPrevisao}')" class="botao botao-tabela--visualizar">Prever temperatura</button>
+                <p id="${idTemperaturaMedida}"><strong>Temperatura Medida:<span class="temperatura-destaque"> ${propriedade.centroide.temperaturaMedida}</span> ${propriedade.centroide.dataHoraTemperaturaMedida}</strong></p>
+                <p style="display: none" id="${idTemperaturaPrevista}"></p>
+                <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idTemperaturaPrevista}', '${idBotaoPrevisao}')" class="botao botao-tabela--visualizar">Prever temperatura</button>
             </div>
         `
     });
@@ -179,7 +181,7 @@ function criarDescricaoPropriedade(propriedade) {
 function gerarHtmlEstacoesAssociadas(propriedade) {
     let html;
     const tituloLista = '<p><strong>Estações Associadas:</strong></p>';
-    const itensLista = propriedade.centroide.estacoesMeteorologicas.map(estacao => `<li><p><strong> ${estacao.nome} (${estacao.codigoEstacao}): ${estacao.localizacao.temperaturaRecente}</strong></p></li>`).join('');
+    const itensLista = propriedade.centroide.estacoesMeteorologicas.map(estacao => `<li><p><strong> ${estacao.nome} (${estacao.codigoEstacao}): <span class="temperatura-destaque"> ${estacao.localizacao.temperaturaMedida}</span> ${estacao.localizacao.dataHoraTemperaturaMedida}</strong></p></li>`).join('');
     const listaUl = `<ul class="info-window-lista-estacoes">${itensLista}</ul>`;
     html = tituloLista + listaUl;
     return html;
@@ -226,16 +228,15 @@ function criarLinhasTracejadasEntreCentroideEEstacoes(propriedade) {
 
 function criarLabelTemperaturaEstacao(estacao) {
     return {
-        text: estacao.localizacao.temperaturaRecenteParaLabel,
+        text: estacao.localizacao.temperaturaMedida,
         color: '#ffffff',
         fontWeight: 'bold',
         fontSize: '12px'
     }
 }
 
-async function preverTemperatura(idCentroide, idParagrafoTemperatura, idBotaoPrevisao) {
-    const paragrafoTemperatura = document.getElementById(idParagrafoTemperatura);
-    const textoTemperatura = paragrafoTemperatura.querySelector('strong');
+async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrevisao) {
+    const paragrafoTemperatura = document.getElementById(idTemperaturaPrevista);
     const botaoPrevisao = document.getElementById(idBotaoPrevisao);
 
     botaoPrevisao.disabled = true;
@@ -247,9 +248,18 @@ async function preverTemperatura(idCentroide, idParagrafoTemperatura, idBotaoPre
             throw new Error(`Falha na requisição: ${resposta.status}`);
         }
         const json = await resposta.json();
-        textoTemperatura.innerHTML = `Temperatura: ${json.temperaturaFormatada}`;
+
+        const temperaturaFormatada = json.temperaturaPrevista.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }) + '°C';
+
+        paragrafoTemperatura.style.display = VISIVEL;
+
+        paragrafoTemperatura.innerHTML = `<strong>Temperatura Prevista: <span class="temperatura-destaque">${temperaturaFormatada}</span> (${json.dataHoraPrevisao})</strong>`;
     } catch (error) {
-        textoTemperatura.innerHTML = 'Indisponível';
+        paragrafoTemperatura.style.display = VISIVEL;
+        paragrafoTemperatura.innerHTML = '<strong>Temperatura Prevista: Indisponível</strong>';
     } finally {
         botaoPrevisao.disabled = false;
         botaoPrevisao.innerHTML = 'Prever temperatura';
