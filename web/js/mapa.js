@@ -81,7 +81,7 @@ function criarDescricaoEstacao(estacao) {
                 <p><strong>Código: ${estacao.codigoEstacao}</strong></p>
                 <p><strong>Situação: ${estacao.situacao}</strong></p>
                 <p><strong>Tipo: ${estacao.tipoEstacao}</strong></p>
-                <p><strong>Temperatura: <span class="temperatura-destaque">${estacao.localizacao.temperaturaMedida}</span> ${estacao.localizacao.dataHoraTemperaturaMedida}</strong></p>
+                <p><strong>Temperatura: <span class="temperatura-destaque">${estacao.localizacao.temperaturaReal}</span> ${estacao.localizacao.dataHoraTemperaturaReal}</strong></p>
             </div>
         `
     });
@@ -101,7 +101,7 @@ function criarElementosPropriedades() {
             linhasTracejadas.forEach(linha => linha.setVisible(true));
             propriedade.centroide.estacoesMeteorologicas.forEach(estacao => {
                 const elementoEstacao = elementosMapa.estacoesMeteorologicas[estacao.id];
-                elementoEstacao.icone.setLabel(criarLabelTemperaturaEstacao(estacao));
+                elementoEstacao.icone.setLabel(criarLabelTemperaturaEstacao(estacao, propriedade.centroide.dataHoraTemperaturaCalculada));
             })
 
         });
@@ -158,7 +158,6 @@ function criarCentroide(propriedade) {
 }
 
 function criarDescricaoPropriedade(propriedade) {
-    const idTemperaturaMedida = `temperatura-medida-propriedade-${propriedade.id}`;
     const idTemperaturaPrevista = `temperatura-prevista-propriedade-${propriedade.id}`;
     const idBotaoPrevisao = `botao-previsao-${propriedade.id}`;
 
@@ -169,8 +168,8 @@ function criarDescricaoPropriedade(propriedade) {
                 <p><strong>Proprietário: ${propriedade.nomeProprietario}</strong></p>
                 <p><strong>CPF: ${propriedade.cpfProprietario}</strong></p>
                 <p><strong>Cor: ${propriedade.corNome}</strong></p>
-                ${gerarHtmlEstacoesAssociadas(propriedade)}
-                <p id="${idTemperaturaMedida}"><strong>Temperatura Medida:<span class="temperatura-destaque"> ${propriedade.centroide.temperaturaMedida}</span> ${propriedade.centroide.dataHoraTemperaturaMedida}</strong></p>
+                ${gerarHtmlEstacoesAssociadas(propriedade, propriedade.centroide.dataHoraTemperaturaCalculada)}
+                <p><strong>Temperatura Calculada:<span class="temperatura-destaque"> ${propriedade.centroide.temperaturaCalculada}</span> ${propriedade.centroide.dataHoraTemperaturaCalculada}</strong></p>
                 <p style="display: none" id="${idTemperaturaPrevista}"></p>
                 <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idTemperaturaPrevista}', '${idBotaoPrevisao}')" class="botao botao-tabela--visualizar">Prever temperatura</button>
             </div>
@@ -178,10 +177,17 @@ function criarDescricaoPropriedade(propriedade) {
     });
 }
 
-function gerarHtmlEstacoesAssociadas(propriedade) {
+function gerarHtmlEstacoesAssociadas(propriedade, dataHoraTemperaturaCalculada) {
     let html;
     const tituloLista = '<p><strong>Estações Associadas:</strong></p>';
-    const itensLista = propriedade.centroide.estacoesMeteorologicas.map(estacao => `<li><p><strong> ${estacao.nome} (${estacao.codigoEstacao}): <span class="temperatura-destaque"> ${estacao.localizacao.temperaturaMedida}</span> ${estacao.localizacao.dataHoraTemperaturaMedida}</strong></p></li>`).join('');
+
+    const itensLista = propriedade.centroide.estacoesMeteorologicas.map(estacao => {
+        if (dataHoraTemperaturaCalculada && estacao.localizacao.dataHoraTemperaturaReal !== dataHoraTemperaturaCalculada) {
+            return `<li><p><strong> ${estacao.nome} (${estacao.codigoEstacao}): Temperatura antiga (Ignorada) </strong></p></li>`
+        } else {
+            return `<li><p><strong> ${estacao.nome} (${estacao.codigoEstacao}): <span class="temperatura-destaque"> ${estacao.localizacao.temperaturaReal}</span> ${estacao.localizacao.dataHoraTemperaturaReal}</strong></p></li>`
+        }
+    }).join('');
     const listaUl = `<ul class="info-window-lista-estacoes">${itensLista}</ul>`;
     html = tituloLista + listaUl;
     return html;
@@ -226,13 +232,19 @@ function criarLinhasTracejadasEntreCentroideEEstacoes(propriedade) {
     return linhas;
 }
 
-function criarLabelTemperaturaEstacao(estacao) {
+function criarLabelTemperaturaEstacao(estacao, dataHoraReferencia) {
+    let textoLabel = estacao.localizacao.temperaturaReal;
+
+    if (dataHoraReferencia && estacao.localizacao.dataHoraTemperaturaReal !== dataHoraReferencia) {
+        textoLabel = "Temperatura antiga (Ignorada)";
+    }
     return {
-        text: estacao.localizacao.temperaturaMedida,
+        text: textoLabel,
         color: '#ffffff',
         fontWeight: 'bold',
         fontSize: '12px'
     }
+
 }
 
 async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrevisao) {

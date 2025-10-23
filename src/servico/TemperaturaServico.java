@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 @Service
 public class TemperaturaServico {
 
-    public static final long ATRASO_INICIAL_PARA_EXECUCAO = 0L;
+    public static final long ATRASO_INICIAL_PARA_EXECUCAO = 1L;
     public static final long INTERVALO_PARA_EXECUTAR = 24L;
     public static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
 
@@ -57,6 +57,22 @@ public class TemperaturaServico {
         iniciarRotinaDeAtualizacaoAutomatica();
     }
 
+    private void popularHistoricosIniciaisSeNecessario() {
+        List<EstacaoMeteorologica> estacoesSemHistorico = dados.buscarComCampoNaoVazio(EstacaoMeteorologica.class, "localizacao.historicoTemperaturas");
+
+        if (estacoesSemHistorico.isEmpty()) {
+            return;
+        }
+
+        for (EstacaoMeteorologica estacao : estacoesSemHistorico) {
+            try {
+                atualizarHistoricoDaEstacao(estacao);
+                dados.salvar(estacao);
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
     public void iniciarRotinaDeAtualizacaoAutomatica() {
         Runnable tarefa = this::executarAtualizacaoPeriodica;
         agendador.scheduleAtFixedRate(tarefa, ATRASO_INICIAL_PARA_EXECUCAO, INTERVALO_PARA_EXECUTAR, UNIDADE_DE_TEMPO_DO_INTERVALO);
@@ -69,32 +85,6 @@ public class TemperaturaServico {
             preencherTemperaturasReaisNasPrevisoes();
         } catch (Exception e) {
             throw new IllegalArgumentException("Falha: Não foi possível executar a atualizacao.");
-        }
-    }
-
-    private void popularHistoricosIniciaisSeNecessario() {
-        List<EstacaoMeteorologica> estacoesSemHistorico = dados.buscarComCampoNaoVazio(EstacaoMeteorologica.class, "localizacao.historicoTemperaturas");
-
-        if (estacoesSemHistorico.isEmpty()) {
-            return;
-        }
-
-        for (EstacaoMeteorologica estacao : estacoesSemHistorico) {
-            try {
-                popularHistoricoInicialPara(estacao);
-                dados.salvar(estacao);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Falha: Não foi possível executar a atualização de temperaturas da estação: " + estacao.getCodigoEstacao());
-
-            }
-        }
-    }
-
-    public void salvar(Temperatura temperatura) {
-        if (validarTemperatura(temperatura)) {
-            dados.salvar(temperatura);
-        } else {
-            throw new RuntimeException("Dados da temperatura são inválidos.");
         }
     }
 
@@ -111,22 +101,30 @@ public class TemperaturaServico {
     }
 
     public void preencherTemperaturasReaisNasPrevisoes() {
-        List<Temperatura> listaTemperaturasPrevistas = dados.buscarPrevisoesComTemperaturaRealNula();
+        List<Temperatura> listaTemperaturasPrevistas = dados.buscarPrevisoesComTemperaturaCalculadaVazia();
 
         if (listaTemperaturasPrevistas.isEmpty()) {
             return;
         }
 
-        for (Temperatura temperaturaPrevista : listaTemperaturasPrevistas) {
-            Ponto ponto = temperaturaPrevista.getPonto();
+        for (Temperatura temperatura : listaTemperaturasPrevistas) {
+            Ponto ponto = temperatura.getPonto();
             List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
 
-            Double temperaturaRealEstimada = ponto.interpolarTemperaturaHistorica(estacoesRelevantes, temperaturaPrevista.getDataHora());
+            Double temperaturaCalculada = ponto.calcularTemperaturaDaPrevisao(estacoesRelevantes, temperatura.getDataHora());
 
-            if (temperaturaRealEstimada != null) {
-                temperaturaPrevista.setTemperaturaReal(temperaturaRealEstimada);
-                salvar(temperaturaPrevista);
+            if (temperaturaCalculada != null) {
+                temperatura.setTemperaturaCalculada(temperaturaCalculada);
+                salvar(temperatura);
             }
+        }
+    }
+
+    public void salvar(Temperatura temperatura) {
+        if (validarTemperatura(temperatura)) {
+            dados.salvar(temperatura);
+        } else {
+            throw new RuntimeException("Dados da temperatura são inválidos.");
         }
     }
 
@@ -148,7 +146,7 @@ public class TemperaturaServico {
     }
 
     private List<Temperatura> buscarECombinarHistoricoParaPrevisao(EstacaoMeteorologica estacao, List<LocalDateTime> datasNecessarias) {
-        List<Temperatura> temperaturasDoBanco = buscarTemperaturasHistoricas(estacao.getLocalizacao(), datasNecessarias);
+        List<Temperatura> temperaturasDoBanco = dados.buscarTemperaturasHistoricas(estacao.getLocalizacao(), datasNecessarias);
         Set<LocalDateTime> datasDoBanco = temperaturasDoBanco.stream()
                 .map(Temperatura::getDataHora)
                 .collect(Collectors.toSet());
@@ -171,7 +169,7 @@ public class TemperaturaServico {
     private void atualizarTemperaturasDasEstacoes(List<EstacaoMeteorologica> estacoesAssociadas) {
         try {
             for (EstacaoMeteorologica estacao : estacoesAssociadas) {
-                popularHistoricoInicialPara(estacao);
+                atualizarHistoricoDaEstacao(estacao);
                 dados.salvar(estacao);
             }
         } catch (PersistenceException e) {
@@ -183,21 +181,18 @@ public class TemperaturaServico {
         for (Ponto ponto : pontos) {
             List<EstacaoMeteorologica> estacoesAssociadas = ponto.getEstacoesMeteorologicas();
             if (!estacoesAssociadas.isEmpty()) {
-                Temperatura novaTemperatura = ponto.interpolarTemperaturaAtual(estacoesAssociadas);
+                Temperatura novaTemperatura = ponto.calcularTemperaturaAtual(estacoesAssociadas);
                 if (novaTemperatura != null) {
                     boolean jaExisteTemperatura = ponto.getHistoricoTemperaturas().stream()
                             .anyMatch(t -> t.getDataHora().equals(novaTemperatura.getDataHora()));
 
                     if (!jaExisteTemperatura) {
+                        ponto.getHistoricoTemperaturas().add(novaTemperatura);
                         salvar(novaTemperatura);
                     }
                 }
             }
         }
-    }
-
-    private List<Temperatura> buscarTemperaturasHistoricas(Ponto ponto, List<LocalDateTime> datas) {
-        return dados.buscarTemperaturasHistoricas(ponto, datas);
     }
 
     private Map<EstacaoMeteorologica, Temperatura> preverTemperaturasParaEstacoes(Map<EstacaoMeteorologica, List<Temperatura>> temperaturasPorEstacao, LocalDateTime dataHoraPrevista) {
@@ -246,9 +241,9 @@ public class TemperaturaServico {
         return datasNecessarias;
     }
 
-    public void popularHistoricoInicialPara(EstacaoMeteorologica estacao) {
+    public void atualizarHistoricoDaEstacao(EstacaoMeteorologica estacao) {
         try {
-            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS + estacao.getCodigoEstacao());
+            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS2 + estacao.getCodigoEstacao());
 
             List<Temperatura> historicoExistente = estacao.getLocalizacao().getHistoricoTemperaturas();
             Set<LocalDateTime> datasExistentes = historicoExistente.stream()

@@ -23,6 +23,7 @@ public class Temperatura {
     private LocalDateTime dataHora;
     private Double temperaturaReal;
     private Double temperaturaPrevista;
+    private Double temperaturaCalculada;
     private Ponto ponto;
 
     @JsonIgnore
@@ -65,6 +66,15 @@ public class Temperatura {
 
     public void setTemperaturaPrevista(Double temperaturaPrevista) {
         this.temperaturaPrevista = temperaturaPrevista;
+    }
+
+    @Column(name = "TEMPERATURA_CALCULADA")
+    public Double getTemperaturaCalculada() {
+        return temperaturaCalculada;
+    }
+
+    public void setTemperaturaCalculada(Double temperaturaCalculada) {
+        this.temperaturaCalculada = temperaturaCalculada;
     }
 
     @JsonIgnore

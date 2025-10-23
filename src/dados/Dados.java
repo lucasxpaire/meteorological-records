@@ -151,7 +151,7 @@ public class Dados {
                 .getResultList();
     }
 
-    public List<Temperatura> buscarPrevisoesComTemperaturaRealNula() {
+    public List<Temperatura> buscarPrevisoesComTemperaturaCalculadaVazia() {
         return entityManager.createQuery(
                         "SELECT t FROM Temperatura t WHERE t.temperaturaReal IS NULL AND t.dataHora < :agora", Temperatura.class)
                 .setParameter("agora", LocalDateTime.now())

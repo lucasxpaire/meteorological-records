@@ -82,7 +82,7 @@ public class PropriedadeController {
         }
 
         Propriedade propriedade = propriedadeServico.prepararPropriedade(command);
-        Ponto centroide = pontoServico.calcularEAdicionarTemperaturaAtual(propriedade.getCentroide());
+        Ponto centroide = pontoServico.interpolarTemperaturaAtual(propriedade.getCentroide());
         propriedade.setCentroide(centroide);
         propriedadeServico.salvar(propriedade);
 

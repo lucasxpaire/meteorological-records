@@ -170,45 +170,52 @@ public class Ponto {
     }
 
     @Transient
-    public Temperatura interpolarTemperaturaAtual(List<EstacaoMeteorologica> estacoes) {
+    public Temperatura calcularTemperaturaAtual(List<EstacaoMeteorologica> estacoes) {
+
+        Optional<LocalDateTime> dataHoraMaisRecente = estacoes.stream()
+                .map(e -> e.getLocalizacao().getHistoricoTemperaturas().stream()
+                        .filter(t -> t.getTemperaturaReal() != null)
+                        .map(Temperatura::getDataHora)
+                        .max(Comparator.naturalOrder())
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .max(Comparator.naturalOrder());
+
+        if (dataHoraMaisRecente.isEmpty()) {
+            return null;
+        }
+
         double somaTemperaturasPonderadas = 0.0;
         double somaPesos = 0.0;
 
-        List<Temperatura> temperaturasRecentes = new ArrayList<>();
-
         for (EstacaoMeteorologica estacao : estacoes) {
-            Temperatura temperaturaMaisRecente = estacao.getLocalizacao().getHistoricoTemperaturas().stream()
-                    .max(Comparator.comparing(Temperatura::getDataHora))
-                    .orElse(null);
+            Optional<Temperatura> temperaturaNaDataHoraMaisRecente = estacao.getLocalizacao().getHistoricoTemperaturas().stream()
+                    .filter(t -> t.getDataHora().equals(dataHoraMaisRecente.get()) && t.getTemperaturaReal() != null)
+                    .findFirst();
 
-            if (temperaturaMaisRecente == null) {
-                continue;
+            if (temperaturaNaDataHoraMaisRecente.isPresent()) {
+                Double temperatura = temperaturaNaDataHoraMaisRecente.get().getTemperaturaReal();
+                Double peso = calcularPesoDeProximidadePara(estacao);
+                somaTemperaturasPonderadas += temperatura * peso;
+                somaPesos += peso;
             }
-
-            temperaturasRecentes.add(temperaturaMaisRecente);
-
-            Double temperatura = temperaturaMaisRecente.getTemperaturaReal();
-            Double peso = calcularPesoDeProximidadePara(estacao);
-            somaTemperaturasPonderadas += temperatura * peso;
-            somaPesos += peso;
         }
 
         if (somaPesos == PESO_NULO) {
-            throw new RuntimeException("Não foi possível atribuir um peso de distância entre o ponto e as estações");
+            return null;
         }
 
-        Double temperaturaAtualInterpolada = somaTemperaturasPonderadas / somaPesos;
-        LocalDateTime dataHoraEstimativa = calcularDataHoraEstimativa(temperaturasRecentes);
+        Double temperaturaCalculada = somaTemperaturasPonderadas / somaPesos;
 
-        Temperatura novaTemperatura = new Temperatura();
-        novaTemperatura.setPonto(this);
-        novaTemperatura.setTemperaturaReal(temperaturaAtualInterpolada);
-        novaTemperatura.setDataHora(dataHoraEstimativa);
-        return novaTemperatura;
+        Temperatura temperatura = new Temperatura();
+        temperatura.setPonto(this);
+        temperatura.setTemperaturaCalculada(temperaturaCalculada);
+        temperatura.setDataHora(dataHoraMaisRecente.get());
+        return temperatura;
     }
 
     @Transient
-    public Double interpolarTemperaturaHistorica(List<EstacaoMeteorologica> estacoes, LocalDateTime dataHora) {
+    public Double calcularTemperaturaDaPrevisao(List<EstacaoMeteorologica> estacoes, LocalDateTime dataHora) {
         double somaTemperaturasReaisPonderadas = 0.0;
         double somaPesos = 0.0;
         boolean dadosReaisEncontrados = false;
@@ -278,7 +285,7 @@ public class Ponto {
     }
 
     @Transient
-    private Optional<Temperatura> obterTemperaturaMedidaMaisRecente() {
+    private Optional<Temperatura> obterTemperaturaRealMaisRecente() {
         return getHistoricoTemperaturas().stream()
                 .filter(t -> t != null && t.getTemperaturaReal() != null && t.getDataHora() != null)
                 .max(Comparator.comparing(Temperatura::getDataHora));
@@ -292,19 +299,26 @@ public class Ponto {
     }
 
     @Transient
-    @JsonProperty("temperaturaMedida")
-    private String obterTemperaturaMedida() {
-        return obterTemperaturaMedidaMaisRecente()
+    private Optional<Temperatura> obterTemperaturaCalculadaMaisRecente() {
+        return getHistoricoTemperaturas().stream()
+                .filter(t -> t != null && t.getTemperaturaCalculada() != null && t.getDataHora() != null)
+                .max(Comparator.comparing(Temperatura::getDataHora));
+    }
+
+    @Transient
+    @JsonProperty("temperaturaReal")
+    private String obterTemperaturaReal() {
+        return obterTemperaturaRealMaisRecente()
                 .map(t -> FormatadorUtil.formatarTemperatura(t.getTemperaturaReal()))
                 .orElse(INDISPONIVEL);
     }
 
     @Transient
-    @JsonProperty("dataHoraTemperaturaMedida")
-    private String obterDataHoraTemperaturaMedida() {
-        return obterTemperaturaMedidaMaisRecente()
+    @JsonProperty("dataHoraTemperaturaReal")
+    private String obterDataHoraTemperaturaReal() {
+        return obterTemperaturaRealMaisRecente()
                 .map(t -> String.format("(%s)", t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO)))
-                .orElse(INDISPONIVEL);
+                .orElse("");
     }
 
     @Transient
@@ -320,7 +334,23 @@ public class Ponto {
     public String obterDataHoraTemperaturaPrevista() {
         return obterTemperaturaPrevistaMaisRecente()
                 .map(t -> String.format("(%s)", t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO)))
+                .orElse("");
+    }
+
+    @Transient
+    @JsonProperty("temperaturaCalculada")
+    private String obterTemperaturaCalculada() {
+        return obterTemperaturaCalculadaMaisRecente()
+                .map(t -> FormatadorUtil.formatarTemperatura(t.getTemperaturaCalculada()))
                 .orElse(INDISPONIVEL);
+    }
+
+    @Transient
+    @JsonProperty("dataHoraTemperaturaCalculada")
+    public String obterDataHoraTemperaturaCalculada() {
+        return obterTemperaturaCalculadaMaisRecente()
+                .map(t -> String.format("(%s)", t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO)))
+                .orElse("");
     }
 
     @Transient
