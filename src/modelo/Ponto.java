@@ -31,6 +31,7 @@ public class Ponto {
     private static final double GRAU_PARA_METROS = 111320.0;
 
     public static final String INDISPONIVEL = "Indisponível";
+    public static final String STRING_VAZIA = "";
 
     private Long id;
     private Double latitude;
@@ -44,12 +45,6 @@ public class Ponto {
     public Ponto(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    public Ponto(Double latitude, Double longitude, List<Temperatura> historicoTemperaturas) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.historicoTemperaturas = historicoTemperaturas;
     }
 
     public Ponto() {}
@@ -200,7 +195,7 @@ public class Ponto {
     private String obterDataHoraTemperaturaReal() {
         return obterTemperaturaRealMaisRecente()
                 .map(t -> String.format("(%s)", t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO)))
-                .orElse("");
+                .orElse(STRING_VAZIA);
     }
 
     @Transient
@@ -216,7 +211,7 @@ public class Ponto {
     public String obterDataHoraTemperaturaPrevista() {
         return obterTemperaturaPrevistaMaisRecente()
                 .map(t -> String.format("(%s)", t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO)))
-                .orElse("");
+                .orElse(STRING_VAZIA);
     }
 
     @Transient
@@ -232,7 +227,7 @@ public class Ponto {
     public String obterDataHoraTemperaturaCalculada() {
         return obterTemperaturaCalculadaMaisRecente()
                 .map(t -> String.format("(%s)", t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO)))
-                .orElse("");
+                .orElse(STRING_VAZIA);
     }
 
     @Transient

@@ -13,7 +13,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import servico.*;
-import util.JsonUtil;
+import util.FormatadorUtil;
 import web.command.ControleMapaCommand;
 import web.validator.ControleMapaValidator;
 
@@ -81,10 +81,10 @@ public class MapaController {
         }
 
         try {
-            String estacoesJson = JsonUtil.converterObjetoParaJson(estacaoMeteorologicaServico.listarTodas());
+            String estacoesJson = FormatadorUtil.converterObjetoParaJson(estacaoMeteorologicaServico.listarTodas());
             mv.addObject("estacoesJson", estacoesJson);
 
-            String propriedadesJson = JsonUtil.converterObjetoParaJson(propriedadesEncontradas);
+            String propriedadesJson = FormatadorUtil.converterObjetoParaJson(propriedadesEncontradas);
             mv.addObject("propriedadesJson", propriedadesJson);
 
         } catch (JsonProcessingException e) {
@@ -101,8 +101,8 @@ public class MapaController {
 
         if (idPropriedade != null) {
             try {
-                mv.addObject("estacoesJson", JsonUtil.converterObjetoParaJson(estacaoMeteorologicaServico.listarTodas()));
-                mv.addObject("propriedadesJson", JsonUtil.converterObjetoParaJson(List.of(propriedadeServico.buscarPorId(idPropriedade))));
+                mv.addObject("estacoesJson", FormatadorUtil.converterObjetoParaJson(estacaoMeteorologicaServico.listarTodas()));
+                mv.addObject("propriedadesJson", FormatadorUtil.converterObjetoParaJson(List.of(propriedadeServico.buscarPorId(idPropriedade))));
             } catch (JsonProcessingException e) {
                 mv.addObject("propriedadesJson", "[]");
                 mv.addObject("estacoesJson", "[]");
@@ -118,6 +118,9 @@ public class MapaController {
     @GetMapping(value = "/preverTemperatura", produces = MediaType.APPLICATION_JSON_VALUE)
     public Temperatura calcularPrevisao(@RequestParam("idCentroide") Long idCentroide) {
         Ponto centroide = pontoServico.buscarPorId(idCentroide);
+        if (centroide == null) {
+            return null;
+        }
 
         LocalDateTime dataHoraAgora = LocalDateTime.now();
         LocalDateTime dataHoraPrevista = dataHoraAgora.plusHours(1).withMinute(0).withSecond(0);

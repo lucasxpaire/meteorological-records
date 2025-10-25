@@ -15,7 +15,7 @@ public class PontoServico {
         if (dados.existeAlgumComEsseCampo(Ponto.class, "id", id)) {
             return dados.buscarUnicoPorCampo(Ponto.class, "id", id);
         } else {
-            throw new IllegalArgumentException("Falha: Não existe nenhum ponto com esse id.");
+            return null;
         }
     }
 

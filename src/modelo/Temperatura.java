@@ -1,6 +1,5 @@
 package modelo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -39,7 +38,6 @@ public class Temperatura {
     }
 
     @JsonIgnore
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     @Column(name = "DATA_HORA")
     public LocalDateTime getDataHora() {
         return dataHora;
@@ -55,8 +53,8 @@ public class Temperatura {
         return temperaturaReal;
     }
 
-    public void setTemperaturaReal(Double temperaturaEstimada) {
-        this.temperaturaReal = temperaturaEstimada;
+    public void setTemperaturaReal(Double temperaturaReal) {
+        this.temperaturaReal = temperaturaReal;
     }
 
     @Column(name = "TEMPERATURA_PREVISTA")
@@ -68,6 +66,7 @@ public class Temperatura {
         this.temperaturaPrevista = temperaturaPrevista;
     }
 
+    @JsonIgnore
     @Column(name = "TEMPERATURA_CALCULADA")
     public Double getTemperaturaCalculada() {
         return temperaturaCalculada;

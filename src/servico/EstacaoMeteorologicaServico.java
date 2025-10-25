@@ -28,6 +28,7 @@ public class EstacaoMeteorologicaServico {
 
     private static final String URL_ESTACOES_AUTOMATICAS = "https://apitempo.inmet.gov.br/estacoes/T";
     private static final String URL_ESTACOES_MANUAIS = "https://apitempo.inmet.gov.br/estacoes/M";
+    public static final int TEMPO_ATE_DESCONECTAR = 1000000;
 
     @Autowired
     private Dados dados;
@@ -73,15 +74,12 @@ public class EstacaoMeteorologicaServico {
         }
     }
 
-    public Double calcularRaioDeBuscaEmGraus(Ponto ponto) {
-        EstacaoMeteorologica estacaoMaisProxima = dados.buscarEstacaoMaisProximaComDados(ponto);
-        double raioDeBuscaMetros = Math.min(ponto.distanciaAte(estacaoMaisProxima.getLocalizacao()), LIMITE_RAIO_BUSCA);
-        return raioDeBuscaMetros / METROS_PARA_GRAU;
-    }
-
     public List<EstacaoMeteorologica> buscarEstacoesRelevantes(Ponto ponto) {
         try {
             List<EstacaoMeteorologica> estacoesNoRaio = buscarEstacoesDentroDoRaio(ponto, calcularRaioDeBuscaEmGraus(ponto));
+            if (estacoesNoRaio == null) {
+                return null;
+            }
             Map<Integer, List<EstacaoMeteorologica>> quadrantes = classificarEstacoesPorQuadrante(estacoesNoRaio, ponto);
 
             for (int quadrante = Ponto.PRIMEIRO_QUADRANTE; quadrante <= Ponto.QUARTO_QUADRANTE; quadrante++) {
@@ -98,11 +96,21 @@ public class EstacaoMeteorologicaServico {
         }
     }
 
-    public List<EstacaoMeteorologica> buscarEstacoesDentroDoRaio(Ponto ponto, Double raioEmGraus) {
-        return dados.buscarEstacoesDentroDoRaio(ponto, raioEmGraus);
+    private Double calcularRaioDeBuscaEmGraus(Ponto ponto) {
+        EstacaoMeteorologica estacaoMaisProxima = dados.buscarEstacaoMaisProximaComDados(ponto);
+        double raioDeBuscaMetros = Math.min(ponto.distanciaAte(estacaoMaisProxima.getLocalizacao()), LIMITE_RAIO_BUSCA);
+        return raioDeBuscaMetros / METROS_PARA_GRAU;
     }
 
-    public EstacaoMeteorologica buscarEstacaoMaisProximaDoQuadrante(Ponto ponto, int quadrante) {
+    private List<EstacaoMeteorologica> buscarEstacoesDentroDoRaio(Ponto ponto, Double raioEmGraus) {
+        if (ponto != null && raioEmGraus != null) {
+            return dados.buscarEstacoesDentroDoRaio(ponto, raioEmGraus);
+        } else {
+            return null;
+        }
+    }
+
+    private EstacaoMeteorologica buscarEstacaoMaisProximaDoQuadrante(Ponto ponto, int quadrante) {
         String condicaoQuadrante = switch (quadrante) {
             case Ponto.PRIMEIRO_QUADRANTE -> "e.localizacao.latitude >= :lat AND e.localizacao.longitude >= :lng";
             case Ponto.SEGUNDO_QUADRANTE -> "e.localizacao.latitude >= :lat AND e.localizacao.longitude <= :lng";
@@ -134,8 +142,8 @@ public class EstacaoMeteorologicaServico {
         URL url = URI.create(URLString).toURL();
         HttpURLConnection conexao = (HttpURLConnection) url.openConnection();
         conexao.setRequestMethod("GET");
-        conexao.setConnectTimeout(1000000);
-        conexao.setReadTimeout(1000000);
+        conexao.setConnectTimeout(TEMPO_ATE_DESCONECTAR);
+        conexao.setReadTimeout(TEMPO_ATE_DESCONECTAR);
 
         try (InputStream dadosJson = conexao.getInputStream()) {
             ObjectMapper conversorJson = new ObjectMapper();

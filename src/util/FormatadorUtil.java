@@ -1,5 +1,8 @@
 package util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.swing.text.MaskFormatter;
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -84,4 +87,9 @@ public class FormatadorUtil {
         return hora.replace(" UTC", "").trim();
     }
 
+    public static String converterObjetoParaJson(Object o) throws JsonProcessingException {
+        ObjectMapper conversorJson = new ObjectMapper();
+        conversorJson.findAndRegisterModules();
+        return conversorJson.writerWithDefaultPrettyPrinter().writeValueAsString(o);
+    }
 }

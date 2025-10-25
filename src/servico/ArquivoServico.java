@@ -12,7 +12,11 @@ public class ArquivoServico {
     private Dados dados;
 
     public Arquivo buscarPorId(Long id) {
-        return dados.buscarUnicoPorCampo(Arquivo.class, "id", id);
+        if (dados.existeAlgumComEsseCampo(Arquivo.class, "id", id)) {
+            return dados.buscarUnicoPorCampo(Arquivo.class, "id", id);
+        } else {
+            return null;
+        }
     }
 
 }

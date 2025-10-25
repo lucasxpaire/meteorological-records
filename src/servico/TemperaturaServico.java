@@ -50,7 +50,7 @@ public class TemperaturaServico {
         dados.iniciarTransacao();
         try {
             popularTemperaturasDeEstacoesSemHistorico();
-            executarAtualizacaoDeTemperaturasPeriodica();
+            executarAtualizacaoDeTemperaturas();
             dados.confirmarTransacao();
         } catch (Exception e) {
             dados.desfazerTransacao();
@@ -65,7 +65,7 @@ public class TemperaturaServico {
         }
     }
 
-    private void executarAtualizacaoDeTemperaturasPeriodica() {
+    private void executarAtualizacaoDeTemperaturas() {
         ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
         atualizarTemperaturasDeEstacoesAssociadasACentroides();
         atualizarTemperaturasDeCentroidesAssociadosAEstacoes();
@@ -148,6 +148,9 @@ public class TemperaturaServico {
 
     public Temperatura calcularTemperatura(Ponto ponto) {
         List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
+        if (estacoesRelevantes == null) {
+            return null;
+        }
         ponto.setEstacoesMeteorologicas(estacoesRelevantes);
 
         Optional<LocalDateTime> dataHoraMaisRecenteDeTemperaturaEntreEstacoes = estacoesRelevantes.stream()
@@ -195,6 +198,9 @@ public class TemperaturaServico {
 
     public Temperatura preverTemperatura(Ponto ponto, LocalDateTime dataHoraPrevisao) {
         List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
+        if (estacoesRelevantes == null) {
+            return null;
+        }
         ponto.setEstacoesMeteorologicas(estacoesRelevantes);
 
         Map<EstacaoMeteorologica, Temperatura> temperaturasPrevistasDasEstacoes = preverTemperaturasParaEstacoes(estacoesRelevantes, dataHoraPrevisao);
@@ -229,7 +235,7 @@ public class TemperaturaServico {
         return temperaturaPrevista;
     }
 
-    public Map<EstacaoMeteorologica, Temperatura> preverTemperaturasParaEstacoes (List<EstacaoMeteorologica> estacaoMeteorologicas, LocalDateTime dataHoraPrevisao) {
+    private Map<EstacaoMeteorologica, Temperatura> preverTemperaturasParaEstacoes (List<EstacaoMeteorologica> estacaoMeteorologicas, LocalDateTime dataHoraPrevisao) {
         Map<EstacaoMeteorologica, List<Temperatura>> temperaturasPorEstacao = new HashMap<>();
 
         for (EstacaoMeteorologica estacao : estacaoMeteorologicas) {
@@ -271,7 +277,7 @@ public class TemperaturaServico {
         return previsoesDeCadaEstacao;
     }
 
-    public List<LocalDateTime> obterDatasHorasDescrescentes(LocalDateTime dataHora) {
+    private List<LocalDateTime> obterDatasHorasDescrescentes(LocalDateTime dataHora) {
         List<LocalDateTime> datasHorasDecrescentes = new ArrayList<>();
         int anoDaDataHora = dataHora.getYear();
         for (int ano = anoDaDataHora - 1; ano >= ANO_MAIS_ANTIGO_TEMPERATURAS_HISTORICAS; ano--) {
@@ -280,7 +286,7 @@ public class TemperaturaServico {
         return datasHorasDecrescentes;
     }
 
-    public List<Temperatura> combinarTemperaturasDoBancoDeDadosComDadosHistoricos(EstacaoMeteorologica estacaoMeteorologica, List<LocalDateTime> datasHorasDecrescentes) {
+    private List<Temperatura> combinarTemperaturasDoBancoDeDadosComDadosHistoricos(EstacaoMeteorologica estacaoMeteorologica, List<LocalDateTime> datasHorasDecrescentes) {
         List<Temperatura> temperaturasDoBancoDeDados = dados.buscarTemperaturasHistoricas(estacaoMeteorologica.getLocalizacao(), datasHorasDecrescentes);
 
         LocalDateTime dataHoraDoAnoAnteriorDaPrevisao = datasHorasDecrescentes.getFirst();

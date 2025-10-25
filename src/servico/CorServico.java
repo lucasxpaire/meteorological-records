@@ -20,7 +20,7 @@ public class CorServico {
 
     private static final String CAMINHO_ARQUIVO_CORES = "/cores.properties";
 
-    private static final Map<String, String> ESTADO_PARA_COR = Map.ofEntries(
+    private static final Map<String, String> ESTADO_COR = Map.ofEntries(
             Map.entry("AC", "Verde"),
             Map.entry("AL", "Azul"),
             Map.entry("AP", "Amarelo"),
@@ -53,7 +53,6 @@ public class CorServico {
     @PostConstruct
     public void inicializarCores() {
         dados.iniciarTransacao();
-
         try {
             if (dados.existeAlgum(Cor.class)) {
                 return;
@@ -95,7 +94,7 @@ public class CorServico {
     }
 
     public Cor selecionarCorPorEstado(String estado) {
-        String nomeCor = ESTADO_PARA_COR.get(estado);
+        String nomeCor = ESTADO_COR.get(estado);
         return dados.buscarUnicoPorCampo(Cor.class, "nome", nomeCor);
     }
 
