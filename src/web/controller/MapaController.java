@@ -12,10 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import servico.EstacaoMeteorologicaServico;
-import servico.PontoServico;
-import servico.PropriedadeServico;
-import servico.TemperaturaServico;
+import servico.*;
 import util.JsonUtil;
 import web.command.ControleMapaCommand;
 import web.validator.ControleMapaValidator;
@@ -124,7 +121,7 @@ public class MapaController {
 
         LocalDateTime dataHoraAgora = LocalDateTime.now();
         LocalDateTime dataHoraPrevista = dataHoraAgora.plusHours(1).withMinute(0).withSecond(0);
-        return temperaturaServico.preverTemperaturaParaPonto(centroide, dataHoraPrevista);
+        return temperaturaServico.preverTemperatura(centroide, dataHoraPrevista);
     }
 
 }

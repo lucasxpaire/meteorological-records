@@ -9,19 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import smile.timeseries.AR;
 import util.FormatadorUtil;
-import util.JsonUtil;
 import util.LeitorArquivoUtil;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,17 +24,22 @@ import java.util.stream.Stream;
 @Service
 public class TemperaturaServico {
 
-    public static final long ATRASO_INICIAL_PARA_EXECUCAO = 1L;
-    public static final long INTERVALO_PARA_EXECUTAR = 24L;
-    public static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
+    public static final String URL_TEMPERATURAS = "https://megatecnologia.com.br/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
+    public static final String URL_TEMPERATURAS2 = "http://192.168.1.2:8081/controle/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
+
+    private static final double PESO_NULO = 0.0;
+
+    private static final int ANO_MAIS_ANTIGO_TEMPERATURAS_HISTORICAS = 2020;
 
     private static final int MINIMO_DE_TEMPERATURAS_PARA_PREVISAO = 2;
     private static final int CONDICAO_DE_TEMPERATURA_UNICA = 1;
 
-    private static final int ANO_INICIO_DADOS_HISTORICOS = 2020;
-    private static final int MES_FEVEREIRO = 2;
-    private static final int DIA_BISSEXTO = 29;
-    private static final int DIA_NAO_BISSEXTO = 28;
+    public static final long ATRASO_INICIAL_PARA_EXECUCAO = 1L;
+    public static final long INTERVALO_PARA_EXECUTAR = 24L;
+    public static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
+
+    public static final long INTERVALO_PARA_EXECUTAR_EM_MS = 86400000L; // 24 horas
+    public static final long ATRASO_INICIAL_PARA_EXECUCAO_EM_MS = 60000L; // 1 minuto
 
     @Autowired
     private Dados dados;
@@ -47,251 +47,263 @@ public class TemperaturaServico {
     @Autowired
     private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
-    private final ScheduledExecutorService agendador = Executors.newSingleThreadScheduledExecutor();
-
     private LocalDateTime ultimaAtualizacaoDeTemperaturas;
 
     @PostConstruct
-    public void inicializarServicos() {
-        popularHistoricosIniciaisSeNecessario();
-        iniciarRotinaDeAtualizacaoAutomatica();
-    }
-
-    private void popularHistoricosIniciaisSeNecessario() {
-        List<EstacaoMeteorologica> estacoesSemHistorico = dados.buscarComCampoNaoVazio(EstacaoMeteorologica.class, "localizacao.historicoTemperaturas");
-
-        if (estacoesSemHistorico.isEmpty()) {
-            return;
-        }
-
-        for (EstacaoMeteorologica estacao : estacoesSemHistorico) {
-            try {
-                atualizarHistoricoDaEstacao(estacao);
-                dados.salvar(estacao);
-            } catch (Exception ignored) {
-            }
-        }
-    }
-
-    public void iniciarRotinaDeAtualizacaoAutomatica() {
-        Runnable tarefa = this::executarAtualizacaoPeriodica;
-        agendador.scheduleAtFixedRate(tarefa, ATRASO_INICIAL_PARA_EXECUCAO, INTERVALO_PARA_EXECUTAR, UNIDADE_DE_TEMPO_DO_INTERVALO);
-    }
-
-    public void executarAtualizacaoPeriodica() {
-        ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
+    private void inicializarTemperaturas() {
+        dados.iniciarTransacao();
         try {
-            atualizarTemperaturasDeEstacoesEPontosAssociados();
-            preencherTemperaturasReaisNasPrevisoes();
+            popularTemperaturasDeEstacoesSemHistorico();
+            executarAtualizacaoDeTemperaturasPeriodica();
+            dados.confirmarTransacao();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Falha: Não foi possível executar a atualizacao.");
+            dados.desfazerTransacao();
+            throw e;
+        }
+
+    }
+
+    private void popularTemperaturasDeEstacoesSemHistorico() {
+        if (dados.existeAlgumVazio(EstacaoMeteorologica.class, "localizacao.historicoTemperaturas")) {
+            atualizarTemperaturasEstacoes(dados.buscarOndeCampoForVazio(EstacaoMeteorologica.class, "localizacao.historicoTemperaturas"));
         }
     }
 
-    public void atualizarTemperaturasDeEstacoesEPontosAssociados() {
+    private void executarAtualizacaoDeTemperaturasPeriodica() {
+        ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
+        atualizarTemperaturasDeEstacoesAssociadasACentroides();
+        atualizarTemperaturasDeCentroidesAssociadosAEstacoes();
+    }
+
+    public void atualizarTemperaturasDeEstacoesAssociadasACentroides() {
         List<EstacaoMeteorologica> estacoesAssociadas = dados.buscarEstacoesAssociadasAPropriedades();
         if (!estacoesAssociadas.isEmpty()) {
-            atualizarTemperaturasDasEstacoes(estacoesAssociadas);
-        }
-
-        List<Ponto> pontosAssociados = dados.buscarPontosCentraisDePropriedadesComEstacoes();
-        if (!pontosAssociados.isEmpty()) {
-            atualizarTemperaturaDePontosAssociados(pontosAssociados);
+            atualizarTemperaturasEstacoes(estacoesAssociadas);
         }
     }
 
-    public void preencherTemperaturasReaisNasPrevisoes() {
-        List<Temperatura> listaTemperaturasPrevistas = dados.buscarPrevisoesComTemperaturaCalculadaVazia();
+    public void atualizarTemperaturasDeCentroidesAssociadosAEstacoes() {
+        List<Ponto> pontosAssociados = dados.buscarCentroidesAssociadosAEstacoes();
+        if (!pontosAssociados.isEmpty()) {
+            atualizarTemperaturasCentroides(pontosAssociados);
+        }
+    }
 
-        if (listaTemperaturasPrevistas.isEmpty()) {
+    private void atualizarTemperaturasEstacoes(List<EstacaoMeteorologica> estacoes) {
+        if (estacoes.isEmpty()) {
             return;
         }
 
-        for (Temperatura temperatura : listaTemperaturasPrevistas) {
-            Ponto ponto = temperatura.getPonto();
-            List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
-
-            Double temperaturaCalculada = ponto.calcularTemperaturaDaPrevisao(estacoesRelevantes, temperatura.getDataHora());
-
-            if (temperaturaCalculada != null) {
-                temperatura.setTemperaturaCalculada(temperaturaCalculada);
-                salvar(temperatura);
-            }
-        }
-    }
-
-    public void salvar(Temperatura temperatura) {
-        if (validarTemperatura(temperatura)) {
-            dados.salvar(temperatura);
-        } else {
-            throw new RuntimeException("Dados da temperatura são inválidos.");
-        }
-    }
-
-    public Temperatura preverTemperaturaParaPonto(Ponto ponto, LocalDateTime dataHoraPrevista) {
-        List<EstacaoMeteorologica> estacoes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
-
-        Map<EstacaoMeteorologica, List<Temperatura>> historicoTemperaturasPorEstacao = new HashMap<>();
         for (EstacaoMeteorologica estacao : estacoes) {
-            List<LocalDateTime> datasAnteriores = obterDatasAnterioresParaBusca(dataHoraPrevista);
-            List<Temperatura> temperaturasCombinadas = buscarECombinarHistoricoParaPrevisao(estacao, datasAnteriores);
+            try {
+                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_TEMPERATURAS + estacao.getCodigoEstacao());
 
-            if (!temperaturasCombinadas.isEmpty()) {
-                historicoTemperaturasPorEstacao.put(estacao, temperaturasCombinadas);
-            }
-        }
+                if (dadosJson.isNull()) {
+                    return;
+                }
 
-        Map<EstacaoMeteorologica, Temperatura> temperaturasPrevistasPorEstacao = preverTemperaturasParaEstacoes(historicoTemperaturasPorEstacao, dataHoraPrevista);
-        return ponto.preverTemperatura(dataHoraPrevista, temperaturasPrevistasPorEstacao);
-    }
+                Set<LocalDateTime> datasHorasExistentes = estacao.obterDatasHorasExistentesNoHistoricoTemperaturas();
 
-    private List<Temperatura> buscarECombinarHistoricoParaPrevisao(EstacaoMeteorologica estacao, List<LocalDateTime> datasNecessarias) {
-        List<Temperatura> temperaturasDoBanco = dados.buscarTemperaturasHistoricas(estacao.getLocalizacao(), datasNecessarias);
-        Set<LocalDateTime> datasDoBanco = temperaturasDoBanco.stream()
-                .map(Temperatura::getDataHora)
-                .collect(Collectors.toSet());
+                for (JsonNode registro : dadosJson) {
+                    if (registro.get("data") == null || registro.get("hora") == null || registro.get("temperatura") == null || registro.get("temperatura").isNull()) {
+                        continue;
+                    }
 
-        LocalDateTime dataHoraReferencia = datasNecessarias.getFirst();
-        String dataReferenciaFormatada = FormatadorUtil.formatarDataParaComparacao(dataHoraReferencia);
-        String horaReferenciaFormatada = FormatadorUtil.formatarHoraParaComparacao(dataHoraReferencia);
+                    String data = registro.get("data").asText();
+                    String hora = String.format("%02d", registro.get("hora").asInt());
+                    LocalDateTime dataHoraUTC = LocalDateTime.parse(data + " " + hora, FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_JSON);
+                    ZonedDateTime dataHoraGMT = dataHoraUTC.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of(estacao.getLocalizacao().getFusoHorario()));
 
-        List<Temperatura> temperaturasDoCsv = LeitorArquivoUtil.lerTemperaturasHistoricasCsv(dataReferenciaFormatada, horaReferenciaFormatada, estacao);
+                    if (!datasHorasExistentes.contains(dataHoraGMT.toLocalDateTime())) {
+                        Temperatura temperatura = new Temperatura();
+                        temperatura.setTemperaturaReal(registro.get("temperatura").asDouble());
+                        temperatura.setDataHora(dataHoraGMT.toLocalDateTime());
+                        temperatura.setPonto(estacao.getLocalizacao());
 
-        List<Temperatura> temperaturasFaltantesDoCsv = temperaturasDoCsv.stream()
-                .filter(t -> !datasDoBanco.contains(t.getDataHora()))
-                .toList();
+                        estacao.getLocalizacao().getHistoricoTemperaturas().add(temperatura);
+                        datasHorasExistentes.add(dataHoraGMT.toLocalDateTime());
+                    }
+                }
 
-        return Stream.concat(temperaturasDoBanco.stream(), temperaturasFaltantesDoCsv.stream())
-                .sorted(Comparator.comparing(Temperatura::getDataHora).reversed())
-                .collect(Collectors.toList());
-    }
-
-    private void atualizarTemperaturasDasEstacoes(List<EstacaoMeteorologica> estacoesAssociadas) {
-        try {
-            for (EstacaoMeteorologica estacao : estacoesAssociadas) {
-                atualizarHistoricoDaEstacao(estacao);
                 dados.salvar(estacao);
+            } catch (IOException e) {
+                throw new RuntimeException("Falha: Não foi possível obter histórico de temperaturas para a estação: " + estacao.getCodigoEstacao());
             }
-        } catch (PersistenceException e) {
-            throw new RuntimeException("Não foi possível atualizar as temperaturas das estações associadas.");
         }
     }
 
-    private void atualizarTemperaturaDePontosAssociados(List<Ponto> pontos) {
+    private void atualizarTemperaturasCentroides(List<Ponto> pontos) {
         for (Ponto ponto : pontos) {
             List<EstacaoMeteorologica> estacoesAssociadas = ponto.getEstacoesMeteorologicas();
             if (!estacoesAssociadas.isEmpty()) {
-                Temperatura novaTemperatura = ponto.calcularTemperaturaAtual(estacoesAssociadas);
-                if (novaTemperatura != null) {
-                    boolean jaExisteTemperatura = ponto.getHistoricoTemperaturas().stream()
-                            .anyMatch(t -> t.getDataHora().equals(novaTemperatura.getDataHora()));
+                Temperatura temperaturaCalculada = calcularTemperatura(ponto);
+                if (temperaturaCalculada != null) {
+                    boolean ehNovaTemperatura = ponto.getHistoricoTemperaturas().stream()
+                            .noneMatch(t -> t.getDataHora().equals(temperaturaCalculada.getDataHora()));
 
-                    if (!jaExisteTemperatura) {
-                        ponto.getHistoricoTemperaturas().add(novaTemperatura);
-                        salvar(novaTemperatura);
+                    if (ehNovaTemperatura) {
+                        ponto.getHistoricoTemperaturas().add(temperaturaCalculada);
+                        dados.salvar(temperaturaCalculada);
                     }
                 }
             }
         }
     }
 
-    private Map<EstacaoMeteorologica, Temperatura> preverTemperaturasParaEstacoes(Map<EstacaoMeteorologica, List<Temperatura>> temperaturasPorEstacao, LocalDateTime dataHoraPrevista) {
-        Map<EstacaoMeteorologica, Temperatura> previsoes = new HashMap<>();
+    public Temperatura calcularTemperatura(Ponto ponto) {
+        List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
+        ponto.setEstacoesMeteorologicas(estacoesRelevantes);
 
-        for (Map.Entry<EstacaoMeteorologica, List<Temperatura>> historicoPorEstacao : temperaturasPorEstacao.entrySet()) {
-            List<Temperatura> temperaturasHistoricasDaEstacao = historicoPorEstacao.getValue();
-            if (temperaturasHistoricasDaEstacao == null || temperaturasHistoricasDaEstacao.isEmpty()) {
+        Optional<LocalDateTime> dataHoraMaisRecenteDeTemperaturaEntreEstacoes = estacoesRelevantes.stream()
+                .map(e -> e.getLocalizacao().getHistoricoTemperaturas().stream()
+                        .filter(t -> t.getTemperaturaReal() != null)
+                        .map(Temperatura::getDataHora)
+                        .max(Comparator.naturalOrder())
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .max(Comparator.naturalOrder());
+
+        if (dataHoraMaisRecenteDeTemperaturaEntreEstacoes.isEmpty()) {
+            return null;
+        }
+
+        double somaTemperaturas = 0.0;
+        double somaPesos = 0.0;
+
+        for (EstacaoMeteorologica estacao : estacoesRelevantes) {
+            Optional<Temperatura> temperaturaMaisRecenteDaEstacao = estacao.getLocalizacao().getHistoricoTemperaturas().stream()
+                    .filter(t -> t.getDataHora().equals(dataHoraMaisRecenteDeTemperaturaEntreEstacoes.get()) && t.getTemperaturaReal() != null)
+                    .findFirst();
+
+            if (temperaturaMaisRecenteDaEstacao.isPresent()) {
+                double temperatura = temperaturaMaisRecenteDaEstacao.get().getTemperaturaReal();
+                double peso = ponto.calcularPesoDeProximidadePara(estacao);
+                somaTemperaturas += temperatura * peso;
+                somaPesos += peso;
+            }
+        }
+
+        if (somaPesos == PESO_NULO) {
+            return null;
+        }
+
+        double temperatura = somaTemperaturas / somaPesos;
+
+        Temperatura temperaturaCalculada = new Temperatura();
+        temperaturaCalculada.setPonto(ponto);
+        temperaturaCalculada.setTemperaturaCalculada(temperatura);
+        temperaturaCalculada.setDataHora(dataHoraMaisRecenteDeTemperaturaEntreEstacoes.get());
+        return temperaturaCalculada;
+
+    }
+
+    public Temperatura preverTemperatura(Ponto ponto, LocalDateTime dataHoraPrevisao) {
+        List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
+        ponto.setEstacoesMeteorologicas(estacoesRelevantes);
+
+        Map<EstacaoMeteorologica, Temperatura> temperaturasPrevistasDasEstacoes = preverTemperaturasParaEstacoes(estacoesRelevantes, dataHoraPrevisao);
+
+        double somaTemperaturas = 0.0;
+        double somaPesos = 0.0;
+
+        for (Map.Entry<EstacaoMeteorologica, Temperatura> entry : temperaturasPrevistasDasEstacoes.entrySet()) {
+            EstacaoMeteorologica estacaoMeteorologica = entry.getKey();
+            Temperatura temperaturaPrevista = entry.getValue();
+
+            if (temperaturaPrevista == null) {
                 continue;
             }
 
-            double[] serieTemporalTemperaturas = temperaturasHistoricasDaEstacao.stream()
+            double peso = ponto.calcularPesoDeProximidadePara(estacaoMeteorologica);
+            somaTemperaturas += temperaturaPrevista.getTemperaturaPrevista() * peso;
+            somaPesos += peso;
+        }
+
+        if (somaPesos == PESO_NULO) {
+            return null;
+        }
+
+        double temperatura = somaTemperaturas / somaPesos;
+
+        Temperatura temperaturaPrevista = new Temperatura();
+        temperaturaPrevista.setDataHora(dataHoraPrevisao);
+        temperaturaPrevista.setTemperaturaPrevista(temperatura);
+        temperaturaPrevista.setPonto(ponto);
+
+        return temperaturaPrevista;
+    }
+
+    public Map<EstacaoMeteorologica, Temperatura> preverTemperaturasParaEstacoes (List<EstacaoMeteorologica> estacaoMeteorologicas, LocalDateTime dataHoraPrevisao) {
+        Map<EstacaoMeteorologica, List<Temperatura>> temperaturasPorEstacao = new HashMap<>();
+
+        for (EstacaoMeteorologica estacao : estacaoMeteorologicas) {
+            List<LocalDateTime> datasHorasDecrescentes = obterDatasHorasDescrescentes(dataHoraPrevisao);
+            List<Temperatura> temperaturasCombinadas = combinarTemperaturasDoBancoDeDadosComDadosHistoricos(estacao, datasHorasDecrescentes);
+
+            if (!temperaturasCombinadas.isEmpty()) {
+                temperaturasPorEstacao.put(estacao, temperaturasCombinadas);
+            }
+        }
+
+        Map<EstacaoMeteorologica, Temperatura> previsoesDeCadaEstacao = new HashMap<>();
+
+        for (Map.Entry<EstacaoMeteorologica, List<Temperatura>> temperaturasDaEstacao : temperaturasPorEstacao.entrySet()) {
+            List<Temperatura> temperaturas = temperaturasDaEstacao.getValue();
+            if (temperaturas == null || temperaturas.isEmpty()) {
+                continue;
+            }
+
+            double[] serieTemporal = temperaturas.stream()
                     .mapToDouble(Temperatura::getTemperaturaReal)
                     .toArray();
 
-            Temperatura temperaturaFutura = new Temperatura();
-            if (serieTemporalTemperaturas.length == CONDICAO_DE_TEMPERATURA_UNICA) {
-                temperaturaFutura.setTemperaturaPrevista(serieTemporalTemperaturas[0]);
-            } else if (serieTemporalTemperaturas.length >= MINIMO_DE_TEMPERATURAS_PARA_PREVISAO) {
-                AR modelo = AR.fit(serieTemporalTemperaturas, serieTemporalTemperaturas.length - 1);
-                double previsao = modelo.forecast();
-                temperaturaFutura.setTemperaturaPrevista(previsao);
+            Temperatura temperaturaPrevistaDaEstacao = new Temperatura();
+            if (serieTemporal.length == CONDICAO_DE_TEMPERATURA_UNICA) {
+                temperaturaPrevistaDaEstacao.setTemperaturaPrevista(serieTemporal[0]);
+            } else if (serieTemporal.length >= MINIMO_DE_TEMPERATURAS_PARA_PREVISAO) {
+                AR modeloAutoRegressivo = AR.fit(serieTemporal, serieTemporal.length - 1);
+                double temperaturaPrevista = modeloAutoRegressivo.forecast();
+                temperaturaPrevistaDaEstacao.setTemperaturaPrevista(temperaturaPrevista);
             } else {
-                throw new IllegalArgumentException("É necessário pelo menos " + MINIMO_DE_TEMPERATURAS_PARA_PREVISAO + " temperaturas de anos passados para prever a temperatura para a estação: " + historicoPorEstacao.getKey().getCodigoEstacao());
+                throw new IllegalArgumentException("Falha: É necessário pelo menos " + MINIMO_DE_TEMPERATURAS_PARA_PREVISAO + " temperaturas de anos passados para prever a temperatura para a estação: " + temperaturasDaEstacao.getKey().getCodigoEstacao());
             }
 
-            Temperatura ultimoRegisto = temperaturasHistoricasDaEstacao.getLast();
-            if (ultimoRegisto == null || ultimoRegisto.getDataHora() == null) {
-                throw new IllegalStateException("O registo histórico mais antigo da estação " + historicoPorEstacao.getKey().getCodigoEstacao() + " contém dados de data inválidos.");
-            }
-
-            LocalDateTime dataHoraProjetada = projetarDataParaAnoDaPrevisao(ultimoRegisto.getDataHora(), dataHoraPrevista.getYear());
-            temperaturaFutura.setDataHora(dataHoraProjetada);
-
-            previsoes.put(historicoPorEstacao.getKey(), temperaturaFutura);
+            temperaturaPrevistaDaEstacao.setDataHora(dataHoraPrevisao);
+            previsoesDeCadaEstacao.put(temperaturasDaEstacao.getKey(), temperaturaPrevistaDaEstacao);
         }
-        return previsoes;
+
+        return previsoesDeCadaEstacao;
     }
 
-    private List<LocalDateTime> obterDatasAnterioresParaBusca(LocalDateTime dataHoraPrevista) {
-        List<LocalDateTime> datasNecessarias = new ArrayList<>();
-        int anoDaPrevisao = dataHoraPrevista.getYear();
-        for (int ano = anoDaPrevisao - 1; ano >= ANO_INICIO_DADOS_HISTORICOS; ano--) {
-            datasNecessarias.add(dataHoraPrevista.withYear(ano));
+    public List<LocalDateTime> obterDatasHorasDescrescentes(LocalDateTime dataHora) {
+        List<LocalDateTime> datasHorasDecrescentes = new ArrayList<>();
+        int anoDaDataHora = dataHora.getYear();
+        for (int ano = anoDaDataHora - 1; ano >= ANO_MAIS_ANTIGO_TEMPERATURAS_HISTORICAS; ano--) {
+            datasHorasDecrescentes.add(dataHora.withYear(ano));
         }
-        return datasNecessarias;
+        return datasHorasDecrescentes;
     }
 
-    public void atualizarHistoricoDaEstacao(EstacaoMeteorologica estacao) {
-        try {
-            JsonNode dadosJson = JsonUtil.obterDadosDoJson(JsonUtil.URL_TEMPERATURAS2 + estacao.getCodigoEstacao());
+    public List<Temperatura> combinarTemperaturasDoBancoDeDadosComDadosHistoricos(EstacaoMeteorologica estacaoMeteorologica, List<LocalDateTime> datasHorasDecrescentes) {
+        List<Temperatura> temperaturasDoBancoDeDados = dados.buscarTemperaturasHistoricas(estacaoMeteorologica.getLocalizacao(), datasHorasDecrescentes);
 
-            List<Temperatura> historicoExistente = estacao.getLocalizacao().getHistoricoTemperaturas();
-            Set<LocalDateTime> datasExistentes = historicoExistente.stream()
-                    .map(Temperatura::getDataHora)
-                    .collect(Collectors.toSet());
+        LocalDateTime dataHoraDoAnoAnteriorDaPrevisao = datasHorasDecrescentes.getFirst();
+        String dataFormatada = FormatadorUtil.formatarDataParaComparacao(dataHoraDoAnoAnteriorDaPrevisao);
+        String horaFormatada = FormatadorUtil.formatarHoraParaComparacao(dataHoraDoAnoAnteriorDaPrevisao);
 
-            List<Temperatura> novasTemperaturas = new ArrayList<>();
+        List<Temperatura> temperaturasDosDadosHistoricos = LeitorArquivoUtil.lerTemperaturasHistoricasCsv(dataFormatada, horaFormatada, estacaoMeteorologica);
 
-            for (JsonNode registro : dadosJson) {
-                if (registro.get("data") == null || registro.get("hora") == null || registro.get("temperatura") == null || registro.get("temperatura").isNull()) {
-                    continue;
-                }
+        Set<LocalDateTime> datasHorasObtidasDoBanco = temperaturasDoBancoDeDados.stream()
+                .map(Temperatura::getDataHora)
+                .collect(Collectors.toSet());
 
-                String data = registro.get("data").asText();
-                String hora = String.format("%02d", registro.get("hora").asInt());
-                LocalDateTime dataHoraUtc = LocalDateTime.parse(data + " " + hora, FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_JSON);
+        List<Temperatura> temperaturasFaltantesDosDadosHistoricos = temperaturasDosDadosHistoricos.stream()
+                .filter(t -> !datasHorasObtidasDoBanco.contains(t.getDataHora()))
+                .toList();
 
-                ZonedDateTime dataHoraLocal = dataHoraUtc.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of(estacao.getLocalizacao().getFusoHorario()));
-                LocalDateTime dataHoraFormatado = dataHoraLocal.toLocalDateTime();
-
-                if (!datasExistentes.contains(dataHoraFormatado)) {
-                    Temperatura temperatura = new Temperatura();
-                    temperatura.setTemperaturaReal(registro.get("temperatura").asDouble());
-                    temperatura.setDataHora(dataHoraFormatado);
-                    temperatura.setPonto(estacao.getLocalizacao());
-                    novasTemperaturas.add(temperatura);
-
-                    datasExistentes.add(dataHoraFormatado);
-                }
-            }
-
-            historicoExistente.addAll(novasTemperaturas);
-            historicoExistente.sort(Comparator.comparing(Temperatura::getDataHora).reversed());
-
-        } catch (IOException e) {
-            throw new RuntimeException("Falha ao obter histórico de temperaturas para a estação " + estacao.getCodigoEstacao(), e);
-        }
-    }
-
-    private LocalDateTime projetarDataParaAnoDaPrevisao(LocalDateTime dataHistorica, int anoDaPrevisao) {
-        boolean ehDiaBissexto = dataHistorica.getMonthValue() == MES_FEVEREIRO && dataHistorica.getDayOfMonth() == DIA_BISSEXTO;
-        boolean anoPrevisaoNaoEhBissexto = !Year.isLeap(anoDaPrevisao);
-
-        if (ehDiaBissexto && anoPrevisaoNaoEhBissexto) {
-            return dataHistorica.withDayOfMonth(DIA_NAO_BISSEXTO).withYear(anoDaPrevisao);
-        } else {
-            return dataHistorica.withYear(anoDaPrevisao);
-        }
+        return Stream.concat(temperaturasDoBancoDeDados.stream(), temperaturasDosDadosHistoricos.stream())
+                .sorted(Comparator.comparing(Temperatura::getDataHora).reversed())
+                .collect(Collectors.toList());
     }
 
     public LocalDateTime obterUltimaAtualizacaoDeTemperaturas() {
@@ -304,9 +316,5 @@ public class TemperaturaServico {
         }
         return null;
     }
-
-    private boolean validarTemperatura(Temperatura temperatura) {
-        return temperatura != null && temperatura.getPonto() != null;
-    }
-
 }
+

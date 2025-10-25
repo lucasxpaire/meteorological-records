@@ -1,7 +1,7 @@
 package web.controller;
 
-import modelo.Ponto;
 import modelo.Propriedade;
+import modelo.Temperatura;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import servico.PontoServico;
 import servico.PropriedadeServico;
+import servico.TemperaturaServico;
 import util.FormatadorUtil;
 import web.command.PropriedadeCommand;
 import web.validator.PropriedadeValidator;
@@ -27,10 +28,13 @@ public class PropriedadeController {
     private PropriedadeServico propriedadeServico;
 
     @Autowired
-    private PropriedadeValidator propriedadeValidator;
+    private PontoServico pontoServico;
 
     @Autowired
-    private PontoServico pontoServico;
+    private TemperaturaServico temperaturaServico;
+
+    @Autowired
+    private PropriedadeValidator propriedadeValidator;
 
     @InitBinder("PropriedadeCommand")
     void validator (WebDataBinder webDataBinder) {
@@ -82,8 +86,9 @@ public class PropriedadeController {
         }
 
         Propriedade propriedade = propriedadeServico.prepararPropriedade(command);
-        Ponto centroide = pontoServico.interpolarTemperaturaAtual(propriedade.getCentroide());
-        propriedade.setCentroide(centroide);
+        Temperatura temperaturaCalculada = temperaturaServico.calcularTemperatura(propriedade.getCentroide());
+        propriedade.getCentroide().getHistoricoTemperaturas().add(temperaturaCalculada);
+
         propriedadeServico.salvar(propriedade);
 
         if (command.getId() != null) {

@@ -24,7 +24,7 @@ public class TemperaturaTest {
         LocalDateTime dataHoraPrevisao = data.atTime(hora, 0);
 
 
-        Temperatura temperatura = temperaturaServico.preverTemperaturaParaPonto(ponto, dataHoraPrevisao);
+        Temperatura temperatura = temperaturaServico.preverTemperatura(ponto, dataHoraPrevisao);
         System.out.println(" DataHora: " + temperatura.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO) + " | Temperatura: " + FormatadorUtil.formatarPontoDecimalParaVirgula(temperatura.getTemperaturaPrevista()) + " °C");
 
     }

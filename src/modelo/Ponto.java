@@ -5,7 +5,6 @@ import net.iakovlev.timeshape.TimeZoneEngine;
 import util.FormatadorUtil;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -133,7 +132,7 @@ public class Ponto {
     }
 
     @Transient
-    private Double calcularPesoDeProximidadePara(EstacaoMeteorologica estacao) {
+    public Double calcularPesoDeProximidadePara(EstacaoMeteorologica estacao) {
         double distancia = distanciaAte(estacao.getLocalizacao());
         if (distancia < DISTANCIA_MINIMA_PARA_PESO_MAXIMO) {
             return PESO_MAXIMO_INTERPOLACAO;
@@ -155,123 +154,6 @@ public class Ponto {
         } else {
             return QUARTO_QUADRANTE;
         }
-    }
-
-    @Transient
-    private LocalDateTime calcularDataHoraEstimativa(List<Temperatura> temperaturas) {
-        if (temperaturas == null || temperaturas.isEmpty()) {
-            return null;
-        }
-
-        return temperaturas.stream()
-                .map(Temperatura::getDataHora)
-                .max(Comparator.naturalOrder())
-                .orElse(null);
-    }
-
-    @Transient
-    public Temperatura calcularTemperaturaAtual(List<EstacaoMeteorologica> estacoes) {
-
-        Optional<LocalDateTime> dataHoraMaisRecente = estacoes.stream()
-                .map(e -> e.getLocalizacao().getHistoricoTemperaturas().stream()
-                        .filter(t -> t.getTemperaturaReal() != null)
-                        .map(Temperatura::getDataHora)
-                        .max(Comparator.naturalOrder())
-                        .orElse(null))
-                .filter(Objects::nonNull)
-                .max(Comparator.naturalOrder());
-
-        if (dataHoraMaisRecente.isEmpty()) {
-            return null;
-        }
-
-        double somaTemperaturasPonderadas = 0.0;
-        double somaPesos = 0.0;
-
-        for (EstacaoMeteorologica estacao : estacoes) {
-            Optional<Temperatura> temperaturaNaDataHoraMaisRecente = estacao.getLocalizacao().getHistoricoTemperaturas().stream()
-                    .filter(t -> t.getDataHora().equals(dataHoraMaisRecente.get()) && t.getTemperaturaReal() != null)
-                    .findFirst();
-
-            if (temperaturaNaDataHoraMaisRecente.isPresent()) {
-                Double temperatura = temperaturaNaDataHoraMaisRecente.get().getTemperaturaReal();
-                Double peso = calcularPesoDeProximidadePara(estacao);
-                somaTemperaturasPonderadas += temperatura * peso;
-                somaPesos += peso;
-            }
-        }
-
-        if (somaPesos == PESO_NULO) {
-            return null;
-        }
-
-        Double temperaturaCalculada = somaTemperaturasPonderadas / somaPesos;
-
-        Temperatura temperatura = new Temperatura();
-        temperatura.setPonto(this);
-        temperatura.setTemperaturaCalculada(temperaturaCalculada);
-        temperatura.setDataHora(dataHoraMaisRecente.get());
-        return temperatura;
-    }
-
-    @Transient
-    public Double calcularTemperaturaDaPrevisao(List<EstacaoMeteorologica> estacoes, LocalDateTime dataHora) {
-        double somaTemperaturasReaisPonderadas = 0.0;
-        double somaPesos = 0.0;
-        boolean dadosReaisEncontrados = false;
-
-        for (EstacaoMeteorologica estacao : estacoes) {
-            Optional<Temperatura> temperaturaRealDaEstacao = estacao.getLocalizacao().getHistoricoTemperaturas().stream()
-                    .filter(t -> t.getDataHora().equals(dataHora) && t.getTemperaturaReal() != null)
-                    .findFirst();
-
-            if (temperaturaRealDaEstacao.isPresent()) {
-                dadosReaisEncontrados = true;
-                Double temperaturaReal = temperaturaRealDaEstacao.get().getTemperaturaReal();
-                Double peso = calcularPesoDeProximidadePara(estacao);
-                somaTemperaturasReaisPonderadas += temperaturaReal * peso;
-                somaPesos += peso;
-            }
-        }
-
-        if (dadosReaisEncontrados && somaPesos > PESO_NULO) {
-            return somaTemperaturasReaisPonderadas / somaPesos;
-        }
-
-        return null;
-    }
-
-    @Transient
-    public Temperatura preverTemperatura(LocalDateTime dataHoraPrevista, Map<EstacaoMeteorologica, Temperatura> previsoesPorEstacao) {
-        double somatorioTemperaturasPrevistasPonderadas = 0.0;
-        double somaPesos = 0.0;
-
-        for (Map.Entry<EstacaoMeteorologica, Temperatura> entrada : previsoesPorEstacao.entrySet()) {
-            EstacaoMeteorologica estacao = entrada.getKey();
-            Temperatura previsaoCalculadaPelaEstacao = entrada.getValue();
-
-            if (previsaoCalculadaPelaEstacao == null) {
-                continue;
-            }
-
-            double peso = calcularPesoDeProximidadePara(estacao);
-            somatorioTemperaturasPrevistasPonderadas += previsaoCalculadaPelaEstacao.getTemperaturaPrevista() * peso;
-            somaPesos += peso;
-        }
-
-        Double temperaturaPrevistaFinal;
-        if (somaPesos == PESO_NULO) {
-            temperaturaPrevistaFinal = null;
-        } else {
-            temperaturaPrevistaFinal = somatorioTemperaturasPrevistasPonderadas / somaPesos;
-        }
-
-        Temperatura previsaoFinal = new Temperatura();
-        previsaoFinal.setDataHora(dataHoraPrevista);
-        previsaoFinal.setTemperaturaPrevista(temperaturaPrevistaFinal);
-        previsaoFinal.setPonto(this);
-
-        return previsaoFinal;
     }
 
     @Transient

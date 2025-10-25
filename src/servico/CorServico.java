@@ -20,17 +20,17 @@ public class CorServico {
 
     @PostConstruct
     public void inicializarCores() {
-        if (dados.existeAlgum(Cor.class)) {
-            return;
-        }
-
         dados.iniciarTransacao();
+
         try {
+            if (dados.existeAlgum(Cor.class)) {
+                return;
+            }
             carregarCoresDoProperties();
             dados.confirmarTransacao();
         } catch (Exception e) {
             dados.desfazerTransacao();
-            throw new RuntimeException("Falha: não foi possível inicializar cores.");
+            throw e;
         }
     }
 

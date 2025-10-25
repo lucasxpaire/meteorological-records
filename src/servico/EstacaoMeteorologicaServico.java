@@ -1,6 +1,7 @@
 package servico;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dados.Dados;
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
@@ -11,6 +12,10 @@ import util.*;
 import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +126,23 @@ public class EstacaoMeteorologicaServico {
             quadrantes.get(quadrante).add(estacao);
         }
         return quadrantes;
+    }
+
+    public JsonNode obterDadosDaEstacao(String URLString) throws IOException {
+        URL url = URI.create(URLString).toURL();
+        HttpURLConnection conexao = (HttpURLConnection) url.openConnection();
+        conexao.setRequestMethod("GET");
+        conexao.setConnectTimeout(1000000);
+        conexao.setReadTimeout(1000000);
+
+        try (InputStream dadosJson = conexao.getInputStream()) {
+            ObjectMapper conversorJson = new ObjectMapper();
+            return conversorJson.readTree(dadosJson);
+        } catch (IOException e) {
+            return null;
+        } finally {
+            conexao.disconnect();
+        }
     }
 
     private boolean validarEstacaoMeteorologica(EstacaoMeteorologica estacao) {

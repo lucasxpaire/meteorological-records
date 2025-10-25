@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import servico.CorServico;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "ESTACAO_METEOROLOGICA")
@@ -105,6 +108,13 @@ public class EstacaoMeteorologica {
         setCodigoEstacao(dadosEstacao.get("CD_ESTACAO").asText());
         setEstado(dadosEstacao.get("SG_ESTADO").asText());
         setCor(corServico.selecionarCorPorEstado(getEstado()));
+    }
+
+    @Transient
+    public Set<LocalDateTime> obterDatasHorasExistentesNoHistoricoTemperaturas() {
+        return this.getLocalizacao().getHistoricoTemperaturas().stream()
+                .map(Temperatura::getDataHora)
+                .collect(Collectors.toSet());
     }
 
 }
