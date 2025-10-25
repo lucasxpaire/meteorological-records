@@ -34,12 +34,8 @@ public class TemperaturaServico {
     private static final int MINIMO_DE_TEMPERATURAS_PARA_PREVISAO = 2;
     private static final int CONDICAO_DE_TEMPERATURA_UNICA = 1;
 
-    public static final long ATRASO_INICIAL_PARA_EXECUCAO = 1L;
     public static final long INTERVALO_PARA_EXECUTAR = 24L;
     public static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
-
-    public static final long INTERVALO_PARA_EXECUTAR_EM_MS = 86400000L; // 24 horas
-    public static final long ATRASO_INICIAL_PARA_EXECUCAO_EM_MS = 60000L; // 1 minuto
 
     @Autowired
     private Dados dados;
