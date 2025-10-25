@@ -24,8 +24,8 @@ import java.util.stream.Stream;
 @Service
 public class TemperaturaServico {
 
-    public static final String URL_TEMPERATURAS = "https://megatecnologia.com.br/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
-    public static final String URL_TEMPERATURAS2 = "http://192.168.1.2:8081/controle/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
+    private static final String URL_TEMPERATURAS = "https://megatecnologia.com.br/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
+    private static final String URL_TEMPERATURAS2 = "http://192.168.1.2:8081/controle/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
 
     private static final double PESO_NULO = 0.0;
 
@@ -34,8 +34,8 @@ public class TemperaturaServico {
     private static final int MINIMO_DE_TEMPERATURAS_PARA_PREVISAO = 2;
     private static final int CONDICAO_DE_TEMPERATURA_UNICA = 1;
 
-    public static final long INTERVALO_PARA_EXECUTAR = 24L;
-    public static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
+    private static final long INTERVALO_PARA_EXECUTAR = 24L;
+    private static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
 
     @Autowired
     private Dados dados;

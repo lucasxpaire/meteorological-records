@@ -7,7 +7,6 @@ import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import util.*;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
@@ -27,6 +26,9 @@ public class EstacaoMeteorologicaServico {
     private static final double METROS_PARA_GRAU = 111320.0;
     private static final int LIMITE_RAIO_BUSCA = 100000;
 
+    private static final String URL_ESTACOES_AUTOMATICAS = "https://apitempo.inmet.gov.br/estacoes/T";
+    private static final String URL_ESTACOES_MANUAIS = "https://apitempo.inmet.gov.br/estacoes/M";
+
     @Autowired
     private Dados dados;
 
@@ -36,7 +38,7 @@ public class EstacaoMeteorologicaServico {
     @PostConstruct
     public void inicializarEstacoesMeteorologicas() {
         if (listarTodas().isEmpty()) {
-            List<String> urlsEstacoes = List.of(JsonUtil.URL_ESTACOES_MANUAIS, JsonUtil.URL_ESTACOES_AUTOMATICAS);
+            List<String> urlsEstacoes = List.of(URL_ESTACOES_MANUAIS, URL_ESTACOES_AUTOMATICAS);
             for (String url : urlsEstacoes) {
                dados.iniciarTransacao();
                try {
@@ -52,7 +54,7 @@ public class EstacaoMeteorologicaServico {
 
     private void preencherBancoComEstacoesDaApi(String urlApiEstacoes) {
         try {
-            JsonNode estacoesNode = JsonUtil.obterDadosDoJson(urlApiEstacoes);
+            JsonNode estacoesNode = obterDadosDaEstacao(urlApiEstacoes);
             for (JsonNode estacaoNode : estacoesNode) {
                 EstacaoMeteorologica estacaoMeteorologica = new EstacaoMeteorologica();
                 estacaoMeteorologica.definirDados(estacaoNode, corServico);
