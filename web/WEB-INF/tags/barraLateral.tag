@@ -1,5 +1,13 @@
-<%@tag pageEncoding="UTF-8" %>
+<%@ tag pageEncoding="UTF-8" %>
+
+<%@ include file="../jsp/cabecalho.jspf"%>
+
 <%@ attribute name="paginaAtiva" required="true" type="java.lang.String" %>
+
+<c:url var="urlInicio" value="inicio.html"/>
+<c:url var="urlGerenciarProprietarios" value="gerenciarProprietarios.html"/>
+<c:url var="urlGerenciarPropriedades" value="gerenciarPropriedades.html"/>
+<c:url var="urlVisualizarMapa" value="visualizarMapa.html"/>
 
 <nav class="menu-lateral">
     <div class="menu-lateral-cabecalho">
@@ -8,16 +16,16 @@
 
     <ul class="menu-lateral-lista">
         <li>
-            <a href="inicio.html" class="${paginaAtiva == 'inicio' ? 'active' : ''}">Início</a>
+            <tags:botao label="Início" href="${urlInicio}" css="${paginaAtiva == 'inicio' ? 'active' : ''}"/>
         </li>
         <li>
-            <a href="gerenciarProprietarios.html" class="${paginaAtiva == 'proprietarios' ? 'active' : ''}">Gerenciar proprietários</a>
+            <tags:botao label="Gerenciar proprietários" href="${urlGerenciarProprietarios}" css="${paginaAtiva == 'proprietarios' ? 'active' : ''}"/>
         </li>
         <li>
-            <a href="gerenciarPropriedades.html" class="${paginaAtiva == 'propriedades' ? 'active' : ''}">Gerenciar propriedades</a>
+            <tags:botao label="Gerenciar propriedades" href="${urlGerenciarPropriedades}" css="${paginaAtiva == 'propriedades' ? 'active' : ''}"/>
         </li>
         <li>
-            <a href="visualizarMapa.html" class="${paginaAtiva == 'mapa' ? 'active' : ''}">Visualizar mapa</a>
+            <tags:botao label="Visualizar mapa" href="${urlVisualizarMapa}" css="${paginaAtiva == 'mapa' ? 'active' : ''}"/>
         </li>
     </ul>
 

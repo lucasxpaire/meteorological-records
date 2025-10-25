@@ -1,6 +1,6 @@
 <%@ tag pageEncoding="UTF-8" %>
-<%@ include file="../jsp/cabecalho.jspf"%>
 
+<%@ include file="../jsp/cabecalho.jspf"%>
 
 <%@ attribute name="path" required="true" type="java.lang.String" %>
 <%@ attribute name="label" required="true" type="java.lang.String" %>

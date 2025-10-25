@@ -1,8 +1,12 @@
-<%@page pageEncoding="UTF-8" %>
+<%@ page pageEncoding="UTF-8" %>
+
 <%@ include file="cabecalho.jspf" %>
 
 <%--@elvariable id="sucesso" type="java.lang.String"--%>
 <%--@elvariable id="falha" type="java.lang.String"--%>
+
+<c:url var="urlCadastroProprietario" value="cadastroProprietario.html"/>
+<c:url var="urlGerenciarProprietarios" value="gerenciarProprietarios.html"/>
 
 <tags:corpo>
     <div class="estrutura-pagina">
@@ -10,16 +14,16 @@
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
                 <h1>Gerenciar proprietários</h1>
-                <a href="cadastroProprietario.html" class="botao botao-novo">Novo proprietário</a>
+                <tags:botao label="Novo proprietário" css="botao botao-novo" href="${urlCadastroProprietario}"/>
             </div>
 
             <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
             <tags:alerta css="alerta-falha" alerta="${falha}" />
 
             <div class="busca-container">
-                <form action="gerenciarProprietarios.html" method="get" class="formulario-busca">
+                <form action="${urlGerenciarProprietarios}" method="get" class="formulario-busca">
                     <input type="text" name="busca" id="campo-busca" placeholder="Buscar por nome ou CPF" class="campo-busca" value="${param.busca}">
-                    <button type="submit" class="botao-busca">Buscar</button>
+                    <tags:botao label="Buscar" css="botao botao-busca" type="submit"/>
                 </form>
             </div>
 
@@ -39,8 +43,15 @@
                             <td>${proprietario.telefoneFormatado}</td>
                             <td>${proprietario.cor.nome}</td>
                             <td>
-                                <a href="alterarProprietario.html?idProprietario=${proprietario.id}" class="botao-tabela botao-tabela--alterar">Alterar</a>
-                                <a href="deletarProprietario.html?idProprietario=${proprietario.id}" class="botao-tabela botao-tabela--deletar">Deletar</a>
+                                <c:url var="urlAlterar" value="/alterarProprietario.html">
+                                    <c:param name="idProprietario" value="${proprietario.id}"/>
+                                </c:url>
+                                <tags:botao label="Alterar" css="botao-tabela botao-tabela--alterar" href="${urlAlterar}"/>
+
+                                <c:url var="urlDeletar" value="deletarProprietario.html">
+                                    <c:param name="idProprietario" value="${proprietario.id}"/>
+                                </c:url>
+                                <tags:botao label="Deletar" css="botao-tabela botao-tabela--deletar" href="${urlDeletar}"/>
                             </td>
                         </tr>
                     </c:forEach>

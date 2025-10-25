@@ -1,8 +1,11 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib prefix="ftags" uri="http://www.springframework.org/tags/form" %>
+<%@ page pageEncoding="UTF-8" %>
+
 <%@ include file="cabecalho.jspf" %>
 
-<%--@elvariable id="sucesso" type="java.lang.String"--%>
+<c:url var="urlGerenciarPropriedades" value="gerenciarPropriedades.html"/>
+<c:url var="urlCadastroPropriedade" value="cadastroPropriedade.html"/>
+<c:url var="downloadUrl" value="/arquivo/baixar/${propriedade.arquivoPontos.id}"/>
+<c:set var="label"><tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Alterar" textoCondicaoFalsa="Cadastrar"/></c:set>
 
 <tags:corpo>
     <div>
@@ -11,7 +14,7 @@
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
                 <tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Edição de propriedade" textoCondicaoFalsa="Cadastro de propriedade" tagHtml="h1" />
-                <a href="gerenciarPropriedades.html" class="botao botao-novo">Voltar</a>
+                <tags:botao label="Voltar" css="botao botao-novo" href="${urlGerenciarPropriedades}"/>
             </div>
 
             <div class="formulario-container">
@@ -19,7 +22,7 @@
 
                 <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
 
-                <form:form modelAttribute="PropriedadeCommand" method="post" action="cadastroPropriedade.html">
+                <form:form modelAttribute="PropriedadeCommand" method="post" action="${urlCadastroPropriedade}">
                     <form:hidden path="id" />
 
                     <tags:inputFormulario path="cpfProprietario" label="CPF do proprietário" placeholder="Digite o CPF do proprietário" />
@@ -29,23 +32,21 @@
                     <h4>Definição do polígono</h4>
                     <form:hidden path="nomeArquivoPontos" />
 
-                    <label for="pontos">Coordenadas</label>
-                    <form:textarea path="pontos" id="pontos" placeholder="Digite as coordenadas (XX,XXXX;XX,XXXX) uma por linha, ou arraste seu arquivo .txt/.csv aqui." cssStyle="width: 700px; height: 200px;"/>
+                    <label for="pontos">Pontos</label>
+                    <form:textarea path="pontos" id="pontos" placeholder="Digite os pontos (XX,XXXX;XX,XXXX) uma por linha, ou arraste seu arquivo .txt/.csv aqui." cssStyle="width: 700px; height: 200px;"/>
                     <form:errors path="pontos" cssClass="alerta-erro-formulario" />
 
                     <div class="formulario-acoes-arquivo">
                         <input type="file" id="seletorDeArquivo" accept=".txt,.csv" style="display: none">
-                        <button type="button" id="linkSelecionarArquivo" class="botao botao-novo botao-com-icone">Selecionar arquivo de coordenadas</button>
-
+                        <tags:botao label="Selecionar arquivo pontos" css="botao botao-novo botao-com-icone" type="button" id="linkSelecionarArquivo"/>
+                        
                         <c:if test="${not empty propriedade && not empty propriedade.arquivoPontos}">
-                            <a href="<c:url value='/arquivo/baixar/${propriedade.arquivoPontos.id}' />" title="Baixar arquivo" class="botao botao-novo botao-com-icone">
-                                <img src="https://img.icons8.com/small/16/download--v1.png" alt="Baixar arquivo"/>Baixar arquivo
-                            </a>
+                            <tags:botao label="Baixar arquivo" css="botao botao-novo botao-com-icone" href="${downloadUrl}" icone="https://img.icons8.com/small/16/download--v1.png"/>
                         </c:if>
                     </div>
 
                     <div class="formulario-acoes">
-                        <input type="submit" value="<tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Alterar" textoCondicaoFalsa="Cadastrar" />" class="botao botao-novo"/>
+                        <tags:botao label="${label}" css="botao botao-novo" type="submit"/>
                     </div>
                 </form:form>
             </div>

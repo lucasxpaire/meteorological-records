@@ -1,5 +1,6 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ tag trimDirectiveWhitespaces="true" %>
+
 <%@ include file="../jsp/cabecalho.jspf"%>
 
 <%@ attribute name="condicao" required="true" type="java.lang.Boolean" %>

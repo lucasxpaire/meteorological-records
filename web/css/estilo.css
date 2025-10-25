@@ -165,7 +165,7 @@ body {
     text-align: center;
 }
 
-.formulario-container input[type="submit"] {
+.formulario-container button[type="submit"] {
     min-width: 200px;
     font-size: 1.1em;
 }

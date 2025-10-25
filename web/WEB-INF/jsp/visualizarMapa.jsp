@@ -1,8 +1,8 @@
 <%@ page pageEncoding="UTF-8" %>
+
 <%@ include file="cabecalho.jspf" %>
 
 <tags:corpo>
-
     <div class="estrutura-pagina">
         <tags:barraLateral paginaAtiva="mapa" />
 
@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="menu-flutuante-grupo">
-                        <tags:botao label="Buscar" css="botao" />
+                        <tags:botao label="Buscar" css="botao" type="submit"/>
                     </div>
                 </div>
 

@@ -1,8 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page pageEncoding="UTF-8" %>
+
 <%@ include file="cabecalho.jspf" %>
 
-<%--@elvariable id="sucesso" type="java.lang.String"--%>
-<%--@elvariable id="falha" type="java.lang.String"--%>
+<c:url var="urlGerenciarProprietarios" value="gerenciarProprietarios.html"/>
+<c:url var="urlCadastroProprietario" value="cadastroProprietario.html"/>
+<c:set var="label"><tags:conteudoCondicional condicao='${not empty proprietario}' textoCondicaoVerdadeira='Alterar' textoCondicaoFalsa='Cadastrar'/></c:set>
 
 <tags:corpo>
     <div class="estrutura-pagina">
@@ -10,7 +12,7 @@
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
                 <tags:conteudoCondicional condicao="${not empty proprietario}" textoCondicaoVerdadeira="Edição de proprietário" textoCondicaoFalsa="Cadastro de proprietário" tagHtml="h1" />
-                <a href="gerenciarProprietarios.html" class="botao botao-novo">Voltar</a>
+                <tags:botao label="Voltar" css="botao botao-novo" href="${urlGerenciarProprietarios}"/>
             </div>
 
             <div class="formulario-container">
@@ -18,7 +20,7 @@
 
                 <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
 
-                <form:form modelAttribute="ProprietarioCommand" method="post" action="cadastroProprietario.html">
+                <form:form modelAttribute="ProprietarioCommand" method="post" action="${urlCadastroProprietario}">
                     <form:hidden path="id"/>
 
                     <tags:inputFormulario path="nome" label="Nome" placeholder="Digite o nome completo" />
@@ -27,9 +29,8 @@
                     <tags:selectFormulario path="corId" label="Cor" items="${cores}" itemValue="id" itemLabel="nome" descricao="Selecione uma cor" />
 
                     <div class="formulario-acoes">
-                        <input type="submit" value="<tags:conteudoCondicional condicao='${not empty proprietario}' textoCondicaoVerdadeira='Alterar' textoCondicaoFalsa='Cadastrar' />" class="botao botao-novo"/>
+                        <tags:botao label="${label}" css="botao botao-novo" type="submit"/>
                     </div>
-
                 </form:form>
             </div>
         </main>

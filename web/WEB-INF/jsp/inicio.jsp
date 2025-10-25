@@ -1,5 +1,9 @@
 <%@ page pageEncoding="UTF-8" %>
+
 <%@ include file="cabecalho.jspf" %>
+
+<c:url var="urlCadastroProprietario" value="cadastroProprietario.html"/>
+<c:url var="urlCadastroPropriedade" value="cadastroPropriedade.html"/>
 
 <tags:corpo>
     <div class="estrutura-pagina">
@@ -42,11 +46,11 @@
 
                 <h2>Ações rápidas</h2>
                 <div class="painel-acoes">
-                    <a href="cadastroProprietario.html" class="cartao-acao">
+                    <a href="${urlCadastroProprietario}" class="cartao-acao">
                         <h3>Cadastro proprietário</h3>
                         <p>Adicione um novo proprietário no sitema.</p>
                     </a>
-                    <a href="cadastroPropriedade.html" class="cartao-acao">
+                    <a href="${urlCadastroPropriedade}" class="cartao-acao">
                         <h3>Cadastro propriedade</h3>
                         <p>Adicione uma nova propriedade no sistema.</p>
                     </a>

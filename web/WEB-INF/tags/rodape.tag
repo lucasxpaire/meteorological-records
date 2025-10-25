@@ -1,4 +1,5 @@
-<%@tag pageEncoding="utf-8" %>
+<%@ tag pageEncoding="UTF-8" %>
+
 <footer class="rodape">
 </footer>
 </body>
