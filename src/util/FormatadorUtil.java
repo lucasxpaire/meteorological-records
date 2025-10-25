@@ -16,58 +16,72 @@ public class FormatadorUtil {
 
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_COMPARACAO_JSON = DateTimeFormatter.ofPattern("dd/MM/yyyy HH");
 
+    public static final String MASCARA_CPF = "###.###.###-##";
+    public static final String MASCARA_TELEFONE = "(##) #####-####";
+
+    public static final String REGEX_QUALQUER_NAO_DIGITO_NUMERICO = "\\D";
+    public static final String REGEX_APENAS_DIGITOS_NUMERICOS = "^[0-9]+$";
+    public static final String REGEX_CODIGO_HEXADECIMAL_VALIDO = "^#[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$";
+
+    public static final int QUANTIDADE_DIGITOS_VALIDOS_CPF = 11;
+    public static final int QUANTIDADE_DIGITOS_VALIDOS_TELEFONE = 11;
+
+    public static final String STRING_VAZIA = "";
+    public static final String INDISPONIVEL = "Indisponível";
+    public static final char PONTO = '.';
+    public static final char VIRGULA = ',';
+    public static final String PONTO_E_VIRGULA = ";";
+    public static final String DOIS_PONTOS = ":";
+    public static final String ESPACO_EM_BRANCO = " ";
+
     public static String formatarTemperatura(Double temperatura) {
-        return String.format("%.2f°C", temperatura).replace('.', ',');
+        return String.format("%.2f°C", temperatura).replace(PONTO, VIRGULA);
     }
 
     public static Double converterStringParaDouble(String valor) {
-        return Double.parseDouble(valor.trim().replace(",", "."));
+        return Double.parseDouble(valor.trim().replace(VIRGULA, PONTO));
     }
 
     public static String formatarPontoDecimalParaVirgula(Double valor) {
         if (valor == null) {
-            return " ";
+            return STRING_VAZIA;
         }
-        return String.format("%.8f", valor).replace('.', ',');
+        return String.format("%.8f", valor).replace(PONTO, VIRGULA);
     }
 
-    public static String formatarString(String texto, String mascara) {
+    public static String formatarString(String texto, String mascaraFormatacao) {
         if (texto == null || texto.trim().isEmpty()) {
-            return "";
+            return STRING_VAZIA;
         }
         try {
-            MaskFormatter mf = new MaskFormatter(mascara);
-            mf.setValueContainsLiteralCharacters(false);
-            return mf.valueToString(texto);
-        } catch (ParseException ex) {
+            MaskFormatter formatador = new MaskFormatter(mascaraFormatacao);
+            formatador.setValueContainsLiteralCharacters(false);
+            return formatador.valueToString(texto);
+        } catch (ParseException e) {
             return texto;
         }
     }
 
     public static String formatarCpf(String cpf) {
-        return formatarString(cpf, "###.###.###-##");
+        return formatarString(cpf, MASCARA_CPF);
     }
 
     public static String formatarTelefone(String telefone) {
-        if (telefone != null && telefone.length() == 11) {
-            return formatarString(telefone, "(##) #####-####");
-        }
-
-        return formatarString(telefone, "(##) ####-####");
+        return formatarString(telefone, MASCARA_TELEFONE);
     }
 
     public static String removerFormatacaoCpf(String cpf) {
         if (cpf != null && !cpf.trim().isEmpty()) {
-            return cpf.replaceAll("\\D", "");
+            return cpf.replaceAll(REGEX_QUALQUER_NAO_DIGITO_NUMERICO, STRING_VAZIA);
         }
-        return " ";
+        return STRING_VAZIA;
     }
 
     public static String removerFormatacaoTelefone(String telefone) {
         if (telefone != null && !telefone.trim().isEmpty()) {
-            return telefone.replaceAll("\\D", "");
+            return telefone.replaceAll(REGEX_QUALQUER_NAO_DIGITO_NUMERICO, STRING_VAZIA);
         }
-        return " ";
+        return STRING_VAZIA;
     }
 
     public static String formatarDataParaComparacao(LocalDateTime dataHora) {

@@ -19,7 +19,7 @@ public class InicioController {
     private PropriedadeServico propriedadeServico;
 
     @Autowired
-    private EstacaoMeteorologicaServico estacaoServico;
+    private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
     @Autowired
     private TemperaturaServico temperaturaServico;
@@ -30,7 +30,7 @@ public class InicioController {
 
         mv.addObject("totalProprietarios", proprietarioServico.listarTodos().size());
         mv.addObject("totalPropriedades", propriedadeServico.listarTodas().size());
-        mv.addObject("totalEstacoes", estacaoServico.listarTodas().size());
+        mv.addObject("totalEstacoes", estacaoMeteorologicaServico.listarTodas().size());
 
         try {
             mv.addObject("propriedadeMaisRecente", propriedadeServico.buscarMaisRecente());

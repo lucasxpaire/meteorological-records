@@ -10,21 +10,24 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static util.FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV;
+import static util.FormatadorUtil.*;
 
 public class LeitorArquivoUtil {
 
     private static final Set<String> CABECALHO_VALIDO_DADOS_HISTORICOS = Set.of("Data;Hora UTC;PRECIPITAÇÃO TOTAL, HORÁRIO (mm);PRESSAO ATMOSFERICA AO NIVEL DA ESTACAO, HORARIA (mB);PRESSÃO ATMOSFERICA MAX.NA HORA ANT. (AUT) (mB);PRESSÃO ATMOSFERICA MIN. NA HORA ANT. (AUT) (mB);RADIACAO GLOBAL (Kj/m²);TEMPERATURA DO AR - BULBO SECO, HORARIA (°C);TEMPERATURA DO PONTO DE ORVALHO (°C);TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C);TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C);TEMPERATURA ORVALHO MAX. NA HORA ANT. (AUT) (°C);TEMPERATURA ORVALHO MIN. NA HORA ANT. (AUT) (°C);UMIDADE REL. MAX. NA HORA ANT. (AUT) (%);UMIDADE REL. MIN. NA HORA ANT. (AUT) (%);UMIDADE RELATIVA DO AR, HORARIA (%);VENTO, DIREÇÃO HORARIA (gr) (° (gr));VENTO, RAJADA MAXIMA (m/s);VENTO, VELOCIDADE HORARIA (m/s);");
 
-    private static final int INTERVALO_DE_COMECO_DIA = 0;
     private static final String[] ANOS_VALIDOS = new String[]{"2020", "2021", "2022", "2023", "2024", "2025"};
-    private static final int TAMANHO_DATA_SEM_ANO = 6;
+
+    private static final int INDICE_INICIO_DIA_MES = 0;
+    private static final int INDICE_FIM_DIA_MES = 6;
+
     private static final int NENHUM_ARQUIVO = 0;
+
+    private static final String CODIFICADOR_DE_CARACTERES = "Windows-1252";
 
     public static List<String> listarCaminhosArquivosTemperaturasHistoricas(String codigoEstacao) {
         try {
-            ClassLoader classLoader = LeitorArquivoUtil.class.getClassLoader();
-            URL resourceUrl = classLoader.getResource("dadosHistoricos");
+            URL resourceUrl = LeitorArquivoUtil.class.getClassLoader().getResource("dadosHistoricos");
 
             if (resourceUrl == null) {
                 throw new IllegalArgumentException("Pasta de dados históricos não encontrada no classpath: dadosHistoricos/");
@@ -68,7 +71,7 @@ public class LeitorArquivoUtil {
         for (String caminhoArquivo : caminhosArquivos) {
             String dataEsperadaDoArquivoAtual = selecionarDataEsperadaDoArquivoAtual(dataDeBusca, caminhoArquivo);
 
-            try (Scanner leitorArquivo = new Scanner(new File(caminhoArquivo), "Windows-1252")) {
+            try (Scanner leitorArquivo = new Scanner(new File(caminhoArquivo), CODIFICADOR_DE_CARACTERES)) {
                 Map<String, Integer> mapaColunasRelevantes = new HashMap<>();
 
                 boolean encontrouCabecalho = false;
@@ -78,7 +81,7 @@ public class LeitorArquivoUtil {
 
                     if (!encontrouCabecalho) {
                         if (CABECALHO_VALIDO_DADOS_HISTORICOS.contains(linhaAtual)) {
-                            String[] cabecalho = linhaAtual.split(";");
+                            String[] cabecalho = linhaAtual.split(PONTO_E_VIRGULA);
                             for (int i = 0; i < cabecalho.length; i++) {
                                 mapaColunasRelevantes.put(cabecalho[i].trim(), i);
                             }
@@ -91,33 +94,33 @@ public class LeitorArquivoUtil {
                         continue;
                     }
 
-                    String[] colunas = linhaAtual.split(";");
+                    String[] colunas = linhaAtual.split(PONTO_E_VIRGULA);
 
-                    Integer idxData = mapaColunasRelevantes.get("Data");
-                    Integer idxHora = mapaColunasRelevantes.get("Hora UTC");
-                    Integer idxTemp = mapaColunasRelevantes.get("TEMPERATURA DO AR - BULBO SECO, HORARIA (°C)");
+                    Integer indiceColunaData = mapaColunasRelevantes.get("Data");
+                    Integer indiceColunaHora = mapaColunasRelevantes.get("Hora UTC");
+                    Integer indiceColunaTemperatura = mapaColunasRelevantes.get("TEMPERATURA DO AR - BULBO SECO, HORARIA (°C)");
 
-                    if (idxData == null || idxHora == null || idxTemp == null) {
+                    if (indiceColunaData == null || indiceColunaHora == null || indiceColunaTemperatura == null) {
                         continue;
                     }
 
                     String colunaData;
-                    if (idxData < colunas.length && !colunas[idxData].isBlank()) {
-                        colunaData = FormatadorUtil.reordenarStringDataParaFormatacaoBrasileira(colunas[idxData]);
+                    if (indiceColunaData < colunas.length && !colunas[indiceColunaData].isBlank()) {
+                        colunaData = FormatadorUtil.reordenarStringDataParaFormatacaoBrasileira(colunas[indiceColunaData]);
                     } else {
                         colunaData = dataEsperadaDoArquivoAtual;
                     }
 
                     String colunaHora;
-                    if (idxHora < colunas.length && !colunas[idxHora].isBlank()) {
-                        colunaHora = FormatadorUtil.removerSubPalavraUTC(colunas[idxHora]);
+                    if (indiceColunaHora < colunas.length && !colunas[indiceColunaHora].isBlank()) {
+                        colunaHora = FormatadorUtil.removerSubPalavraUTC(colunas[indiceColunaHora]);
                     } else {
                         colunaHora = horaDeBusca;
                     }
 
                     String colunaTemperatura;
-                    if (idxTemp < colunas.length && !colunas[idxTemp].isBlank()) {
-                        colunaTemperatura = colunas[idxTemp];
+                    if (indiceColunaTemperatura < colunas.length && !colunas[indiceColunaTemperatura].isBlank()) {
+                        colunaTemperatura = colunas[indiceColunaTemperatura];
                     } else {
                         colunaTemperatura = null;
                     }
@@ -134,7 +137,7 @@ public class LeitorArquivoUtil {
                             temperatura.setTemperaturaReal(FormatadorUtil.converterStringParaDouble(colunaTemperatura));
                         }
 
-                        LocalDateTime dataHora = LocalDateTime.parse(dataEsperadaDoArquivoAtual + " " +  horaDeBusca.substring(0, 2) + ":" + horaDeBusca.substring(2, 4), FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
+                        LocalDateTime dataHora = LocalDateTime.parse(dataEsperadaDoArquivoAtual + ESPACO_EM_BRANCO +  horaDeBusca.substring(0, 2) + DOIS_PONTOS + horaDeBusca.substring(2, 4), FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
                         temperatura.setDataHora(dataHora);
 
                         temperaturasHistoricas.add(temperatura);
@@ -145,6 +148,7 @@ public class LeitorArquivoUtil {
                 throw new RuntimeException(e);
             }
         }
+
         temperaturasHistoricas.sort(Comparator.comparing(Temperatura::getDataHora));
 
         return temperaturasHistoricas.stream()
@@ -155,7 +159,7 @@ public class LeitorArquivoUtil {
     private static String selecionarDataEsperadaDoArquivoAtual(String dataDeBusca, String caminhoArquivo) {
         for (String ano : ANOS_VALIDOS) {
             if (caminhoArquivo.contains(ano)) {
-                return dataDeBusca.substring(INTERVALO_DE_COMECO_DIA, TAMANHO_DATA_SEM_ANO) + ano;
+                return dataDeBusca.substring(INDICE_INICIO_DIA_MES, INDICE_FIM_DIA_MES) + ano;
             }
         }
         return null;

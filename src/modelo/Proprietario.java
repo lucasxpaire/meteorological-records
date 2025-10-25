@@ -7,15 +7,11 @@ import javax.persistence.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static util.FormatadorUtil.*;
+
 @Entity
 @Table(name = "PROPRIETARIO")
 public class Proprietario {
-
-    private static final int QUANTIDADE_DIGITOS_VALIDOS_CPF = 11;
-    private static final int QUANTIDADE_DIGITOS_VALIDOS_TELEFONE = 11;
-
-    private static final String REGEX_NAO_DIGITO = "\\D";
-    private static final String STRING_VAZIA = "";
 
     private Long id;
     private String nome;
@@ -88,7 +84,7 @@ public class Proprietario {
             return false;
         }
 
-        String cpfSemFormatacao = cpf.replaceAll(REGEX_NAO_DIGITO, STRING_VAZIA);
+        String cpfSemFormatacao = cpf.replaceAll(REGEX_QUALQUER_NAO_DIGITO_NUMERICO, STRING_VAZIA);
         return cpfSemFormatacao.length() == QUANTIDADE_DIGITOS_VALIDOS_CPF;
     }
 
@@ -102,7 +98,7 @@ public class Proprietario {
         if (telefone == null) {
             return false;
         }
-        String telefoneSemFormatacao = telefone.replaceAll(REGEX_NAO_DIGITO, STRING_VAZIA);
+        String telefoneSemFormatacao = telefone.replaceAll(REGEX_QUALQUER_NAO_DIGITO_NUMERICO, STRING_VAZIA);
         return telefoneSemFormatacao.length() == QUANTIDADE_DIGITOS_VALIDOS_TELEFONE;
     }
 

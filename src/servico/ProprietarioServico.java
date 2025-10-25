@@ -10,10 +10,10 @@ import web.command.ProprietarioCommand;
 
 import java.util.List;
 
+import static util.FormatadorUtil.REGEX_APENAS_DIGITOS_NUMERICOS;
+
 @Service
 public class ProprietarioServico {
-
-    private static final String REGEX_APENAS_NUMEROS = "^[0-9]+$";
 
     @Autowired
     private Dados dados;
@@ -52,36 +52,33 @@ public class ProprietarioServico {
     }
 
     public Proprietario buscarPorCpf(String cpfBusca) {
-        String cpfSemFormatacao = FormatadorUtil.removerFormatacaoCpf(cpfBusca);
-        if (Proprietario.validarTamanhoCpf(cpfSemFormatacao)) {
-            return dados.buscarUnicoPorCampo(Proprietario.class, "cpf", cpfSemFormatacao);
+        if (Proprietario.validarTamanhoCpf(cpfBusca)) {
+            return dados.buscarUnicoPorCampo(Proprietario.class, "cpf", FormatadorUtil.removerFormatacaoCpf(cpfBusca));
         } else {
             throw new IllegalArgumentException("CPF de busca é inválido.");
         }
     }
 
     public Proprietario buscarPorTelefone(String telefoneBusca) {
-        String telefoneSemFormatacao = FormatadorUtil.removerFormatacaoTelefone(telefoneBusca);
-        if (Proprietario.validarTamanhoTelefone(telefoneSemFormatacao)) {
-            return dados.buscarUnicoPorCampo(Proprietario.class, "telefone", telefoneSemFormatacao);
+        if (Proprietario.validarTamanhoTelefone(telefoneBusca)) {
+            return dados.buscarUnicoPorCampo(Proprietario.class, "telefone", FormatadorUtil.removerFormatacaoTelefone(telefoneBusca));
         } else {
             throw new IllegalArgumentException("Telefone de busca é inválido.");
         }
     }
 
-    public List<Proprietario> buscarPorCpfOuNome(String termo) {
-        if (termo == null || termo.trim().isEmpty()) {
+    public List<Proprietario> buscarPorCpfOuNome(String busca) {
+        if (busca == null || busca.trim().isEmpty()) {
             return listarTodos();
         }
 
-        String termoNormalizado = FormatadorUtil.removerFormatacaoCpf(termo);
-        if (!termoNormalizado.isEmpty() && termoNormalizado.matches(REGEX_APENAS_NUMEROS)) {
-            return dados.buscarListaPorCampo(Proprietario.class, "cpf", termoNormalizado);
+        String cpfBuscaSemFormatacao = FormatadorUtil.removerFormatacaoCpf(busca);
+        if (!cpfBuscaSemFormatacao.isEmpty() && cpfBuscaSemFormatacao.matches(REGEX_APENAS_DIGITOS_NUMERICOS)) {
+            return dados.buscarListaPorCampo(Proprietario.class, "cpf", cpfBuscaSemFormatacao);
         } else {
-            return dados.buscarPorCampoContendo(Proprietario.class, "nome", termo);
+            return dados.buscarPorCampoContendo(Proprietario.class, "nome", busca);
         }
     }
-
 
     public List<Proprietario> listarTodos() {
         return dados.listarTodos(Proprietario.class);
@@ -100,21 +97,19 @@ public class ProprietarioServico {
     }
 
     public boolean existeComEsseCpf(String cpf) {
-        String cpfNormalizado = FormatadorUtil.removerFormatacaoCpf(cpf);
-        if (!Proprietario.validarTamanhoCpf(cpfNormalizado)) {
+        if (!Proprietario.validarTamanhoCpf(cpf)) {
             return false;
         }
 
-        return dados.existeAlgumComEsseCampo(Proprietario.class, "cpf", cpfNormalizado);
+        return dados.existeAlgumComEsseCampo(Proprietario.class, "cpf", FormatadorUtil.removerFormatacaoCpf(cpf));
     }
 
     public boolean existeComEsseTelefone(String telefone) {
-        String telefoneNormalizado = FormatadorUtil.removerFormatacaoTelefone(telefone);
         if (!Proprietario.validarTamanhoTelefone(telefone)) {
             return false;
         }
 
-        return dados.existeAlgumComEsseCampo(Proprietario.class, "telefone", telefoneNormalizado);
+        return dados.existeAlgumComEsseCampo(Proprietario.class, "telefone", FormatadorUtil.removerFormatacaoTelefone(telefone));
     }
 
     public boolean cpfPertenceAOutroProprietario(Long idAtual, String cpf) {

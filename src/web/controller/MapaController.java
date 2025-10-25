@@ -47,15 +47,9 @@ public class MapaController {
     @Autowired
     private ControleMapaValidator controleMapaValidator;
 
-
     @InitBinder("ControleMapaCommand")
     public void initBinder(WebDataBinder binder) {
         binder.addValidators(controleMapaValidator);
-    }
-
-    @ModelAttribute("opcoesControleMapa")
-    public Map<Integer, String> opcoesControleMapa() {
-        return OPCOES_CONTROLE_MAPA;
     }
 
     @GetMapping("/visualizarMapa.html")
@@ -65,16 +59,11 @@ public class MapaController {
         List<Propriedade> propriedadesEncontradas = new ArrayList<>();
 
         if (!erros.hasErrors() && command.getOpcaoSelecionada() != null) {
-            String acao = OPCOES_CONTROLE_MAPA.get(command.getOpcaoSelecionada());
-
-            if (acao.equalsIgnoreCase(BUSCAR_TODAS_PROPRIEDADES)) {
-                propriedadesEncontradas = propriedadeServico.listarTodas();
-            } else if (acao.equalsIgnoreCase(BUSCAR_PROPRIEDADE_MAIS_RECENTE)) {
-                propriedadesEncontradas = List.of(propriedadeServico.buscarMaisRecente());
-            } else if (acao.equalsIgnoreCase(BUSCAR_PROPRIEDADES_POR_NOME)) {
-                propriedadesEncontradas = propriedadeServico.buscarPorNome(command.getNomeBusca());
-            } else if (acao.equalsIgnoreCase(BUSCAR_PROPRIEDADES_POR_CPF)) {
-                propriedadesEncontradas = propriedadeServico.buscarPorCpfDoProprietario(command.getCpfBusca());
+            switch (OPCOES_CONTROLE_MAPA.get(command.getOpcaoSelecionada())) {
+                case BUSCAR_TODAS_PROPRIEDADES -> propriedadesEncontradas = propriedadeServico.listarTodas();
+                case BUSCAR_PROPRIEDADE_MAIS_RECENTE -> propriedadesEncontradas = List.of(propriedadeServico.buscarMaisRecente());
+                case BUSCAR_PROPRIEDADES_POR_NOME -> propriedadesEncontradas = propriedadeServico.buscarPorNome(command.getNomeBusca());
+                case BUSCAR_PROPRIEDADES_POR_CPF -> propriedadesEncontradas = propriedadeServico.buscarPorCpfDoProprietario(command.getCpfBusca());
             }
         } else {
             mv.addObject("ControleMapaCommand", command);
@@ -91,6 +80,8 @@ public class MapaController {
             mv.addObject("propriedadesJson", "[]");
             mv.addObject("estacoesJson", "[]");
         }
+
+        mv.addObject("opcoesControleMapa", OPCOES_CONTROLE_MAPA);
 
         return mv;
     }
@@ -110,6 +101,7 @@ public class MapaController {
         }
 
         mv.addObject("ControleMapaCommand", command);
+        mv.addObject("opcoesControleMapa", OPCOES_CONTROLE_MAPA);
 
         return mv;
     }

@@ -77,7 +77,6 @@ public class PropriedadeController {
 
     @PostMapping("/cadastroPropriedade.html")
     public String salvar(@ModelAttribute("PropriedadeCommand") @Validated PropriedadeCommand command, BindingResult errors, Model model) {
-
         if (errors.hasErrors()) {
             if (command.getId() != null) {
                 model.addAttribute("propriedade", propriedadeServico.buscarPorId(command.getId()));

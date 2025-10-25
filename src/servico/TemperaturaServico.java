@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static util.FormatadorUtil.ESPACO_EM_BRANCO;
+
 @Service
 public class TemperaturaServico {
 
@@ -56,7 +58,6 @@ public class TemperaturaServico {
             dados.desfazerTransacao();
             throw e;
         }
-
     }
 
     private void popularTemperaturasDeEstacoesSemHistorico() {
@@ -107,7 +108,7 @@ public class TemperaturaServico {
 
                     String data = registro.get("data").asText();
                     String hora = String.format("%02d", registro.get("hora").asInt());
-                    LocalDateTime dataHoraUTC = LocalDateTime.parse(data + " " + hora, FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_JSON);
+                    LocalDateTime dataHoraUTC = LocalDateTime.parse(data + ESPACO_EM_BRANCO + hora, FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_JSON);
                     ZonedDateTime dataHoraGMT = dataHoraUTC.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of(estacao.getLocalizacao().getFusoHorario()));
 
                     if (!datasHorasExistentes.contains(dataHoraGMT.toLocalDateTime())) {
@@ -264,6 +265,7 @@ public class TemperaturaServico {
                 temperaturaPrevistaDaEstacao.setTemperaturaPrevista(serieTemporal[0]);
             } else if (serieTemporal.length >= MINIMO_DE_TEMPERATURAS_PARA_PREVISAO) {
                 AR modeloAutoRegressivo = AR.fit(serieTemporal, serieTemporal.length - 1);
+
                 double temperaturaPrevista = modeloAutoRegressivo.forecast();
                 temperaturaPrevistaDaEstacao.setTemperaturaPrevista(temperaturaPrevista);
             } else {
@@ -287,23 +289,25 @@ public class TemperaturaServico {
     }
 
     private List<Temperatura> combinarTemperaturasDoBancoDeDadosComDadosHistoricos(EstacaoMeteorologica estacaoMeteorologica, List<LocalDateTime> datasHorasDecrescentes) {
+        if (datasHorasDecrescentes == null || datasHorasDecrescentes.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<Temperatura> temperaturasDoBancoDeDados = dados.buscarTemperaturasHistoricas(estacaoMeteorologica.getLocalizacao(), datasHorasDecrescentes);
+        Set<LocalDateTime> datasHorasObtidasDoBanco = temperaturasDoBancoDeDados.stream()
+                .map(Temperatura::getDataHora)
+                .collect(Collectors.toSet());
 
         LocalDateTime dataHoraDoAnoAnteriorDaPrevisao = datasHorasDecrescentes.getFirst();
         String dataFormatada = FormatadorUtil.formatarDataParaComparacao(dataHoraDoAnoAnteriorDaPrevisao);
         String horaFormatada = FormatadorUtil.formatarHoraParaComparacao(dataHoraDoAnoAnteriorDaPrevisao);
 
         List<Temperatura> temperaturasDosDadosHistoricos = LeitorArquivoUtil.lerTemperaturasHistoricasCsv(dataFormatada, horaFormatada, estacaoMeteorologica);
-
-        Set<LocalDateTime> datasHorasObtidasDoBanco = temperaturasDoBancoDeDados.stream()
-                .map(Temperatura::getDataHora)
-                .collect(Collectors.toSet());
-
-        List<Temperatura> temperaturasFaltantesDosDadosHistoricos = temperaturasDosDadosHistoricos.stream()
+        List<Temperatura> temperaturasDoCsvAusentesNoBanco = temperaturasDosDadosHistoricos.stream()
                 .filter(t -> !datasHorasObtidasDoBanco.contains(t.getDataHora()))
                 .toList();
 
-        return Stream.concat(temperaturasDoBancoDeDados.stream(), temperaturasDosDadosHistoricos.stream())
+        return Stream.concat(temperaturasDoBancoDeDados.stream(), temperaturasDoCsvAusentesNoBanco.stream())
                 .sorted(Comparator.comparing(Temperatura::getDataHora).reversed())
                 .collect(Collectors.toList());
     }

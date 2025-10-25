@@ -17,6 +17,8 @@ import java.util.List;
 @Service
 public class PropriedadeServico {
 
+    private static final String TIPO_ARQUIVO_CSV = ".csv";
+
     @Autowired
     private Dados dados;
 
@@ -24,8 +26,8 @@ public class PropriedadeServico {
     private ProprietarioServico proprietarioServico;
 
     public Propriedade prepararPropriedade(PropriedadeCommand command) {
-        Propriedade propriedade;
 
+        Propriedade propriedade;
         if (command.getId() != null) {
             propriedade = dados.buscarUnicoPorCampo(Propriedade.class, "id", command.getId());
         } else {
@@ -46,7 +48,7 @@ public class PropriedadeServico {
         if (command.getNomeArquivoPontos() != null && !command.getNomeArquivoPontos().isEmpty()) {
             arquivo.setNomeOriginal(command.getNomeArquivoPontos());
         } else {
-            arquivo.setNomeOriginal(command.getNome() + ".csv");
+            arquivo.setNomeOriginal(command.getNome() + TIPO_ARQUIVO_CSV);
         }
 
         arquivo.setTipoConteudo(MediaType.TEXT_PLAIN_VALUE);
@@ -61,47 +63,6 @@ public class PropriedadeServico {
         dados.salvar(poligono.calcularCentroide());
 
         return propriedade;
-    }
-
-    public void salvar(Propriedade propriedade) {
-        if (validarPropriedade(propriedade)) {
-            dados.salvar(propriedade);
-        } else {
-            throw new IllegalArgumentException("Falha: Dados da propriedade são inválidos.");
-        }
-    }
-
-    public Propriedade buscarPorId(Long id) {
-        if (existeAlgumaPropriedade()) {
-            return dados.buscarUnicoPorCampo(Propriedade.class, "id", id);
-        } else {
-            throw new IllegalArgumentException("Falha: Não existe nenhuma propriedade");
-        }
-    }
-
-    public List<Propriedade> buscarPorCpfDoProprietario(String cpfBusca) {
-        String cpfSemFormatacao = FormatadorUtil.removerFormatacaoCpf(cpfBusca);
-        if (Proprietario.validarTamanhoCpf(cpfSemFormatacao)) {
-            return dados.buscarListaPorCampo(Propriedade.class, "proprietario.cpf", cpfSemFormatacao);
-        } else {
-            throw new IllegalArgumentException("Falha: CPF de busca é inválido.");
-        }
-    }
-
-    public List<Propriedade> buscarPorNome(String nome) {
-        if (Propriedade.validarNome(nome)) {
-            return dados.buscarListaPorCampo(Propriedade.class, "nome", nome);
-        } else {
-            throw new IllegalArgumentException("Falha: Nome de busca é inválido.");
-        }
-    }
-
-    public Propriedade buscarMaisRecente() {
-        return dados.buscarMaisRecente(Propriedade.class);
-    }
-
-    public List<Propriedade> listarTodas() {
-        return dados.listarTodos(Propriedade.class);
     }
 
     public void validarFormatoPoligono(PropriedadeCommand command) {
@@ -124,6 +85,46 @@ public class PropriedadeServico {
         }
     }
 
+    public void salvar(Propriedade propriedade) {
+        if (validarPropriedade(propriedade)) {
+            dados.salvar(propriedade);
+        } else {
+            throw new IllegalArgumentException("Falha: Dados da propriedade são inválidos.");
+        }
+    }
+
+    public Propriedade buscarPorId(Long id) {
+        if (existeAlgumaPropriedade()) {
+            return dados.buscarUnicoPorCampo(Propriedade.class, "id", id);
+        } else {
+            throw new IllegalArgumentException("Falha: Não existe nenhuma propriedade");
+        }
+    }
+
+    public List<Propriedade> buscarPorCpfDoProprietario(String cpfBusca) {
+        if (Proprietario.validarTamanhoCpf(cpfBusca)) {
+            return dados.buscarListaPorCampo(Propriedade.class, "proprietario.cpf", FormatadorUtil.removerFormatacaoCpf(cpfBusca));
+        } else {
+            throw new IllegalArgumentException("Falha: CPF de busca é inválido.");
+        }
+    }
+
+    public List<Propriedade> buscarPorNome(String nome) {
+        if (Propriedade.validarNome(nome)) {
+            return dados.buscarListaPorCampo(Propriedade.class, "nome", nome);
+        } else {
+            throw new IllegalArgumentException("Falha: Nome de busca é inválido.");
+        }
+    }
+
+    public Propriedade buscarMaisRecente() {
+        return dados.buscarMaisRecente(Propriedade.class);
+    }
+
+    public List<Propriedade> listarTodas() {
+        return dados.listarTodos(Propriedade.class);
+    }
+
     public void deletar(Propriedade propriedade) {
         if (validarPropriedade(propriedade)) {
             dados.deletar(propriedade);
@@ -137,8 +138,7 @@ public class PropriedadeServico {
     }
 
     public boolean existePropriedadesNesseCpf(String cpfBusca) {
-        String cpfSemFormatacao = FormatadorUtil.removerFormatacaoCpf(cpfBusca);
-        return dados.existeAlgumComEsseCampo(Propriedade.class, "proprietario.cpf", cpfSemFormatacao);
+        return dados.existeAlgumComEsseCampo(Propriedade.class, "proprietario.cpf", FormatadorUtil.removerFormatacaoCpf(cpfBusca));
     }
 
     public boolean existePropriedadesNesseNome(String nomeBusca) {

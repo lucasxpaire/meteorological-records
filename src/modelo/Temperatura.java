@@ -10,12 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "TEMPERATURA")
-@JsonPropertyOrder({
-        "latitude",
-        "longitude",
-        "dataHoraPrevisao",
-        "temperaturaPrevista"
-})
+@JsonPropertyOrder({"latitude", "longitude", "dataHoraPrevisao", "temperaturaPrevista"})
 public class Temperatura {
 
     private Long id;

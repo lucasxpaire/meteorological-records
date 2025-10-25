@@ -8,6 +8,9 @@ import javax.persistence.*;
 import java.time.ZoneId;
 import java.util.*;
 
+import static util.FormatadorUtil.INDISPONIVEL;
+import static util.FormatadorUtil.STRING_VAZIA;
+
 @Entity
 @Table(name = "PONTO")
 public class Ponto {
@@ -22,16 +25,11 @@ public class Ponto {
     public static final int LONGITUDE_MINIMA = -180;
     public static final int LONGITUDE_MAXIMA = 180;
 
-    private static final double PESO_NULO = 0.0;
-    private static final double PESO_MAXIMO_INTERPOLACAO = 10.0;
-    private static final double DISTANCIA_MINIMA_PARA_PESO_MAXIMO = 0.1;
-    private static final int NUMERADOR_PESO_PROXIMIDADE = 1;
+    private static final double PESO_MAXIMO = 10.0;
+    private static final double DISTANCIA_MINIMA = 0.1;
+    private static final int PESO_PROXIMIDADE = 1;
 
     private static final int RAIO_DA_TERRA_EM_METROS = 6371000;
-    private static final double GRAU_PARA_METROS = 111320.0;
-
-    public static final String INDISPONIVEL = "Indisponível";
-    public static final String STRING_VAZIA = "";
 
     private Long id;
     private Double latitude;
@@ -129,10 +127,10 @@ public class Ponto {
     @Transient
     public Double calcularPesoDeProximidadePara(EstacaoMeteorologica estacao) {
         double distancia = distanciaAte(estacao.getLocalizacao());
-        if (distancia < DISTANCIA_MINIMA_PARA_PESO_MAXIMO) {
-            return PESO_MAXIMO_INTERPOLACAO;
+        if (distancia < DISTANCIA_MINIMA) {
+            return PESO_MAXIMO;
         }
-        return NUMERADOR_PESO_PROXIMIDADE / distancia;
+        return PESO_PROXIMIDADE / distancia;
     }
 
     @Transient

@@ -2,11 +2,11 @@ package modelo;
 
 import javax.persistence.*;
 
+import static util.FormatadorUtil.REGEX_CODIGO_HEXADECIMAL_VALIDO;
+
 @Entity
 @Table(name = "COR")
 public class Cor {
-
-    private static final String REGEX_CODIGO_HEXADECIMAL_VALIDO = "^#[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$";
 
     private Long id;
     private String nome;
