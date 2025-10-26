@@ -4,7 +4,7 @@
 
 <tags:corpo>
     <div class="estrutura-pagina">
-        <tags:barraLateral paginaAtiva="mapa" />
+        <tags:menuLateral paginaAtiva="mapa" />
 
         <div class="estrutura-pagina-conteudo">
             <div id="mapa"></div>

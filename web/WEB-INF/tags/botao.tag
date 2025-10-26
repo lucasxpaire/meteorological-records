@@ -10,9 +10,6 @@
 <%@ attribute name="icone" required="false" type="java.lang.String" %>
 <%@ attribute name="onclick" required="false" type="java.lang.String" %>
 
-<c:if test="${empty type and empty href}">
-    <c:set var="buttonType" value="submit" />
-</c:if>
 <c:if test="${not empty type}">
     <c:set var="buttonType" value="${type}" />
 </c:if>

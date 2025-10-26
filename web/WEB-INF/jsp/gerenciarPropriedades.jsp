@@ -10,7 +10,7 @@
 
 <tags:corpo>
     <div class="estrutura-pagina">
-        <tags:barraLateral paginaAtiva="propriedades" />
+        <tags:menuLateral paginaAtiva="propriedades" />
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
                 <h1>Gerenciar propriedades</h1>

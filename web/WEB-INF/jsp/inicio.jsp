@@ -7,7 +7,7 @@
 
 <tags:corpo>
     <div class="estrutura-pagina">
-        <tags:barraLateral paginaAtiva="inicio"/>
+        <tags:menuLateral paginaAtiva="inicio"/>
         <main class="estrutura-pagina-conteudo">
             <h1>Início</h1>
             <p>Visualize as estatísticas, atualizações de temperaturas e ações rápidas.</p>

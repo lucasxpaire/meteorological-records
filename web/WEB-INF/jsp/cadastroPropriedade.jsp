@@ -5,20 +5,20 @@
 <c:url var="urlGerenciarPropriedades" value="gerenciarPropriedades.html"/>
 <c:url var="urlCadastroPropriedade" value="cadastroPropriedade.html"/>
 <c:url var="downloadUrl" value="/arquivo/baixar/${propriedade.arquivoPontos.id}"/>
-<c:set var="label"><tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Alterar" textoCondicaoFalsa="Cadastrar"/></c:set>
+<c:set var="label"><tags:alternarTexto condicao="${not empty propriedade}" textoCondicaoVerdadeira="Alterar" textoCondicaoFalsa="Cadastrar"/></c:set>
 
 <tags:corpo>
     <div>
-        <tags:barraLateral paginaAtiva="propriedades" />
+        <tags:menuLateral paginaAtiva="propriedades" />
 
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
-                <tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Edição de propriedade" textoCondicaoFalsa="Cadastro de propriedade" tagHtml="h1" />
+                <tags:alternarTexto condicao="${not empty propriedade}" textoCondicaoVerdadeira="Edição de propriedade" textoCondicaoFalsa="Cadastro de propriedade" tagHtml="h1" />
                 <tags:botao label="Voltar" css="botao botao-novo" href="${urlGerenciarPropriedades}"/>
             </div>
 
             <div class="formulario-container">
-                <tags:conteudoCondicional condicao="${not empty propriedade}" textoCondicaoVerdadeira="Altere os dados necessários de propriedade" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar uma propriedade" tagHtml="h3" />
+                <tags:alternarTexto condicao="${not empty propriedade}" textoCondicaoVerdadeira="Altere os dados necessários de propriedade" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar uma propriedade" tagHtml="h3" />
 
                 <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
 

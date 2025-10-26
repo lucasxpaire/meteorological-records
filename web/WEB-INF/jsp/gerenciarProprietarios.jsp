@@ -10,7 +10,7 @@
 
 <tags:corpo>
     <div class="estrutura-pagina">
-        <tags:barraLateral paginaAtiva="proprietarios"/>
+        <tags:menuLateral paginaAtiva="proprietarios"/>
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
                 <h1>Gerenciar proprietários</h1>

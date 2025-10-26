@@ -4,19 +4,19 @@
 
 <c:url var="urlGerenciarProprietarios" value="gerenciarProprietarios.html"/>
 <c:url var="urlCadastroProprietario" value="cadastroProprietario.html"/>
-<c:set var="label"><tags:conteudoCondicional condicao='${not empty proprietario}' textoCondicaoVerdadeira='Alterar' textoCondicaoFalsa='Cadastrar'/></c:set>
+<c:set var="label"><tags:alternarTexto condicao='${not empty proprietario}' textoCondicaoVerdadeira='Alterar' textoCondicaoFalsa='Cadastrar'/></c:set>
 
 <tags:corpo>
     <div class="estrutura-pagina">
-        <tags:barraLateral paginaAtiva="proprietarios"/>
+        <tags:menuLateral paginaAtiva="proprietarios"/>
         <main class="estrutura-pagina-conteudo">
             <div class="estrutura-pagina-cabecalho">
-                <tags:conteudoCondicional condicao="${not empty proprietario}" textoCondicaoVerdadeira="Edição de proprietário" textoCondicaoFalsa="Cadastro de proprietário" tagHtml="h1" />
+                <tags:alternarTexto condicao="${not empty proprietario}" textoCondicaoVerdadeira="Edição de proprietário" textoCondicaoFalsa="Cadastro de proprietário" tagHtml="h1" />
                 <tags:botao label="Voltar" css="botao botao-novo" href="${urlGerenciarProprietarios}"/>
             </div>
 
             <div class="formulario-container">
-                <tags:conteudoCondicional condicao="${not empty proprietario}" textoCondicaoVerdadeira="Altere os dados necessários do proprietário" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar um proprietário" tagHtml="h3" />
+                <tags:alternarTexto condicao="${not empty proprietario}" textoCondicaoVerdadeira="Altere os dados necessários do proprietário" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar um proprietário" tagHtml="h3" />
 
                 <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
 
