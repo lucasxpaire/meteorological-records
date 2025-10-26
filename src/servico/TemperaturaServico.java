@@ -307,8 +307,8 @@ public class TemperaturaServico {
             return new ArrayList<>();
         }
 
-        List<Temperatura> temperaturasDoBancoDeDados = dados.buscarTemperaturasHistoricas(estacaoMeteorologica.getLocalizacao(), datasHorasDecrescentes);
-        Set<LocalDateTime> datasHorasObtidasDoBanco = temperaturasDoBancoDeDados.stream()
+        List<Temperatura> temperaturasExistentesNoBancoDeDados = dados.buscarTemperaturasHistoricas(estacaoMeteorologica.getLocalizacao(), datasHorasDecrescentes);
+        Set<LocalDateTime> datasHorasObtidasDoBanco = temperaturasExistentesNoBancoDeDados.stream()
                 .map(Temperatura::getDataHora)
                 .collect(Collectors.toSet());
 
@@ -317,11 +317,11 @@ public class TemperaturaServico {
         String horaFormatada = FormatadorUtil.formatarHoraParaComparacao(dataHoraDoAnoAnteriorDaPrevisao);
 
         List<Temperatura> temperaturasDosDadosHistoricos = LeitorArquivoUtil.lerTemperaturasHistoricasCsv(dataFormatada, horaFormatada, estacaoMeteorologica);
-        List<Temperatura> temperaturasDoCsvAusentesNoBanco = temperaturasDosDadosHistoricos.stream()
+        List<Temperatura> temperaturasDoCsvAusentesNoBancoDeDados = temperaturasDosDadosHistoricos.stream()
                 .filter(t -> !datasHorasObtidasDoBanco.contains(t.getDataHora()))
                 .toList();
 
-        return Stream.concat(temperaturasDoBancoDeDados.stream(), temperaturasDoCsvAusentesNoBanco.stream())
+        return Stream.concat(temperaturasExistentesNoBancoDeDados.stream(), temperaturasDoCsvAusentesNoBancoDeDados.stream())
                 .sorted(Comparator.comparing(Temperatura::getDataHora).reversed())
                 .collect(Collectors.toList());
     }
