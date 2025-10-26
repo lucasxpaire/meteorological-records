@@ -39,18 +39,16 @@ public class EstacaoMeteorologicaServico {
 
     @PostConstruct
     public void inicializarEstacoesMeteorologicas() {
+        dados.iniciarTransacao();
         if (listarTodas().isEmpty()) {
-            List<String> urlsEstacoes = List.of(URL_ESTACOES_MANUAIS, URL_ESTACOES_AUTOMATICAS);
-            for (String url : urlsEstacoes) {
-               dados.iniciarTransacao();
-               try {
-                   popularBancoDeDadosComEstacoesMeteorologicas(url);
-                   dados.confirmarTransacao();
-               } catch (Exception e) {
-                   dados.desfazerTransacao();
-                   throw new RuntimeException("Falha: não foi possível inicializar estações da URL: " + url);
-               }
-            }
+           try {
+               popularBancoDeDadosComEstacoesMeteorologicas(URL_ESTACOES_MANUAIS);
+               popularBancoDeDadosComEstacoesMeteorologicas(URL_ESTACOES_AUTOMATICAS);
+               dados.confirmarTransacao();
+           } catch (Exception e) {
+               dados.desfazerTransacao();
+               throw new RuntimeException("Falha: não foi possível inicializar estações.");
+           }
         }
     }
 
