@@ -6,6 +6,7 @@ import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
 import modelo.Temperatura;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import smile.timeseries.AR;
 import util.FormatadorUtil;
@@ -36,8 +37,14 @@ public class TemperaturaServico {
     private static final int MINIMO_DE_TEMPERATURAS_PARA_PREVISAO = 2;
     private static final int CONDICAO_DE_TEMPERATURA_UNICA = 1;
 
-    private static final long INTERVALO_PARA_EXECUTAR = 24L;
     private static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
+
+    public static final long QUANTIDADE_HORAS = 4L;
+    private static final long MINUTOS_POR_HORA = 60L;
+    private static final long SEGUNDOS_POR_MINUTO = 60L;
+    private static final long MILISSEGUNDOS_POR_SEGUNDO = 1000L;
+
+    private static final long INTERVALO_ATUALIZACAO = QUANTIDADE_HORAS * MINUTOS_POR_HORA * SEGUNDOS_POR_MINUTO * MILISSEGUNDOS_POR_SEGUNDO;
 
     @Autowired
     private Dados dados;
@@ -66,10 +73,17 @@ public class TemperaturaServico {
         }
     }
 
+    @Scheduled(fixedRate = INTERVALO_ATUALIZACAO)
     private void executarAtualizacaoDeTemperaturas() {
-        ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
-        atualizarTemperaturasDeEstacoesAssociadasACentroides();
-        atualizarTemperaturasDeCentroidesAssociadosAEstacoes();
+        dados.iniciarTransacao();
+        try {
+            ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
+            atualizarTemperaturasDeEstacoesAssociadasACentroides();
+            atualizarTemperaturasDeCentroidesAssociadosAEstacoes();
+            dados.confirmarTransacao();
+        } catch (Exception e) {
+            dados.desfazerTransacao();
+        }
     }
 
     public void atualizarTemperaturasDeEstacoesAssociadasACentroides() {
@@ -318,7 +332,7 @@ public class TemperaturaServico {
 
     public LocalDateTime obterProximaAtualizacaoDeTemperaturas() {
         if (ultimaAtualizacaoDeTemperaturas != null) {
-            return ultimaAtualizacaoDeTemperaturas.plus(INTERVALO_PARA_EXECUTAR, UNIDADE_DE_TEMPO_DO_INTERVALO.toChronoUnit());
+            return ultimaAtualizacaoDeTemperaturas.plus(QUANTIDADE_HORAS, UNIDADE_DE_TEMPO_DO_INTERVALO.toChronoUnit());
         }
         return null;
     }

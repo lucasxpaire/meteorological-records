@@ -29,7 +29,7 @@ public class EstacaoMeteorologicaServico {
     private static final String URL_ESTACOES_AUTOMATICAS = "https://apitempo.inmet.gov.br/estacoes/T";
     private static final String URL_ESTACOES_MANUAIS = "https://apitempo.inmet.gov.br/estacoes/M";
 
-    private static final int TEMPO_ATE_DESCONECTAR = 1000000;
+    private static final int TEMPO_ATE_DESCONECTAR = 1000000000;
 
     @Autowired
     private Dados dados;
@@ -41,14 +41,14 @@ public class EstacaoMeteorologicaServico {
     public void inicializarEstacoesMeteorologicas() {
         dados.iniciarTransacao();
         if (listarTodas().isEmpty()) {
-           try {
-               popularBancoDeDadosComEstacoesMeteorologicas(URL_ESTACOES_MANUAIS);
-               popularBancoDeDadosComEstacoesMeteorologicas(URL_ESTACOES_AUTOMATICAS);
-               dados.confirmarTransacao();
-           } catch (Exception e) {
-               dados.desfazerTransacao();
-               throw new RuntimeException("Falha: não foi possível inicializar estações.");
-           }
+            try {
+                popularBancoDeDadosComEstacoesMeteorologicas(URL_ESTACOES_MANUAIS);
+                popularBancoDeDadosComEstacoesMeteorologicas(URL_ESTACOES_AUTOMATICAS);
+                dados.confirmarTransacao();
+            } catch (Exception e) {
+                dados.desfazerTransacao();
+                throw new RuntimeException("Falha: não foi possível inicializar estações.");
+            }
         }
     }
 

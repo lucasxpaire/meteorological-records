@@ -6,7 +6,7 @@
 <%@ attribute name="condicao" required="true" type="java.lang.Boolean" %>
 <%@ attribute name="textoCondicaoVerdadeira" required="true" type="java.lang.String" %>
 <%@ attribute name="textoCondicaoFalsa" required="true" type="java.lang.String" %>
-<%@ attribute name="tagHtml" required="false" type="java.lang.String" description="Elemento HTML para envolver o texto." %>
+<%@ attribute name="tagHtml" required="false" type="java.lang.String" %>
 
 <c:set var="textoFinal">
     <c:choose>
