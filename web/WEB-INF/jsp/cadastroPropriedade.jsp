@@ -29,10 +29,8 @@
 
                     <tags:inputFormulario path="nome" label="Nome" placeholder="Digite o nome da propriedade" />
 
-                    <h4>Definição do polígono</h4>
                     <form:hidden path="nomeArquivoPontos" />
-
-                    <label for="pontos">Pontos</label>
+                    <label for="pontos">Formato da propriedade</label>
                     <form:textarea path="pontos" id="pontos" placeholder="Digite os pontos (XX,XXXX;XX,XXXX) uma por linha, ou selecione seu arquivo .txt/.csv." cssStyle="width: 700px; height: 200px;"/>
                     <form:errors path="pontos" cssClass="alerta-erro-formulario" />
 

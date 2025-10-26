@@ -179,7 +179,7 @@ function criarDescricaoPropriedade(propriedade) {
 
 function gerarHtmlEstacoesAssociadas(propriedade, dataHoraTemperaturaCalculada) {
     let html;
-    const tituloLista = '<p><strong>Estações Associadas:</strong></p>';
+    const tituloLista = '<p><strong>Estações Meteorológicas Associadas:</strong></p>';
 
     const itensLista = propriedade.centroide.estacoesMeteorologicas.map(estacao => {
         if (dataHoraTemperaturaCalculada && estacao.localizacao.dataHoraTemperaturaReal !== dataHoraTemperaturaCalculada) {

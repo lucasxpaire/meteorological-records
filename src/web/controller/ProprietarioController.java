@@ -97,7 +97,7 @@ public class ProprietarioController {
             proprietarioServico.deletar(proprietario);
             redirectAttributes.addFlashAttribute("sucesso", "Proprietário deletado com sucesso!");
         } else {
-            redirectAttributes.addFlashAttribute("falha", "Falha: Não é possível deletar proprietário com propriedades existentes!");
+            redirectAttributes.addFlashAttribute("falha", "Falha: Não é possível deletar o proprietário com propriedades existentes!");
         }
         return "redirect:/gerenciarProprietarios.html";
     }
