@@ -33,7 +33,7 @@
                     <form:hidden path="nomeArquivoPontos" />
 
                     <label for="pontos">Pontos</label>
-                    <form:textarea path="pontos" id="pontos" placeholder="Digite os pontos (XX,XXXX;XX,XXXX) uma por linha, ou arraste seu arquivo .txt/.csv aqui." cssStyle="width: 700px; height: 200px;"/>
+                    <form:textarea path="pontos" id="pontos" placeholder="Digite os pontos (XX,XXXX;XX,XXXX) uma por linha, ou selecione seu arquivo .txt/.csv." cssStyle="width: 700px; height: 200px;"/>
                     <form:errors path="pontos" cssClass="alerta-erro-formulario" />
 
                     <div class="formulario-acoes-arquivo">
@@ -52,7 +52,7 @@
             </div>
         </main>
     </div>
-    <script src="<c:url value='/js/insercaoCoordenadas.js' />"></script>
+    <script src="<c:url value='/js/insercaoArquivoPontos.js' />"></script>
     <script>
         VMasker(document.getElementById("cpfProprietario")).maskPattern("999.999.999-99");
     </script>

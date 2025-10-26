@@ -16,31 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
             processarArquivo(arquivo);
         }
     });
-
-    areaDeTexto.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        areaDeTexto.style.borderColor = '#17A2B8';
-    });
-
-    areaDeTexto.addEventListener('dragleave', () => {
-        areaDeTexto.style.borderColor = '#CED4DA';
-    });
-
-    areaDeTexto.addEventListener('drop', (event) => {
-        event.preventDefault();
-        areaDeTexto.style.borderColor = '#CED4DA';
-
-        const arquivoCoordenadas = event.dataTransfer.files.item(0);
-        processarArquivo(arquivoCoordenadas);
-    });
-
-    areaDeTexto.addEventListener('input', () => {
-        inputNomeArquivo.value = "";
-    });
 });
 
 function processarArquivo(arquivo) {
-    if (arquivo.type === "text/plain" || arquivo.name.endsWith(".csv") || arquivo.name.endsWith(".txt")) {
+    if (arquivo.name.endsWith(".csv") || arquivo.name.endsWith(".txt")) {
         const leitor = new FileReader();
         leitor.onload = () => {
             areaDeTexto.value = leitor.result;
