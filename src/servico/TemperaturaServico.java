@@ -107,7 +107,7 @@ public class TemperaturaServico {
 
         for (EstacaoMeteorologica estacao : estacoes) {
             try {
-                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_TEMPERATURAS + estacao.getCodigoEstacao());
+                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_TEMPERATURAS2 + estacao.getCodigoEstacao());
 
                 if (dadosJson.isNull()) {
                     return;

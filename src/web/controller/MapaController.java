@@ -19,6 +19,7 @@ import web.validator.ControleMapaValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -59,11 +60,15 @@ public class MapaController {
         List<Propriedade> propriedadesEncontradas = new ArrayList<>();
 
         if (!erros.hasErrors() && command.getOpcaoSelecionada() != null) {
-            switch (OPCOES_CONTROLE_MAPA.get(command.getOpcaoSelecionada())) {
-                case BUSCAR_TODAS_PROPRIEDADES -> propriedadesEncontradas = propriedadeServico.listarTodas();
-                case BUSCAR_PROPRIEDADE_MAIS_RECENTE -> propriedadesEncontradas = List.of(propriedadeServico.buscarMaisRecente());
-                case BUSCAR_PROPRIEDADES_POR_NOME -> propriedadesEncontradas = propriedadeServico.buscarPorNome(command.getNomeBusca());
-                case BUSCAR_PROPRIEDADES_POR_CPF -> propriedadesEncontradas = propriedadeServico.buscarPorCpfDoProprietario(command.getCpfBusca());
+            try {
+                switch (OPCOES_CONTROLE_MAPA.get(command.getOpcaoSelecionada())) {
+                    case BUSCAR_TODAS_PROPRIEDADES -> propriedadesEncontradas = propriedadeServico.listarTodas();
+                    case BUSCAR_PROPRIEDADE_MAIS_RECENTE -> propriedadesEncontradas = Collections.singletonList(propriedadeServico.buscarMaisRecente());
+                    case BUSCAR_PROPRIEDADES_POR_NOME -> propriedadesEncontradas = propriedadeServico.buscarPorNome(command.getNomeBusca());
+                    case BUSCAR_PROPRIEDADES_POR_CPF -> propriedadesEncontradas = propriedadeServico.buscarPorCpfDoProprietario(command.getCpfBusca());
+                }
+            } catch (Exception e) {
+                propriedadesEncontradas = new ArrayList<>();
             }
         } else {
             mv.addObject("ControleMapaCommand", command);
