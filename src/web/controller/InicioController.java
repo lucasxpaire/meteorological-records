@@ -22,7 +22,7 @@ public class InicioController {
     private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
     @Autowired
-    private TemperaturaServico temperaturaServico;
+    private RegistroMeteorologicoServico registroMeteorologicoServico;
 
     @GetMapping(value = { "/", "inicio.html" })
     public ModelAndView inicio() {
@@ -38,8 +38,8 @@ public class InicioController {
             mv.addObject("propriedadeMaisRecente", null);
         }
 
-        LocalDateTime ultimaAtualizacaoTemperaturas = temperaturaServico.obterUltimaAtualizacaoDeTemperaturas();
-        LocalDateTime proximaAtualizacaoTemperaturas = temperaturaServico.obterProximaAtualizacaoDeTemperaturas();
+        LocalDateTime ultimaAtualizacaoTemperaturas = registroMeteorologicoServico.obterUltimaAtualizacaoDeTemperaturas();
+        LocalDateTime proximaAtualizacaoTemperaturas = registroMeteorologicoServico.obterProximaAtualizacaoDeTemperaturas();
 
         if (ultimaAtualizacaoTemperaturas == null) {
             mv.addObject("ultimaAtualizacaoTemperaturas", "Aguardando execução");

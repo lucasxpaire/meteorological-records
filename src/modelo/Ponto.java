@@ -34,7 +34,7 @@ public class Ponto {
     private Long id;
     private Double latitude;
     private Double longitude;
-    private List<Temperatura> historicoTemperaturas = new ArrayList<>();
+    private List<RegistroMeteorologico> historicoTemperaturas = new ArrayList<>();
     private List<EstacaoMeteorologica> estacoesMeteorologicas = new ArrayList<>();
     private String fusoHorario;
 
@@ -78,11 +78,11 @@ public class Ponto {
 
     @OneToMany(mappedBy = "ponto", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("dataHora DESC")
-    public List<Temperatura> getHistoricoTemperaturas() {
+    public List<RegistroMeteorologico> getHistoricoTemperaturas() {
         return historicoTemperaturas;
     }
 
-    public void setHistoricoTemperaturas(List<Temperatura> historicoTemperaturas) {
+    public void setHistoricoTemperaturas(List<RegistroMeteorologico> historicoTemperaturas) {
         this.historicoTemperaturas = historicoTemperaturas;
     }
 
@@ -160,24 +160,24 @@ public class Ponto {
     }
 
     @Transient
-    private Optional<Temperatura> obterTemperaturaRealMaisRecente() {
+    private Optional<RegistroMeteorologico> obterTemperaturaRealMaisRecente() {
         return getHistoricoTemperaturas().stream()
                 .filter(t -> t != null && t.getTemperaturaReal() != null && t.getDataHora() != null)
-                .max(Comparator.comparing(Temperatura::getDataHora));
+                .max(Comparator.comparing(RegistroMeteorologico::getDataHora));
     }
 
     @Transient
-    private Optional<Temperatura> obterTemperaturaPrevistaMaisRecente() {
+    private Optional<RegistroMeteorologico> obterTemperaturaPrevistaMaisRecente() {
         return getHistoricoTemperaturas().stream()
                 .filter(t -> t != null && t.getTemperaturaPrevista() != null && t.getDataHora() != null)
-                .max(Comparator.comparing(Temperatura::getDataHora));
+                .max(Comparator.comparing(RegistroMeteorologico::getDataHora));
     }
 
     @Transient
-    private Optional<Temperatura> obterTemperaturaCalculadaMaisRecente() {
+    private Optional<RegistroMeteorologico> obterTemperaturaCalculadaMaisRecente() {
         return getHistoricoTemperaturas().stream()
                 .filter(t -> t != null && t.getTemperaturaCalculada() != null && t.getDataHora() != null)
-                .max(Comparator.comparing(Temperatura::getDataHora));
+                .max(Comparator.comparing(RegistroMeteorologico::getDataHora));
     }
 
     @Transient

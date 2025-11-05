@@ -37,6 +37,10 @@ public class EstacaoMeteorologicaServico {
     @Autowired
     private CorServico corServico;
 
+    public EstacaoMeteorologicaServico(Dados dados) {
+        this.dados = dados;
+    }
+
     @PostConstruct
     public void inicializarEstacoesMeteorologicas() {
         dados.iniciarTransacao();

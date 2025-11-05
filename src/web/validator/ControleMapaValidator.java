@@ -33,7 +33,7 @@ public class ControleMapaValidator implements Validator {
 
             if (opcao.equalsIgnoreCase(MapaController.BUSCAR_PROPRIEDADES_POR_CPF)) {
                 if (command.getCpfBusca().isEmpty() || command.getCpfBusca() == null) {
-                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "cpfBusca", "field.required", "Falha: CPF de busca está vazio.");
+                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "cpfBusca", "field.required", "Falha: O CPF do proprietário está vazio.");
                 } else {
                     if (!Proprietario.validarTamanhoCpf(command.getCpfBusca())) {
                         errors.rejectValue("cpfBusca", "cpfBusca.tamanhoInvalido", "Falha: CPF de busca deve conter exatamente 11 dígitos numéricos.");
@@ -49,7 +49,7 @@ public class ControleMapaValidator implements Validator {
                 }
             } else if (opcao.equalsIgnoreCase(MapaController.BUSCAR_PROPRIEDADES_POR_NOME)) {
                 if (command.getNomeBusca().isEmpty() || command.getNomeBusca() == null) {
-                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nomeBusca", "field.required", "Falha: Nome de busca está vazio.");
+                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nomeBusca", "field.required", "Falha: O nome da propriedade para buscar está vazia.");
                 } else {
                     if (!propriedadeServico.existePropriedadesNesseNome(command.getNomeBusca())) {
                         errors.rejectValue("nomeBusca", "nomeBusca.nenhumaPropriedade", "Falha: Nenhuma propriedade cadastrada com esse nome.");

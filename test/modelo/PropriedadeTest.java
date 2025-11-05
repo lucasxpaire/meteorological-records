@@ -13,7 +13,9 @@ public class PropriedadeTest {
 
     @Test
     public void verificarJsonDePropriedade() throws JsonProcessingException {
+        dados.iniciarTransacao();
         List<Propriedade> propriedades = dados.listarTodos(Propriedade.class);
+        dados.confirmarTransacao();
         ObjectMapper conversorJson = new ObjectMapper();
         conversorJson.findAndRegisterModules();
         String propriedadesJson = conversorJson.writerWithDefaultPrettyPrinter().writeValueAsString(propriedades);
@@ -22,7 +24,9 @@ public class PropriedadeTest {
 
     @Test
     public void verificarJsonDePropriedadeEspecificaPorId() throws JsonProcessingException {
-        Propriedade propriedade = dados.buscarUnicoPorCampo(Propriedade.class, "id", 12L);
+        dados.iniciarTransacao();
+        Propriedade propriedade = dados.buscarMaisRecente(Propriedade.class);
+        dados.confirmarTransacao();
         ObjectMapper conversorJson = new ObjectMapper();
         conversorJson.findAndRegisterModules();
         String propriedadeJson = conversorJson.writerWithDefaultPrettyPrinter().writeValueAsString(propriedade);

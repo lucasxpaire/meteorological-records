@@ -11,13 +11,23 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "TEMPERATURA")
 @JsonPropertyOrder({"latitude", "longitude", "dataHoraPrevisao", "temperaturaPrevista"})
-public class Temperatura {
+public class RegistroMeteorologico {
 
     private Long id;
     private LocalDateTime dataHora;
+
     private Double temperaturaReal;
     private Double temperaturaPrevista;
     private Double temperaturaCalculada;
+
+    private Double precipitacaoReal;
+    private Double precipitacaoPrevista;
+    private Double precipitacaoCalculada;
+
+    private Double radiacaoSolarReal;
+    private Double radiacaoSolarPrevista;
+    private Double radiacaoSolarCalculada;
+
     private Ponto ponto;
 
     @JsonIgnore
@@ -69,6 +79,60 @@ public class Temperatura {
 
     public void setTemperaturaCalculada(Double temperaturaCalculada) {
         this.temperaturaCalculada = temperaturaCalculada;
+    }
+
+    @Column(name = "PRECIPITACAO_REAL")
+    public Double getPrecipitacaoReal() {
+        return precipitacaoReal;
+    }
+
+    public void setPrecipitacaoReal(Double precipitacaoReal) {
+        this.precipitacaoReal = precipitacaoReal;
+    }
+
+    @Column(name = "PRECIPITACAO_PREVISTA")
+    public Double getPrecipitacaoPrevista() {
+        return precipitacaoPrevista;
+    }
+
+    public void setPrecipitacaoPrevista(Double precipitacaoPrevista) {
+        this.precipitacaoPrevista = precipitacaoPrevista;
+    }
+
+    @Column(name = "PRECIPITACAO_CALCULADA")
+    public Double getPrecipitacaoCalculada() {
+        return precipitacaoCalculada;
+    }
+
+    public void setPrecipitacaoCalculada(Double precipitacaoCalculada) {
+        this.precipitacaoCalculada = precipitacaoCalculada;
+    }
+
+    @Column(name = "RADIACAO_SOLAR_REAL")
+    public Double getRadiacaoSolarReal() {
+        return radiacaoSolarReal;
+    }
+
+    public void setRadiacaoSolarReal(Double radiacaoSolar) {
+        this.radiacaoSolarReal = radiacaoSolar;
+    }
+
+    @Column(name = "RADIACAO_SOLAR_PREVISTA")
+    public Double getRadiacaoSolarPrevista() {
+        return radiacaoSolarPrevista;
+    }
+
+    public void setRadiacaoSolarPrevista(Double radiacaoPrevista) {
+        this.radiacaoSolarPrevista = radiacaoPrevista;
+    }
+
+    @Column(name = "RADIACAO_SOLAR_CALCULADA")
+    public Double getRadiacaoSolarCalculada() {
+        return radiacaoSolarCalculada;
+    }
+
+    public void setRadiacaoSolarCalculada(Double radiacaoCalculada) {
+        this.radiacaoSolarCalculada = radiacaoCalculada;
     }
 
     @JsonIgnore

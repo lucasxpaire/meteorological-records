@@ -171,7 +171,7 @@ function criarDescricaoPropriedade(propriedade) {
                 ${gerarHtmlEstacoesAssociadas(propriedade, propriedade.centroide.dataHoraTemperaturaCalculada)}
                 <p><strong>Temperatura Calculada:<span class="temperatura-destaque"> ${propriedade.centroide.temperaturaCalculada}</span> ${propriedade.centroide.dataHoraTemperaturaCalculada}</strong></p>
                 <p style="display: none" id="${idTemperaturaPrevista}"></p>
-                <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idTemperaturaPrevista}', '${idBotaoPrevisao}')" class="botao botao-tabela--visualizar">Prever temperatura</button>
+                <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.latitude}, ${propriedade.centroide.longitude}, '${idTemperaturaPrevista}', '${idBotaoPrevisao}')" class="botao botao-tabela--visualizar">Prever temperatura</button>
             </div>
         `
     });
@@ -247,7 +247,7 @@ function criarLabelTemperaturaEstacao(estacao, dataHoraReferencia) {
 
 }
 
-async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrevisao) {
+async function preverTemperatura(latitude, longitude, idTemperaturaPrevista, idBotaoPrevisao) {
     const paragrafoTemperatura = document.getElementById(idTemperaturaPrevista);
     const botaoPrevisao = document.getElementById(idBotaoPrevisao);
 
@@ -255,7 +255,7 @@ async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrev
     botaoPrevisao.innerHTML = 'Carregando...';
 
     try {
-        const resposta = await fetch(`${urlPrevisao}?idCentroide=${idCentroide}`);
+        const resposta = await fetch(`${urlPrevisao}?latitude=${latitude}&longitude=${longitude}`);
         if (!resposta.ok) {
             throw new Error(`Falha na requisição: ${resposta.status}`);
         }

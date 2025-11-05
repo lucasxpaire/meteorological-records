@@ -2,7 +2,7 @@ package dados;
 
 import modelo.EstacaoMeteorologica;
 import modelo.Ponto;
-import modelo.Temperatura;
+import modelo.RegistroMeteorologico;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
@@ -156,12 +156,12 @@ public class Dados {
         }
     }
 
-    public List<Temperatura> buscarTemperaturasHistoricas(Ponto ponto, List<LocalDateTime> datas) {
+    public List<RegistroMeteorologico> buscarTemperaturasHistoricas(Ponto ponto, List<LocalDateTime> datas) {
         if (ponto == null || ponto.getId() == null || datas == null || datas.isEmpty()) {
             return new ArrayList<>();
         }
         try {
-            return obterEntityManager().createQuery("SELECT t FROM Temperatura t WHERE t.ponto = :ponto AND t.dataHora IN :datas", Temperatura.class)
+            return obterEntityManager().createQuery("SELECT t FROM RegistroMeteorologico t WHERE t.ponto = :ponto AND t.dataHora IN :datas", RegistroMeteorologico.class)
                     .setParameter("ponto", ponto)
                     .setParameter("datas", datas)
                     .getResultList();
@@ -184,9 +184,9 @@ public class Dados {
                 .getResultList();
     }
 
-    public List<Temperatura> buscarPrevisoesComTemperaturaCalculadaVazia() {
+    public List<RegistroMeteorologico> buscarPrevisoesComTemperaturaCalculadaVazia() {
         return obterEntityManager().createQuery(
-                        "SELECT t FROM Temperatura t WHERE t.temperaturaReal IS NULL AND t.dataHora < :agora", Temperatura.class)
+                        "SELECT t FROM RegistroMeteorologico t WHERE t.temperaturaReal IS NULL AND t.dataHora < :agora", RegistroMeteorologico.class)
                 .setParameter("agora", LocalDateTime.now())
                 .getResultList();
     }

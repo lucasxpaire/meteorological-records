@@ -3,7 +3,7 @@ package web.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import modelo.Ponto;
 import modelo.Propriedade;
-import modelo.Temperatura;
+import modelo.RegistroMeteorologico;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -40,7 +40,7 @@ public class MapaController {
     private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
     @Autowired
-    private TemperaturaServico temperaturaServico;
+    private RegistroMeteorologicoServico registroMeteorologicoServico;
 
     @Autowired
     private PontoServico pontoServico;
@@ -113,15 +113,15 @@ public class MapaController {
 
     @ResponseBody
     @GetMapping(value = "/preverTemperatura", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Temperatura calcularPrevisao(@RequestParam("idCentroide") Long idCentroide) {
-        Ponto centroide = pontoServico.buscarPorId(idCentroide);
-        if (centroide == null) {
-            return null;
-        }
+    public RegistroMeteorologico calcularPrevisaoDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
+        Ponto ponto = new Ponto(latitude, longitude);
+
+        ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
 
         LocalDateTime dataHoraAgora = LocalDateTime.now();
         LocalDateTime dataHoraPrevista = dataHoraAgora.plusHours(1).withMinute(0).withSecond(0);
-        return temperaturaServico.preverTemperatura(centroide, dataHoraPrevista);
+
+        return registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevista);
     }
 
 }

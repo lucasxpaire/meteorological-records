@@ -38,7 +38,7 @@
     <script>
         const propriedades = ${propriedadesJson};
         const estacoes = ${estacoesJson};
-        const urlPrevisao = '<c:url value="/preverTemperatura" />';
+        const urlPrevisao = '<c:url value="preverTemperatura" />';
     </script>
     <script src="https://maps.googleapis.com/maps/api/js"></script>
     <script src="<c:url value='/js/mapa.js' />"></script>

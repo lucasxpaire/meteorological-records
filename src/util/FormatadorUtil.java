@@ -13,6 +13,7 @@ public class FormatadorUtil {
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_EXIBICAO = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
     
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    public static final DateTimeFormatter FORMATADOR_DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_COMPARACAO_JSON = DateTimeFormatter.ofPattern("dd/MM/yyyy HH");
 
@@ -39,7 +40,11 @@ public class FormatadorUtil {
     }
 
     public static Double converterStringParaDouble(String valor) {
-        return Double.parseDouble(valor.trim().replace(VIRGULA, PONTO));
+       try {
+           return Double.parseDouble(valor.trim().replace(VIRGULA, PONTO));
+       } catch (NumberFormatException e) {
+           return null;
+       }
     }
 
     public static String formatarPontoDecimalParaVirgula(Double valor) {
@@ -92,18 +97,46 @@ public class FormatadorUtil {
         return dataHora.format(DateTimeFormatter.ofPattern("HHmm"));
     }
 
-    public static String reordenarStringDataParaFormatacaoBrasileira(String data) {
+    public static String formatarParaDataBrasileira(String data) {
         String[] partes = data.split("/");
         return partes[2] + "/" + partes[1] + "/" + partes[0];
-    }
-
-    public static String removerSubPalavraUTC(String hora) {
-        return hora.replace(" UTC", "").trim();
     }
 
     public static String converterObjetoParaJson(Object o) throws JsonProcessingException {
         ObjectMapper conversorJson = new ObjectMapper();
         conversorJson.findAndRegisterModules();
         return conversorJson.writerWithDefaultPrettyPrinter().writeValueAsString(o);
+    }
+
+    public static String padronizarSeparadorData(String data) {
+        if (data.contains("-")) {
+            return data.replace('-', '/').trim();
+        } else {
+            return data.trim();
+        }
+    }
+
+    public static String padronizarSeparadorHora(String hora) {
+        String horaPadronizada = hora.trim();
+        if (horaPadronizada.contains("UTC")) {
+            horaPadronizada = horaPadronizada.replace(" UTC", "");
+        }
+
+        if (!horaPadronizada.contains(":")) {
+            horaPadronizada = horaPadronizada.substring(0, 2) + DOIS_PONTOS + horaPadronizada.substring(2, 4);
+        }
+
+        return horaPadronizada;
+    }
+
+    public static String removerSubPalavraUTC(String hora) {
+        return hora.replace(" UTC", "").trim();
+    }
+
+    public static LocalDateTime formatarECombinarDataHora(String data, String hora) {
+        String dataPadronizada = padronizarSeparadorData(formatarParaDataBrasileira(data));
+        String horaPadronizada = padronizarSeparadorHora(hora);
+
+        return LocalDateTime.parse(dataPadronizada + ESPACO_EM_BRANCO + horaPadronizada, FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
     }
 }
