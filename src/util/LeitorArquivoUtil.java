@@ -294,14 +294,18 @@ public class LeitorArquivoUtil {
                     }
 
                     String[] registroMeteorologico = linha.split(";");
-                    RegistroMeteorologico temperatura = new RegistroMeteorologico();
 
-                    temperatura.setDataHora(formatarECombinarDataHora(registroMeteorologico[indiceColunaData], registroMeteorologico[indiceColunaHora]));
-                    temperatura.setPrecipitacaoReal(definirValor(indiceColunaPrecipitacao, registroMeteorologico));
-                    temperatura.setRadiacaoSolarReal(definirValor(indiceColunaRadiacaoSolar, registroMeteorologico));
-                    temperatura.setTemperaturaReal(definirValor(indiceColunaTemperatura, registroMeteorologico));
+                    LocalDateTime dataHora = formatarECombinarDataHora(registroMeteorologico[indiceColunaData], registroMeteorologico[indiceColunaHora]);
+                    if (!dataHora.isBefore(dataHoraInicioDaLeitura) && !dataHora.isAfter(dataHoraFimDaLeitura)) {
+                        RegistroMeteorologico temperatura = new RegistroMeteorologico();
 
-                    registrosMeteorologicos.add(temperatura);
+                        temperatura.setDataHora(formatarECombinarDataHora(registroMeteorologico[indiceColunaData], registroMeteorologico[indiceColunaHora]));
+                        temperatura.setPrecipitacaoReal(definirValor(indiceColunaPrecipitacao, registroMeteorologico));
+                        temperatura.setRadiacaoSolarReal(definirValor(indiceColunaRadiacaoSolar, registroMeteorologico));
+                        temperatura.setTemperaturaReal(definirValor(indiceColunaTemperatura, registroMeteorologico));
+
+                        registrosMeteorologicos.add(temperatura);
+                    }
                 }
 
             } catch (FileNotFoundException e) {
@@ -312,66 +316,6 @@ public class LeitorArquivoUtil {
         }
 
         return registrosMeteorologicos;
-    }
-
-    public static List<RegistroMeteorologico> lerRegistrosMeteorologicos(String caminhoArquivo) {
-        List<RegistroMeteorologico> registrosMeteorologicos = new ArrayList<>();
-        File arquivo = new File(caminhoArquivo);
-
-        try (Scanner leitorArquivo = new Scanner(arquivo, CODIFICADOR_DE_CARACTERES)) {
-            boolean cabecalhoEncontrado = false;
-
-            int indiceColunaData = -1;
-            int indiceColunaHora = -1;
-            int indiceColunaTemperatura = -1;
-            int indiceColunaPrecipitacao = -1;
-            int indiceColunaRadiacaoSolar = -1;
-
-            while (leitorArquivo.hasNextLine()) {
-                String linha = leitorArquivo.nextLine().trim();
-
-                if (!cabecalhoEncontrado) {
-                    if (CABECALHO_VALIDO_REGISTROS_METEOROLOGICOS.contains(linha)) {
-                        String[] cabecalho = linha.split(";");
-
-                        for (int i = 0; i < cabecalho.length; i++) {
-                            if (COLUNA_DATA.contains(cabecalho[i])) {
-                                indiceColunaData = i;
-                            } else if (COLUNA_HORA.contains(cabecalho[i])) {
-                                indiceColunaHora = i;
-                            } else if (COLUNA_PRECIPITACAO.contains(cabecalho[i])) {
-                                indiceColunaPrecipitacao = i;
-                            } else if (COLUNA_RADIACAO.contains(cabecalho[i])) {
-                                indiceColunaRadiacaoSolar = i;
-                            } else if (COLUNA_TEMPERATURA.contains(cabecalho[i])) {
-                                indiceColunaTemperatura = i;
-                            }
-                        }
-
-                        cabecalhoEncontrado = true;
-                    }
-                    continue;
-                }
-
-                if (linha.isEmpty()) {
-                    continue;
-                }
-
-                String[] registroMeteorologico = linha.split(";");
-                RegistroMeteorologico temperatura = new RegistroMeteorologico();
-
-                temperatura.setDataHora(formatarECombinarDataHora(registroMeteorologico[indiceColunaData], registroMeteorologico[indiceColunaHora]));
-                temperatura.setPrecipitacaoReal(definirValor(indiceColunaPrecipitacao, registroMeteorologico));
-                temperatura.setRadiacaoSolarReal(definirValor(indiceColunaRadiacaoSolar, registroMeteorologico));
-                temperatura.setTemperaturaReal(definirValor(indiceColunaTemperatura, registroMeteorologico));
-
-                registrosMeteorologicos.add(temperatura);
-            }
-
-            return registrosMeteorologicos;
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static Double definirValor(int indiceColuna, String[] registro) {
