@@ -342,8 +342,10 @@ public class RegistroMeteorologicoServico {
         for (EstacaoMeteorologica estacao : ponto.getEstacoesMeteorologicas()) {
             LocalDateTime dataHoraInicioIntervalo = dataHoraPrevisao.minusDays(7).minusHours(1);
             LocalDateTime dataHoraFimIntervalo = dataHoraPrevisao.minusHours(1);
-            List<RegistroMeteorologico> registros = LeitorArquivoUtil.lerRegistrosMeteorologicos(estacao.getCodigoEstacao(), dataHoraInicioIntervalo, dataHoraFimIntervalo);
+            List<RegistroMeteorologico> registros = LeitorArquivoUtil.lerJanelaDeRegistros(estacao.getCodigoEstacao(), dataHoraInicioIntervalo, dataHoraFimIntervalo);
         }
+
+        return null;
     }
 }
 

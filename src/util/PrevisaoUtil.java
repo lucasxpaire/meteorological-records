@@ -1,8 +1,12 @@
 package util;
 
+import com.workday.insights.timeseries.arima.Arima;
+import com.workday.insights.timeseries.arima.struct.ArimaParams;
+import com.workday.insights.timeseries.arima.struct.ForecastResult;
 import modelo.RegistroMeteorologico;
 
-import java.util.ArrayList;
+import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -11,105 +15,68 @@ public class PrevisaoUtil {
 
     private static final int LIMITE_INTERPOLACAO = 6;
 
-    public static List<RegistroMeteorologico> limparJanelaDePrevisao(List<RegistroMeteorologico> registrosComBuracos, String codigoEstacao, Function<RegistroMeteorologico, Double> getter, BiConsumer<RegistroMeteorologico, Double> setter) {
+    private static final int JANELA_SARIMA_TREINO = 168;
 
-        List<RegistroMeteorologico> registrosLimpos = new ArrayList<>();
+    private static final ArimaParams PARAMS_SARIMA_IMPUTACAO = new ArimaParams(1, 0, 0, 1, 0, 0, 24);
 
-        for (int indiceAtual = 0; indiceAtual < registrosComBuracos.size(); indiceAtual++) {
+    public static void limparJanelaDePrevisao(List<RegistroMeteorologico> janelaParaLimpar, String codigoEstacao, Function<RegistroMeteorologico, Double> getter, BiConsumer<RegistroMeteorologico, Double> setter) throws URISyntaxException {
+        for (int indiceAtual = 0; indiceAtual < janelaParaLimpar.size(); indiceAtual++) {
 
-            RegistroMeteorologico registroAtual = registrosComBuracos.get(indiceAtual);
-            if (getter.apply(registroAtual) != null) {
-                registrosLimpos.add(registroAtual);
+            if (getter.apply(janelaParaLimpar.get(indiceAtual)) != null) {
                 continue;
             }
 
             int indiceInicioBuraco = indiceAtual;
             int tamanhoDoBuraco = 0;
 
-            while (indiceAtual < registrosComBuracos.size() && getter.apply(registrosComBuracos.get(indiceAtual)) == null) {
-                indiceAtual++;
+            while (indiceAtual < janelaParaLimpar.size() && getter.apply(janelaParaLimpar.get(indiceAtual)) == null) {
                 tamanhoDoBuraco++;
+                indiceAtual++;
             }
 
-            List<RegistroMeteorologico> registrosComBuracosPreenchidos;
-            if (tamanhoDoBuraco <= LIMITE_INTERPOLACAO) {
-                registrosComBuracosPreenchidos = preencherComInterpolacaoLinear(registrosComBuracos, indiceInicioBuraco, tamanhoDoBuraco, getter, setter);
+            boolean temValorAnterior = (indiceInicioBuraco > 0);
+            boolean temValorPosterior = (indiceAtual < janelaParaLimpar.size());
+
+            if (temValorAnterior && temValorPosterior && tamanhoDoBuraco <= LIMITE_INTERPOLACAO) {
+                preencherComInterpolacaoLinear(janelaParaLimpar, indiceInicioBuraco, tamanhoDoBuraco, getter, setter);
             } else {
-                registrosComBuracosPreenchidos = preencherComSarima(registrosComBuracos, indiceInicioBuraco, tamanhoDoBuraco, codigoEstacao, getter, setter);
+                preencherComSarima(janelaParaLimpar, indiceInicioBuraco, tamanhoDoBuraco, codigoEstacao, getter, setter);
             }
 
-            registrosLimpos.addAll(registrosComBuracosPreenchidos);
-
-            indiceAtual--;
         }
-
-        return registrosLimpos;
     }
 
-    public static List<RegistroMeteorologico> preencherComInterpolacaoLinear(List<RegistroMeteorologico> registrosComDadosNulos, int indiceAtual, int tamanhoDoBuraco, Function<RegistroMeteorologico, Double> getter, BiConsumer<RegistroMeteorologico, Double> setter) {
+    public static void preencherComInterpolacaoLinear(List<RegistroMeteorologico> listaRegistros, int indiceInicioBuraco, int tamanhoDoBuraco, Function<RegistroMeteorologico, Double> getter, BiConsumer<RegistroMeteorologico, Double> setter) {
+        double valorAnterior = getter.apply(listaRegistros.get(indiceInicioBuraco - 1));
+        double valorPosterior = getter.apply(listaRegistros.get(indiceInicioBuraco + tamanhoDoBuraco));
 
-    }
+        int distanciaEntreValores = tamanhoDoBuraco + 1;
+        double incrementoPorPasso = (valorPosterior - valorAnterior) / distanciaEntreValores;
 
-    public static List<RegistroMeteorologico> preencherComSarima(List<RegistroMeteorologico> registrosComDadosNulos, int indiceAtual, int tamanhoDoBuraco, String codigoEstacao, Function<RegistroMeteorologico, Double> getter, BiConsumer<RegistroMeteorologico, Double> setter) {
-
-    }
-
-    public static double[] preencherBuracosComInterpolacao(List<Double> dadosComValoresAusentes) {
-        double[] dadosPreenchidos = new double[dadosComValoresAusentes.size()];
-
-        for (int indiceAtual = 0; indiceAtual < dadosComValoresAusentes.size(); indiceAtual++) {
-            if (Double.isNaN(dadosComValoresAusentes.get(indiceAtual))) {
-
-                if (indiceAtual == 0) {
-                    int indicePrimeiroNumeroValido = 0;
-                    while (indicePrimeiroNumeroValido < dadosComValoresAusentes.size() && Double.isNaN(dadosComValoresAusentes.get(indicePrimeiroNumeroValido))) {
-                        indicePrimeiroNumeroValido++;
-                    }
-
-                    double primeiroNumeroValido;
-                    if (indicePrimeiroNumeroValido == dadosComValoresAusentes.size()) {
-                        primeiroNumeroValido = 0.0;
-                    } else {
-                        primeiroNumeroValido = dadosComValoresAusentes.get(indicePrimeiroNumeroValido);
-                    }
-
-                    for(int j = 0; j < indicePrimeiroNumeroValido; j++) {
-                        dadosPreenchidos[j] = primeiroNumeroValido;
-                    }
-                    indiceAtual = indicePrimeiroNumeroValido - 1;
-                    continue;
-                }
-
-                double valorAnterior = dadosPreenchidos[indiceAtual - 1];
-                int indiceValorAnterior = indiceAtual - 1;
-
-                int indiceProximoValor = indiceAtual;
-                while (indiceProximoValor < dadosComValoresAusentes.size() && Double.isNaN(dadosComValoresAusentes.get(indiceProximoValor))) {
-                    indiceProximoValor++;
-                }
-
-                double valorPosterior;
-                if (indiceProximoValor == dadosComValoresAusentes.size()) {
-                    valorPosterior = valorAnterior;
-                } else {
-                    valorPosterior = dadosComValoresAusentes.get(indiceProximoValor);
-                }
-
-                int numeroDePassosNoBuraco = indiceProximoValor - indiceValorAnterior;
-                double incrementoPorPasso = (valorPosterior - valorAnterior) / numeroDePassosNoBuraco;
-
-                for (int indiceBuraco = indiceAtual; indiceBuraco < indiceProximoValor; indiceBuraco++) {
-                    int distanciaDesdeOValorAnterior = indiceBuraco - indiceValorAnterior;
-                    dadosPreenchidos[indiceBuraco] = valorAnterior + (incrementoPorPasso * distanciaDesdeOValorAnterior);
-                }
-
-                indiceAtual = indiceProximoValor - 1;
-
-            } else {
-                dadosPreenchidos[indiceAtual] = dadosComValoresAusentes.get(indiceAtual);
-            }
+        for (int i = 0; i < tamanhoDoBuraco; i++) {
+            double valorPreenchido = valorAnterior + incrementoPorPasso * (i + 1);
+            setter.accept(listaRegistros.get(indiceInicioBuraco + i), valorPreenchido);
         }
-        return dadosPreenchidos;
+    }
+
+    public static void preencherComSarima(List<RegistroMeteorologico> listaRegistros, int indiceInicioBuraco, int tamanhoDoBuraco, String codigoEstacao, Function<RegistroMeteorologico, Double> getter, BiConsumer<RegistroMeteorologico, Double> setter) throws URISyntaxException {
+        LocalDateTime dataHoraFimTreino = listaRegistros.get(indiceInicioBuraco).getDataHora().minusHours(1);
+        LocalDateTime dataHoraInicioTreino = dataHoraFimTreino.minusHours(JANELA_SARIMA_TREINO - 1);
+
+        List<RegistroMeteorologico> novaJanelaTreino = LeitorArquivoUtil.lerJanelaDeRegistros(codigoEstacao, dataHoraInicioTreino, dataHoraFimTreino);
+
+        limparJanelaDePrevisao(novaJanelaTreino, codigoEstacao, getter, setter);
+
+        double[] dadosDeTreino = novaJanelaTreino.stream()
+                .mapToDouble(getter::apply)
+                .toArray();
+
+        ForecastResult previsao = Arima.forecast_arima(dadosDeTreino, tamanhoDoBuraco, PARAMS_SARIMA_IMPUTACAO);
+        double[] valoresPrevistos = previsao.getForecast();
+
+        for (int i = 0; i < tamanhoDoBuraco; i++) {
+            setter.accept(listaRegistros.get(indiceInicioBuraco + i), valoresPrevistos[i]);
+        }
     }
 
 }

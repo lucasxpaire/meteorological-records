@@ -41,48 +41,48 @@ public class SarimaAprendizadoTest {
 
     @Test
     public void obterDados() throws URISyntaxException, FileNotFoundException {
-        dados.iniciarTransacao();
-        List<EstacaoMeteorologica> estacoes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
-        dados.confirmarTransacao();
-
-        for (EstacaoMeteorologica estacaoMeteorologica : estacoes) {
-            if (estacaoMeteorologica.getCodigoEstacao().equals("A803")) {
-                System.out.println("--- Testando SARIMA na Estação: " + estacaoMeteorologica.getCodigoEstacao() + " ---");
-                String caminhoArquivo = LeitorArquivoUtil.obterCaminhoDoArquivoDaEstacao("2019", estacaoMeteorologica.getCodigoEstacao());
-                if (!caminhoArquivo.isEmpty()) {
-                    List<Double> temperaturasComGaps = LeitorArquivoUtil.obterDadosEmColunaEspecifica(caminhoArquivo, COLUNA_TEMPERATURA.toString());
-                    System.out.println("Total de dados: " + temperaturasComGaps.size());
-
-                    double[] dadosLimpos = PrevisaoUtil.preencherBuracosComInterpolacao(temperaturasComGaps);
-                    System.out.println("Total dos dados após interpolação: " + dadosLimpos.length);
-
-                    if (dadosLimpos.length == 0) {
-                        return;
-                    }
-
-                    int pontosParaTreino = m * 7;
-                    if (dadosLimpos.length < pontosParaTreino) {
-                        System.out.println("Dados insuficientes para treinar (precisa de " + pontosParaTreino + ", tem " + dadosLimpos.length + ")");
-                        return;
-                    }
-
-                    double[] janelaDeTreino = Arrays.copyOfRange(dadosLimpos, dadosLimpos.length - pontosParaTreino, dadosLimpos.length);
-
-                    System.out.println("Usando " + janelaDeTreino.length + " pontos (7 dias) para treino.");
-
-                    ArimaParams params = new ArimaParams(p, d, q, P, D, Q, m);
-                    ForecastResult forecastResult = Arima.forecast_arima(janelaDeTreino, forecastSize, params);
-                    double[] valoresPrevistos = forecastResult.getForecast();
-
-                    System.out.println("\n--- Previsão (próximas " + forecastSize + " horas) ---");
-                    System.out.println("Última temperatura real (para referência): " + String.format("%.4f", janelaDeTreino[janelaDeTreino.length - 1]));
-
-                    for (int i = 0; i < valoresPrevistos.length; i++) {
-                        System.out.printf("Previsão [t+%d]: %.4f\n", (i + 1), valoresPrevistos[i]);
-                    }
-                }
-            }
-        }
+//        dados.iniciarTransacao();
+//        List<EstacaoMeteorologica> estacoes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
+//        dados.confirmarTransacao();
+//
+//        for (EstacaoMeteorologica estacaoMeteorologica : estacoes) {
+//            if (estacaoMeteorologica.getCodigoEstacao().equals("A803")) {
+//                System.out.println("--- Testando SARIMA na Estação: " + estacaoMeteorologica.getCodigoEstacao() + " ---");
+//                String caminhoArquivo = LeitorArquivoUtil.obterCaminhoDoArquivoDaEstacao("2019", estacaoMeteorologica.getCodigoEstacao());
+//                if (!caminhoArquivo.isEmpty()) {
+//                    List<Double> temperaturasComGaps = LeitorArquivoUtil.obterDadosEmColunaEspecifica(caminhoArquivo, COLUNA_TEMPERATURA.toString());
+//                    System.out.println("Total de dados: " + temperaturasComGaps.size());
+//
+//                    double[] dadosLimpos = PrevisaoUtil.preencherBuracosComInterpolacao(temperaturasComGaps);
+//                    System.out.println("Total dos dados após interpolação: " + dadosLimpos.length);
+//
+//                    if (dadosLimpos.length == 0) {
+//                        return;
+//                    }
+//
+//                    int pontosParaTreino = m * 7;
+//                    if (dadosLimpos.length < pontosParaTreino) {
+//                        System.out.println("Dados insuficientes para treinar (precisa de " + pontosParaTreino + ", tem " + dadosLimpos.length + ")");
+//                        return;
+//                    }
+//
+//                    double[] janelaDeTreino = Arrays.copyOfRange(dadosLimpos, dadosLimpos.length - pontosParaTreino, dadosLimpos.length);
+//
+//                    System.out.println("Usando " + janelaDeTreino.length + " pontos (7 dias) para treino.");
+//
+//                    ArimaParams params = new ArimaParams(p, d, q, P, D, Q, m);
+//                    ForecastResult forecastResult = Arima.forecast_arima(janelaDeTreino, forecastSize, params);
+//                    double[] valoresPrevistos = forecastResult.getForecast();
+//
+//                    System.out.println("\n--- Previsão (próximas " + forecastSize + " horas) ---");
+//                    System.out.println("Última temperatura real (para referência): " + String.format("%.4f", janelaDeTreino[janelaDeTreino.length - 1]));
+//
+//                    for (int i = 0; i < valoresPrevistos.length; i++) {
+//                        System.out.printf("Previsão [t+%d]: %.4f\n", (i + 1), valoresPrevistos[i]);
+//                    }
+//                }
+//            }
+//        }
     }
 
     @Test

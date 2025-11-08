@@ -250,10 +250,12 @@ public class LeitorArquivoUtil {
         }
     }
 
-    public static List<RegistroMeteorologico> lerRegistrosMeteorologicos(String codigoEstacao, LocalDateTime dataHoraInicioDaLeitura, LocalDateTime dataHoraFimDaLeitura) {
+    public static List<RegistroMeteorologico> lerJanelaDeRegistros(String codigoEstacao, LocalDateTime dataHoraInicioDaLeitura, LocalDateTime dataHoraFimDaLeitura) throws URISyntaxException {
         List<RegistroMeteorologico> registrosMeteorologicos = new ArrayList<>();
-        try {
-            File arquivo = new File(obterCaminhoDoArquivoDaEstacao(String.valueOf(dataHoraFimDaLeitura.getYear()), codigoEstacao));
+        List<String> caminhosDeArquivos = obterCaminhosDeArquivosPorIntervalo(codigoEstacao, dataHoraInicioDaLeitura, dataHoraFimDaLeitura);
+
+        for (String caminhoArquivo : caminhosDeArquivos) {
+            File arquivo = new File(caminhoArquivo);
 
             try (Scanner leitorArquivo = new Scanner(arquivo)) {
                 boolean cabecalhoEncontrado = false;
@@ -307,18 +309,41 @@ public class LeitorArquivoUtil {
                         registrosMeteorologicos.add(temperatura);
                     }
                 }
-
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
         }
 
         return registrosMeteorologicos;
     }
 
-    public static Double definirValor(int indiceColuna, String[] registro) {
+    public static List<String> obterCaminhosDeArquivosPorIntervalo(String codigoEstacao, LocalDateTime inicioIntervalo, LocalDateTime finalIntervalo) throws URISyntaxException {
+        File pastaRaiz = new File(Objects.requireNonNull(LeitorArquivoUtil.class.getClassLoader().getResource("dadosEstacoesMeteorologicas")).toURI());
+
+        String anoInicio = String.valueOf(inicioIntervalo.getYear());
+        String anoFinal = String.valueOf(finalIntervalo.getYear());
+
+        File[] subpastas = pastaRaiz.listFiles(File::isDirectory);
+        if (subpastas == null) {
+            return Collections.singletonList(STRING_VAZIA);
+        }
+
+        List<String> caminhosDeArquivos = new ArrayList<>();
+        for (File subspasta : subpastas) {
+            if (subspasta.getName().contains(anoInicio) || subspasta.getName().contains(anoFinal)) {
+                File[] arquivos = subspasta.listFiles(((dir, name) -> name.contains(codigoEstacao)));
+                if (arquivos != null) {
+                    caminhosDeArquivos.add(arquivos[0].getPath());
+                } else {
+                    caminhosDeArquivos.add(STRING_VAZIA);
+                }
+            }
+        }
+
+        return caminhosDeArquivos;
+    }
+
+    private static Double definirValor(int indiceColuna, String[] registro) {
         if (indiceColuna == -1 || indiceColuna >= registro.length || registro[indiceColuna].isBlank()) {
             return null;
         } else {
