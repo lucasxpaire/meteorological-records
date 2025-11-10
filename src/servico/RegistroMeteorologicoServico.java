@@ -8,6 +8,7 @@ import modelo.RegistroMeteorologico;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import smile.timeseries.AR;
 import util.FormatadorUtil;
 import util.LeitorArquivoUtil;
@@ -78,6 +79,30 @@ public class RegistroMeteorologicoServico {
             dados.desfazerTransacao();
             throw e;
         }
+    }
+
+    @PostConstruct
+    public void carregarDadosHistoricos() {
+        dados.iniciarTransacao();
+        if (dados.existeAlgum(RegistroMeteorologico.class)) {
+            System.out.println("Banco de dados já populado com dados históricos.");
+            return;
+        }
+
+        List<EstacaoMeteorologica> estacoes = dados.listarTodos(EstacaoMeteorologica.class);
+
+        for (EstacaoMeteorologica estacao : estacoes) {
+            List<String> todosArquivosCsv = LeitorArquivoUtil.obterCaminhosDeArquivosCsvDaEstacao(estacao.getCodigoEstacao());
+
+            for (String arquivoCsv : todosArquivosCsv) {
+                List<RegistroMeteorologico> registrosDoArquivo = LeitorArquivoUtil.lerRegistrosDeArquivo(arquivoCsv);
+
+                for (RegistroMeteorologico registro : registrosDoArquivo) {
+                    dados.salvar(registro);
+                }
+            }
+        }
+        dados.confirmarTransacao();
     }
 
     private void popularTemperaturasDeEstacoesSemHistorico() {

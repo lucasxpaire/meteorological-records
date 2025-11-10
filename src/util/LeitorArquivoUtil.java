@@ -250,6 +250,54 @@ public class LeitorArquivoUtil {
         }
     }
 
+
+    public static List<RegistroMeteorologico> lerRegistrosDeArquivo(String caminhoArquivo) {
+        File arquivo = new File(caminhoArquivo);
+        List<RegistroMeteorologico> registros = new ArrayList<>();
+        try (Scanner leitorArquivo = new Scanner(arquivo, CODIFICADOR_DE_CARACTERES)) {
+            boolean cabecalhoEncontrado = false;
+            int indiceColunaData = -1, indiceColunaHora = -1, indiceColunaTemperatura = -1, indiceColunaPrecipitacao = -1, indiceColunaRadiacaoSolar = -1;
+
+            while (leitorArquivo.hasNextLine()) {
+                String linha = leitorArquivo.nextLine().trim();
+
+                if (!cabecalhoEncontrado) {
+                    if (CABECALHO_VALIDO_REGISTROS_METEOROLOGICOS.contains(linha)) {
+                        String[] cabecalho = linha.split(";");
+                        for (int i = 0; i < cabecalho.length; i++) {
+                            if (COLUNA_DATA.contains(cabecalho[i])) indiceColunaData = i;
+                            else if (COLUNA_HORA.contains(cabecalho[i])) indiceColunaHora = i;
+                            else if (COLUNA_PRECIPITACAO.contains(cabecalho[i])) indiceColunaPrecipitacao = i;
+                            else if (COLUNA_RADIACAO.contains(cabecalho[i])) indiceColunaRadiacaoSolar = i;
+                            else if (COLUNA_TEMPERATURA.contains(cabecalho[i])) indiceColunaTemperatura = i;
+                        }
+                        cabecalhoEncontrado = true;
+                    }
+                    continue;
+                }
+
+                if (linha.isEmpty() || indiceColunaData == -1 || indiceColunaHora == -1) {
+                    continue;
+                }
+
+                String[] colunas = linha.split(";");
+
+                LocalDateTime dataHora = formatarECombinarDataHora(colunas[indiceColunaData], colunas[indiceColunaHora]);
+
+                RegistroMeteorologico registro = new RegistroMeteorologico();
+                registro.setDataHora(dataHora);
+                registro.setPrecipitacaoReal(definirValor(indiceColunaPrecipitacao, colunas));
+                registro.setRadiacaoSolarReal(definirValor(indiceColunaRadiacaoSolar, colunas));
+                registro.setTemperaturaReal(definirValor(indiceColunaTemperatura, colunas));
+
+                registros.add(registro);
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Falha: Arquivo não encontrado - " + caminhoArquivo);
+        }
+        return registros;
+    }
+
     public static List<RegistroMeteorologico> lerJanelaDeRegistros(String codigoEstacao, LocalDateTime dataHoraInicioDaLeitura, LocalDateTime dataHoraFimDaLeitura) throws URISyntaxException {
         Map<LocalDateTime, RegistroMeteorologico> mapaJanela = new LinkedHashMap<>();
         LocalDateTime horaAtual = dataHoraInicioDaLeitura;
