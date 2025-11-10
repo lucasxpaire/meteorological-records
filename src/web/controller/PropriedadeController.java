@@ -86,7 +86,7 @@ public class PropriedadeController {
 
         Propriedade propriedade = propriedadeServico.prepararPropriedade(command);
         RegistroMeteorologico temperaturaCalculada = registroMeteorologicoServico.calcularTemperatura(propriedade.getCentroide());
-        propriedade.getCentroide().getHistoricoTemperaturas().add(temperaturaCalculada);
+        propriedade.getCentroide().getHistoricoRegistrosMeteorologicos().add(temperaturaCalculada);
 
         propriedadeServico.salvar(propriedade);
 

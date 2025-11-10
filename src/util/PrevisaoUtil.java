@@ -108,7 +108,6 @@ public class PrevisaoUtil {
             }
         }
 
-        // Tenta treinar e prever com SARIMA
         try {
             ForecastResult previsao = Arima.forecast_arima(dadosDeTreino, tamanhoDoBuraco, PARAMS_SARIMA_IMPUTACAO);
             double[] valoresPrevistos = previsao.getForecast();
@@ -117,7 +116,6 @@ public class PrevisaoUtil {
                 setter.accept(janela.get(indiceInicioBuraco + i), valoresPrevistos[i]);
             }
         } catch (Exception e) {
-            // Se SARIMA falhar (ex: dados insuficientes, etc.), usa fallback.
             preencherComFallback(janela, indiceInicioBuraco, tamanhoDoBuraco, setter, valorAnterior, valorPosterior);
         }
     }

@@ -1,6 +1,7 @@
 package web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import modelo.Ponto;
 import modelo.Propriedade;
 import modelo.RegistroMeteorologico;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +116,8 @@ public class MapaController {
         LocalDateTime dataHoraAgora = LocalDateTime.now();
         LocalDateTime dataHoraPrevista = dataHoraAgora.plusHours(1).withMinute(0).withSecond(0);
 
-        return registroMeteorologicoServico.preverRegistroMeteorologico(latitude, longitude, dataHoraPrevista);
+        Ponto ponto = new Ponto(latitude, longitude);
+        return registroMeteorologicoServico.preverRegistroMeteorologico(ponto,  dataHoraPrevista);
     }
 
 }

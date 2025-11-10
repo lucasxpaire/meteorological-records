@@ -195,7 +195,7 @@ public class Dados {
         return obterEntityManager().createQuery(
                         "SELECT e FROM EstacaoMeteorologica e " +
                                 "JOIN e.localizacao p " +
-                                "JOIN p.historicoTemperaturas h " +
+                                "JOIN p.historicoRegistrosMeteorologicos h " +
                                 "WHERE h.temperaturaReal IS NOT NULL " +
                                 "ORDER BY " + "(POWER(e.localizacao.latitude - :lat, 2) + POWER(e.localizacao.longitude - :lng, 2)) ASC", EstacaoMeteorologica.class)
                 .setParameter("lat", ponto.getLatitude())
@@ -208,7 +208,7 @@ public class Dados {
         return obterEntityManager().createQuery(
                         "SELECT e FROM EstacaoMeteorologica e " +
                                 "WHERE SQRT(POWER(e.localizacao.latitude - :lat, 2) + POWER(e.localizacao.longitude - :lng, 2)) <= :raio " +
-                                "AND e.localizacao.historicoTemperaturas IS NOT EMPTY " +
+                                "AND e.localizacao.historicoRegistrosMeteorologicos IS NOT EMPTY " +
                                 "ORDER BY SQRT(POWER(e.localizacao.latitude - :lat, 2) + POWER(e.localizacao.longitude - :lng, 2)) ASC",
                         EstacaoMeteorologica.class)
                 .setParameter("lat", ponto.getLatitude())
@@ -221,7 +221,7 @@ public class Dados {
         try {
             return obterEntityManager().createQuery(
                             "SELECT e FROM EstacaoMeteorologica e " +
-                                    "WHERE " + condicaoQuadrante + " AND e.localizacao.historicoTemperaturas IS NOT EMPTY " +
+                                    "WHERE " + condicaoQuadrante + " AND e.localizacao.historicoRegistrosMeteorologicos IS NOT EMPTY " +
                                     "ORDER BY (POWER(e.localizacao.latitude - :lat, 2) + POWER(e.localizacao.longitude - :lng, 2)) ASC",
                             EstacaoMeteorologica.class)
                     .setParameter("lat", ponto.getLatitude())

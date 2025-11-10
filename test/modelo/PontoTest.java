@@ -23,7 +23,7 @@ public class PontoTest {
         Ponto ponto = new Ponto(-29.72047902, -53.705404735);
         ponto.setFusoHorario(ponto.determinarFusoHorario());
 
-        ponto.getHistoricoTemperaturas().add(registroMeteorologicoServico.calcularTemperatura(ponto));
+        ponto.getHistoricoRegistrosMeteorologicos().add(registroMeteorologicoServico.calcularTemperatura(ponto));
         ObjectMapper conversorJson = new ObjectMapper();
         conversorJson.findAndRegisterModules();
         String pontoJson = conversorJson.writerWithDefaultPrettyPrinter().writeValueAsString(ponto);

@@ -112,7 +112,7 @@ public class EstacaoMeteorologica {
 
     @Transient
     public Set<LocalDateTime> obterDatasHorasExistentesNoHistoricoTemperaturas() {
-        return this.getLocalizacao().getHistoricoTemperaturas().stream()
+        return this.getLocalizacao().getHistoricoRegistrosMeteorologicos().stream()
                 .map(RegistroMeteorologico::getDataHora)
                 .collect(Collectors.toSet());
     }

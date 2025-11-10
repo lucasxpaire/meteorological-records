@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "TEMPERATURA")
+@Table(name = "REGISTRO_METEOROLOGICO")
 @JsonPropertyOrder({"latitude", "longitude", "dataHoraPrevisao", "temperaturaPrevista"})
 public class RegistroMeteorologico {
 
@@ -33,7 +33,7 @@ public class RegistroMeteorologico {
     @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID_TEMPERATURA")
+    @Column(name = "ID_REGISTRO_METEOROLOGICO")
     public Long getId() {
         return id;
     }
