@@ -29,7 +29,7 @@ public class LeitorArquivoUtil {
     public static final Set<String> COLUNA_DATA = Set.of("Data", "DATA (YYYY-MM-DD)");
     public static final Set<String> COLUNA_HORA = Set.of("Hora UTC", "HORA (UTC)");
     public static final Set<String> COLUNA_PRECIPITACAO = Set.of("PRECIPITAÇÃO TOTAL, HORÁRIO (mm)");
-    public static final Set<String> COLUNA_RADIACAO = Set.of("RADIACAO GLOBAL (Kj/m²)");
+    public static final Set<String> COLUNA_RADIACAO = Set.of("RADIACAO GLOBAL (Kj/m²)", "RADIACAO GLOBAL (KJ/m²)", "RADIACAO GLOBAL");
     public static final Set<String> COLUNA_TEMPERATURA = Set.of("TEMPERATURA DO AR - BULBO SECO, HORARIA (°C)") ;
 
     public static List<String> obterCaminhosDeArquivosCsvDaEstacao(String codigoEstacao) {
@@ -251,77 +251,78 @@ public class LeitorArquivoUtil {
     }
 
     public static List<RegistroMeteorologico> lerJanelaDeRegistros(String codigoEstacao, LocalDateTime dataHoraInicioDaLeitura, LocalDateTime dataHoraFimDaLeitura) throws URISyntaxException {
-        List<RegistroMeteorologico> registrosMeteorologicos = new ArrayList<>();
+        Map<LocalDateTime, RegistroMeteorologico> mapaJanela = new LinkedHashMap<>();
+        LocalDateTime horaAtual = dataHoraInicioDaLeitura;
+        while (!horaAtual.isAfter(dataHoraFimDaLeitura)) {
+            RegistroMeteorologico registroVazio = new RegistroMeteorologico();
+            registroVazio.setDataHora(horaAtual);
+            mapaJanela.put(horaAtual, registroVazio);
+            horaAtual = horaAtual.plusHours(1);
+        }
+
         List<String> caminhosDeArquivos = obterCaminhosDeArquivosPorIntervalo(codigoEstacao, dataHoraInicioDaLeitura, dataHoraFimDaLeitura);
 
         for (String caminhoArquivo : caminhosDeArquivos) {
+            if (caminhoArquivo.equals(STRING_VAZIA)) continue;
+
             File arquivo = new File(caminhoArquivo);
+            if (!arquivo.exists()) continue;
 
-            try (Scanner leitorArquivo = new Scanner(arquivo)) {
+            try (Scanner leitorArquivo = new Scanner(arquivo, CODIFICADOR_DE_CARACTERES)) {
                 boolean cabecalhoEncontrado = false;
-
-                int indiceColunaData = -1;
-                int indiceColunaHora = -1;
-                int indiceColunaTemperatura = -1;
-                int indiceColunaPrecipitacao = -1;
-                int indiceColunaRadiacaoSolar = -1;
+                int indiceColunaData = -1, indiceColunaHora = -1, indiceColunaTemperatura = -1, indiceColunaPrecipitacao = -1, indiceColunaRadiacaoSolar = -1;
 
                 while (leitorArquivo.hasNextLine()) {
-                    String linha = leitorArquivo.nextLine();
+                    String linha = leitorArquivo.nextLine().trim();
 
                     if (!cabecalhoEncontrado) {
                         if (CABECALHO_VALIDO_REGISTROS_METEOROLOGICOS.contains(linha)) {
                             String[] cabecalho = linha.split(";");
-
                             for (int i = 0; i < cabecalho.length; i++) {
-                                if (COLUNA_DATA.contains(cabecalho[i])) {
-                                    indiceColunaData = i;
-                                } else if (COLUNA_HORA.contains(cabecalho[i])) {
-                                    indiceColunaHora = i;
-                                } else if (COLUNA_PRECIPITACAO.contains(cabecalho[i])) {
-                                    indiceColunaPrecipitacao = i;
-                                } else if (COLUNA_RADIACAO.contains(cabecalho[i])) {
-                                    indiceColunaRadiacaoSolar = i;
-                                } else if (COLUNA_TEMPERATURA.contains(cabecalho[i])) {
-                                    indiceColunaTemperatura = i;
-                                }
+                                if (COLUNA_DATA.contains(cabecalho[i])) indiceColunaData = i;
+                                else if (COLUNA_HORA.contains(cabecalho[i])) indiceColunaHora = i;
+                                else if (COLUNA_PRECIPITACAO.contains(cabecalho[i])) indiceColunaPrecipitacao = i;
+                                else if (COLUNA_RADIACAO.contains(cabecalho[i])) indiceColunaRadiacaoSolar = i;
+                                else if (COLUNA_TEMPERATURA.contains(cabecalho[i])) indiceColunaTemperatura = i;
                             }
                             cabecalhoEncontrado = true;
-                            continue;
                         }
-                    }
-
-                    if (linha.isEmpty()) {
                         continue;
                     }
 
-                    String[] registroMeteorologico = linha.split(";");
+                    if (linha.isEmpty() || indiceColunaData == -1 || indiceColunaHora == -1) {
+                        continue;
+                    }
 
-                    LocalDateTime dataHora = formatarECombinarDataHora(registroMeteorologico[indiceColunaData], registroMeteorologico[indiceColunaHora]);
-                    if (!dataHora.isBefore(dataHoraInicioDaLeitura) && !dataHora.isAfter(dataHoraFimDaLeitura)) {
-                        RegistroMeteorologico temperatura = new RegistroMeteorologico();
+                    String[] colunas = linha.split(";");
 
-                        temperatura.setDataHora(formatarECombinarDataHora(registroMeteorologico[indiceColunaData], registroMeteorologico[indiceColunaHora]));
-                        temperatura.setPrecipitacaoReal(definirValor(indiceColunaPrecipitacao, registroMeteorologico));
-                        temperatura.setRadiacaoSolarReal(definirValor(indiceColunaRadiacaoSolar, registroMeteorologico));
-                        temperatura.setTemperaturaReal(definirValor(indiceColunaTemperatura, registroMeteorologico));
+                    LocalDateTime dataHora = formatarECombinarDataHora(colunas[indiceColunaData], colunas[indiceColunaHora]);
 
-                        registrosMeteorologicos.add(temperatura);
+                    if (mapaJanela.containsKey(dataHora)) {
+                        RegistroMeteorologico registro = mapaJanela.get(dataHora);
+                        registro.setPrecipitacaoReal(definirValor(indiceColunaPrecipitacao, colunas));
+                        registro.setRadiacaoSolarReal(definirValor(indiceColunaRadiacaoSolar, colunas));
+                        registro.setTemperaturaReal(definirValor(indiceColunaTemperatura, colunas));
                     }
                 }
             } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+                System.err.println("Falha: Arquivo não encontrado - " + caminhoArquivo);
             }
         }
 
-        return registrosMeteorologicos;
+        return new ArrayList<>(mapaJanela.values());
     }
 
     public static List<String> obterCaminhosDeArquivosPorIntervalo(String codigoEstacao, LocalDateTime inicioIntervalo, LocalDateTime finalIntervalo) throws URISyntaxException {
         File pastaRaiz = new File(Objects.requireNonNull(LeitorArquivoUtil.class.getClassLoader().getResource("dadosEstacoesMeteorologicas")).toURI());
 
-        String anoInicio = String.valueOf(inicioIntervalo.getYear());
-        String anoFinal = String.valueOf(finalIntervalo.getYear());
+        int anoInicio = inicioIntervalo.getYear();
+        int anoFinal = finalIntervalo.getYear();
+
+        Set<String> anosNecessarios = new HashSet<>();
+        for (int ano = anoInicio; ano <= anoFinal; ano++) {
+            anosNecessarios.add(String.valueOf(ano));
+        }
 
         File[] subpastas = pastaRaiz.listFiles(File::isDirectory);
         if (subpastas == null) {
@@ -330,7 +331,7 @@ public class LeitorArquivoUtil {
 
         List<String> caminhosDeArquivos = new ArrayList<>();
         for (File subspasta : subpastas) {
-            if (subspasta.getName().contains(anoInicio) || subspasta.getName().contains(anoFinal)) {
+            if (anosNecessarios.stream().anyMatch(ano -> subspasta.getName().contains(ano))) {
                 File[] arquivos = subspasta.listFiles(((dir, name) -> name.contains(codigoEstacao)));
                 if (arquivos != null) {
                     caminhosDeArquivos.add(arquivos[0].getPath());
@@ -344,7 +345,7 @@ public class LeitorArquivoUtil {
     }
 
     private static Double definirValor(int indiceColuna, String[] registro) {
-        if (indiceColuna == -1 || indiceColuna >= registro.length || registro[indiceColuna].isBlank()) {
+        if (indiceColuna == -1 || indiceColuna >= registro.length || registro[indiceColuna].isBlank() || registro[indiceColuna].isEmpty()) {
             return null;
         } else {
             return converterStringParaDouble(registro[indiceColuna]);

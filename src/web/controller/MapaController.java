@@ -1,7 +1,6 @@
 package web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import modelo.Ponto;
 import modelo.Propriedade;
 import modelo.RegistroMeteorologico;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import util.FormatadorUtil;
 import web.command.ControleMapaCommand;
 import web.validator.ControleMapaValidator;
 
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,9 +41,6 @@ public class MapaController {
 
     @Autowired
     private RegistroMeteorologicoServico registroMeteorologicoServico;
-
-    @Autowired
-    private PontoServico pontoServico;
 
     @Autowired
     private ControleMapaValidator controleMapaValidator;
@@ -113,15 +110,12 @@ public class MapaController {
 
     @ResponseBody
     @GetMapping(value = "/preverTemperatura", produces = MediaType.APPLICATION_JSON_VALUE)
-    public RegistroMeteorologico calcularPrevisaoDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
-        Ponto ponto = new Ponto(latitude, longitude);
-
-        ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
+    public RegistroMeteorologico calcularPrevisaoDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) throws URISyntaxException {
 
         LocalDateTime dataHoraAgora = LocalDateTime.now();
         LocalDateTime dataHoraPrevista = dataHoraAgora.plusHours(1).withMinute(0).withSecond(0);
 
-        return registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevista);
+        return registroMeteorologicoServico.preverRegistroMeteorologico(latitude, longitude, dataHoraPrevista);
     }
 
 }
