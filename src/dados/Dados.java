@@ -170,6 +170,20 @@ public class Dados {
         }
     }
 
+    public List<RegistroMeteorologico> buscarRegistrosHistoricos(Ponto ponto, List<LocalDateTime> datas) {
+        if (ponto == null || ponto.getId() == null || datas == null || datas.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            return obterEntityManager().createQuery("SELECT r FROM RegistroMeteorologico r WHERE r.ponto = :ponto AND r.dataHora IN :datas", RegistroMeteorologico.class)
+                    .setParameter("ponto", ponto)
+                    .setParameter("datas", datas)
+                    .getResultList();
+        } catch (PersistenceException e) {
+            throw new RuntimeException("Não foi possível buscar os registros históricos do ponto.");
+        }
+    }
+
     public List<EstacaoMeteorologica> buscarEstacoesAssociadasAPropriedades() {
         return obterEntityManager().createQuery(
                         "SELECT DISTINCT e FROM Propriedade p JOIN p.centroide.estacoesMeteorologicas e",

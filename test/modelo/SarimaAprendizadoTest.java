@@ -1,22 +1,15 @@
 package modelo;
 
-import com.workday.insights.timeseries.arima.Arima;
-import com.workday.insights.timeseries.arima.struct.ArimaParams;
-import com.workday.insights.timeseries.arima.struct.ForecastResult;
 import dados.Dados;
 import org.junit.Test;
 
 import servico.EstacaoMeteorologicaServico;
 import servico.RegistroMeteorologicoServico;
 import util.LeitorArquivoUtil;
-import util.PrevisaoUtil;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.List;
-
-import static util.LeitorArquivoUtil.COLUNA_TEMPERATURA;
 
 public class SarimaAprendizadoTest {
 
