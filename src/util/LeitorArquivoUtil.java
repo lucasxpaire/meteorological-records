@@ -76,12 +76,9 @@ public class LeitorArquivoUtil {
         List<RegistroMeteorologico> temperaturasHistoricas = new ArrayList<>();
 
         for (String caminhoArquivo : caminhosArquivos) {
-            String dataEsperadaDoArquivoAtual = selecionarDataEsperadaDoArquivoAtual(dataDeBusca, caminhoArquivo);
-
             try (Scanner leitorArquivo = new Scanner(new File(caminhoArquivo), CODIFICADOR_DE_CARACTERES)) {
-                Map<String, Integer> mapaColunasRelevantes = new HashMap<>();
-
                 boolean encontrouCabecalho = false;
+                int indiceColunaData = -1, indiceColunaHora = -1, indiceColunaTemperatura = -1, indiceColunaPrecipitacao = -1, indiceColunaRadiacaoSolar = -1;
 
                 while (leitorArquivo.hasNextLine()) {
                     String linhaAtual = leitorArquivo.nextLine().trim();
@@ -90,59 +87,46 @@ public class LeitorArquivoUtil {
                         if (CABECALHO_VALIDO_REGISTROS_METEOROLOGICOS.contains(linhaAtual)) {
                             String[] cabecalho = linhaAtual.split(PONTO_E_VIRGULA);
                             for (int i = 0; i < cabecalho.length; i++) {
-                                mapaColunasRelevantes.put(cabecalho[i].trim(), i);
+                                if (COLUNA_DATA.contains(cabecalho[i])) {
+                                    indiceColunaData = i;
+                                } else if (COLUNA_HORA.contains(cabecalho[i])) {
+                                    indiceColunaHora = i;
+                                } else if (COLUNA_TEMPERATURA.contains(cabecalho[i])) {
+                                    indiceColunaTemperatura = i;
+                                } else if (COLUNA_PRECIPITACAO.contains(cabecalho[i])) {
+                                    indiceColunaPrecipitacao = i;
+                                } else if (COLUNA_RADIACAO.contains(cabecalho[i])) {
+                                    indiceColunaRadiacaoSolar = i;
+                                }
                             }
                             encontrouCabecalho = true;
                         }
                         continue;
                     }
 
-                    if (linhaAtual.isEmpty()) {
+                    if (linhaAtual.isEmpty() || indiceColunaData == -1 || indiceColunaHora == -1 || indiceColunaTemperatura == -1 || indiceColunaPrecipitacao == -1 || indiceColunaRadiacaoSolar == -1) {
                         continue;
                     }
 
                     String[] colunas = linhaAtual.split(PONTO_E_VIRGULA);
 
-                    Integer indiceColunaData = mapaColunasRelevantes.get("Data");
-                    Integer indiceColunaHora = mapaColunasRelevantes.get("Hora UTC");
-                    Integer indiceColunaTemperatura = mapaColunasRelevantes.get("TEMPERATURA DO AR - BULBO SECO, HORARIA (°C)");
+                    String colunaData = definirValorString(indiceColunaData, colunas);
+                    String colunaHora = definirValorString(indiceColunaHora, colunas);
 
-                    if (indiceColunaData == null || indiceColunaHora == null || indiceColunaTemperatura == null) {
+                    if (colunaData == null || colunaHora == null) {
                         continue;
                     }
 
-                    String colunaData;
-                    if (indiceColunaData < colunas.length && !colunas[indiceColunaData].isBlank()) {
-                        colunaData = formatarParaDataBrasileira(colunas[indiceColunaData]);
-                    } else {
-                        colunaData = dataEsperadaDoArquivoAtual;
-                    }
+                    Double colunaTemperatura = definirValorDouble(indiceColunaTemperatura, colunas);
 
-                    String colunaHora;
-                    if (indiceColunaHora < colunas.length && !colunas[indiceColunaHora].isBlank()) {
-                        colunaHora = removerSubPalavraUTC(colunas[indiceColunaHora]);
-                    } else {
-                        colunaHora = horaDeBusca;
-                    }
-
-                    String colunaTemperatura;
-                    if (indiceColunaTemperatura < colunas.length && !colunas[indiceColunaTemperatura].isBlank()) {
-                        colunaTemperatura = colunas[indiceColunaTemperatura];
-                    } else {
-                        colunaTemperatura = null;
-                    }
-
+                    String dataEsperadaDoArquivoAtual = selecionarDataEsperadaDoArquivoAtual(dataDeBusca, caminhoArquivo);
                     if (dataEsperadaDoArquivoAtual == null) {
                         continue;
                     }
 
                     if (dataEsperadaDoArquivoAtual.contains(colunaData) && horaDeBusca.contains(colunaHora)) {
                         RegistroMeteorologico registroMeteorologico = new RegistroMeteorologico();
-                        if (colunaTemperatura == null) {
-                            registroMeteorologico.setTemperaturaReal(null);
-                        } else {
-                            registroMeteorologico.setTemperaturaReal(converterStringParaDouble(colunaTemperatura));
-                        }
+                        registroMeteorologico.setTemperaturaReal(colunaTemperatura);
 
                         LocalDateTime dataHora = LocalDateTime.parse(dataEsperadaDoArquivoAtual + ESPACO_EM_BRANCO +  horaDeBusca.substring(0, 2) + DOIS_PONTOS + horaDeBusca.substring(2, 4), FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
                         registroMeteorologico.setDataHora(dataHora);
@@ -161,6 +145,20 @@ public class LeitorArquivoUtil {
         return temperaturasHistoricas.stream()
                 .filter(t -> t.getTemperaturaReal() != null)
                 .collect(Collectors.toList());
+    }
+
+    private static String definirValorString(int indiceColuna, String[] colunas) {
+        if (indiceColuna == -1 || indiceColuna >= colunas.length || colunas[indiceColuna].isBlank() || colunas[indiceColuna].isEmpty()) {
+            return null;
+        }
+        return colunas[indiceColuna];
+    }
+
+    private static Double definirValorDouble(int indiceColuna, String[] colunas) {
+        if (indiceColuna == -1 || indiceColuna >= colunas.length || colunas[indiceColuna].isBlank() || colunas[indiceColuna].isEmpty()) {
+            return null;
+        }
+        return FormatadorUtil.converterStringParaDouble(colunas[indiceColuna]);
     }
 
     private static String selecionarDataEsperadaDoArquivoAtual(String dataDeBusca, String caminhoArquivo) {
