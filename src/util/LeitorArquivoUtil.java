@@ -60,7 +60,7 @@ public class LeitorArquivoUtil {
             }
 
             if (caminhos.isEmpty()) {
-                throw new RuntimeException("Não foi encontrado nenhum arquivo de temperaturas históricas com o código de estação: " + codigoEstacao);
+                throw new RuntimeException("Não foi encontrado nenhum arquivo de registros históricos com o código de estação: " + codigoEstacao);
             }
 
             return caminhos;
@@ -70,7 +70,7 @@ public class LeitorArquivoUtil {
         }
     }
 
-    public static List<RegistroMeteorologico> lerRegistrosMeteorologicosHistoricosCsv(String dataDeBusca, String horaDeBusca, EstacaoMeteorologica estacaoMeteorologica) {
+    public static List<RegistroMeteorologico> lerRegistrosAnuaisDosCsv(String dataDeBusca, String horaDeBusca, EstacaoMeteorologica estacaoMeteorologica) {
         List<String> caminhosArquivos = obterCaminhosDeArquivosCsvDaEstacao(estacaoMeteorologica.getCodigoEstacao());
         List<RegistroMeteorologico> registrosHistoricos = new ArrayList<>();
 
@@ -119,19 +119,19 @@ public class LeitorArquivoUtil {
                     String dataNormalizada = FormatadorUtil.formatarParaDataBrasileira(colunaData);
                     String horaNormalizada = FormatadorUtil.formatarHoraHHmm(FormatadorUtil.removerSubPalavraUTC(colunaHora));
 
-                    String dataEsperadaDoArquivoAtual = selecionarDataEsperadaDoArquivoAtual(dataDeBusca, caminhoArquivo);
-                    if (dataEsperadaDoArquivoAtual == null) {
+                    String dataDeBuscaNoArquivo = obterDataDeBuscaComAnoDoArquivo(dataDeBusca, caminhoArquivo);
+                    if (dataDeBuscaNoArquivo == null) {
                         continue;
                     }
 
-                    if (dataEsperadaDoArquivoAtual.equals(dataNormalizada) && horaDeBusca.equals(horaNormalizada)) {
+                    if (dataDeBuscaNoArquivo.equals(dataNormalizada) && horaDeBusca.equals(horaNormalizada)) {
                         RegistroMeteorologico registroMeteorologico = new RegistroMeteorologico();
                         registroMeteorologico.setTemperaturaReal(definirValorDouble(indiceColunaTemperatura, colunas));
                         registroMeteorologico.setPrecipitacaoReal(definirValorDouble(indiceColunaPrecipitacao, colunas));
                         registroMeteorologico.setRadiacaoSolarReal(definirValorDouble(indiceColunaRadiacaoSolar, colunas));
 
                         String horaFormatada = horaDeBusca.substring(0, 2) + DOIS_PONTOS + horaDeBusca.substring(2, 4);
-                        LocalDateTime dataHora = LocalDateTime.parse(dataEsperadaDoArquivoAtual + ESPACO_EM_BRANCO + horaFormatada, FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
+                        LocalDateTime dataHora = LocalDateTime.parse(dataDeBuscaNoArquivo + ESPACO_EM_BRANCO + horaFormatada, FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
                         registroMeteorologico.setDataHora(dataHora);
 
                         registrosHistoricos.add(registroMeteorologico);
@@ -162,7 +162,7 @@ public class LeitorArquivoUtil {
         return FormatadorUtil.converterStringParaDouble(colunas[indiceColuna]);
     }
 
-    private static String selecionarDataEsperadaDoArquivoAtual(String dataDeBusca, String caminhoArquivo) {
+    private static String obterDataDeBuscaComAnoDoArquivo(String dataDeBusca, String caminhoArquivo) {
         for (String ano : ANOS_VALIDOS) {
             if (caminhoArquivo.contains(ano)) {
                 return dataDeBusca.substring(INDICE_INICIO_DIA_MES, INDICE_FIM_DIA_MES) + ano;

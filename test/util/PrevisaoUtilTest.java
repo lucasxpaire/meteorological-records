@@ -82,7 +82,7 @@ public class PrevisaoUtilTest {
             caminhosArquivos.forEach(System.out::println);
             System.out.println("------------------------------------------------------");
 
-            List<RegistroMeteorologico> registros = LeitorArquivoUtil.lerRegistrosMeteorologicosHistoricosCsv(dataDeBusca, horaDeBusca, estacao);
+            List<RegistroMeteorologico> registros = LeitorArquivoUtil.lerRegistrosAnuaisDosCsv(dataDeBusca, horaDeBusca, estacao);
 
             System.out.println("Registros lidos do CSV (" + registros.size() + " encontrados):");
             if (registros.isEmpty()) {

@@ -15,7 +15,7 @@ public class LeitorArquivoUtilTest {
     private final EstacaoMeteorologicaServico estacaoMeteorologicaServico = new EstacaoMeteorologicaServico(dados);
 
     @Test
-    public void lerRegistrosMeteorologicosHistoricosCsv() {
+    public void lerRegistrosAnuaisDosCsv() {
         LocalDateTime inicio = LocalDateTime.of(2024, 2, 1, 5, 0);
         LocalDateTime fim = LocalDateTime.of(2022,2, 1, 5, 0);
 
@@ -26,7 +26,7 @@ public class LeitorArquivoUtilTest {
         System.out.println(caminhosArquivos);
 
         dados.iniciarTransacao();
-        List<RegistroMeteorologico> registros = LeitorArquivoUtil.lerRegistrosMeteorologicosHistoricosCsv(dataHoraInicio, dataHoraFim, dados.buscarUnicoPorCampo(EstacaoMeteorologica.class, "codigoEstacao", "A803"));
+        List<RegistroMeteorologico> registros = LeitorArquivoUtil.lerRegistrosAnuaisDosCsv(dataHoraInicio, dataHoraFim, dados.buscarUnicoPorCampo(EstacaoMeteorologica.class, "codigoEstacao", "A803"));
         dados.confirmarTransacao();
 
         for (RegistroMeteorologico registro : registros) {

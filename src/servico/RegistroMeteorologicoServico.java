@@ -130,7 +130,7 @@ public class RegistroMeteorologicoServico {
                     continue;
                 }
 
-                Set<LocalDateTime> datasHorasExistentes = estacao.obterDatasHorasExistentesNoHistoricoTemperaturas();
+                Set<LocalDateTime> datasHorasExistentes = estacao.obterDatasHorasExistentesNoHistorico();
 
                 for (JsonNode objeto : dadosJson) {
                     if (objeto.get(JSON_CHAVE_DATA) == null || objeto.get(JSON_CHAVE_HORA) == null || objeto.get(JSON_CHAVE_TEMPERATURA) == null || objeto.get(JSON_CHAVE_PRECIPITACAO) == null || objeto.get(JSON_CHAVE_RADIACAO_SOLAR) == null) {
@@ -157,7 +157,7 @@ public class RegistroMeteorologicoServico {
 
                 dados.salvar(estacao);
             } catch (IOException e) {
-                throw new RuntimeException("Falha: Não foi possível obter histórico de temperaturas para a estação: " + estacao.getCodigoEstacao());
+                throw new RuntimeException("Falha: Não foi possível obter histórico de registros para a estação: " + estacao.getCodigoEstacao());
             }
         }
     }
@@ -181,22 +181,18 @@ public class RegistroMeteorologicoServico {
     }
 
     public RegistroMeteorologico calcularRegistroMeteorologico(Ponto ponto) {
-        List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
-        if (estacoesRelevantes == null) {
-            return null;
-        }
-        ponto.setEstacoesMeteorologicas(estacoesRelevantes);
+        ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
 
-        Optional<LocalDateTime> dataHoraMaisRecenteDeRegistroMeteorologicoEntreAsEstacoes = estacoesRelevantes.stream()
+        Optional<LocalDateTime> dataHoraDoRegistroMaisRecenteEntreEstacoes = ponto.getEstacoesMeteorologicas().stream()
                 .map(e -> e.getLocalizacao().getHistoricoRegistrosMeteorologicos().stream()
-                        .filter(t -> t.getTemperaturaReal() != null)
+                        .filter(t -> t.getTemperaturaReal() != null && t.getRadiacaoSolarReal() != null && t.getPrecipitacaoReal() != null)
                         .map(RegistroMeteorologico::getDataHora)
                         .max(Comparator.naturalOrder())
                         .orElse(null))
                 .filter(Objects::nonNull)
                 .max(Comparator.naturalOrder());
 
-        if (dataHoraMaisRecenteDeRegistroMeteorologicoEntreAsEstacoes.isEmpty()) {
+        if (dataHoraDoRegistroMaisRecenteEntreEstacoes.isEmpty()) {
             return null;
         }
 
@@ -205,15 +201,15 @@ public class RegistroMeteorologicoServico {
         double somaRadiacaoSolar = 0.0;
         double somaPesos = 0.0;
 
-        for (EstacaoMeteorologica estacao : estacoesRelevantes) {
-            Optional<RegistroMeteorologico> temperaturaMaisRecenteDaEstacao = estacao.getLocalizacao().getHistoricoRegistrosMeteorologicos().stream()
-                    .filter(t -> t.getDataHora().equals(dataHoraMaisRecenteDeRegistroMeteorologicoEntreAsEstacoes.get()) && t.getTemperaturaReal() != null)
+        for (EstacaoMeteorologica estacao : ponto.getEstacoesMeteorologicas()) {
+            Optional<RegistroMeteorologico> registroMaisRecenteDaEstacao = estacao.getLocalizacao().getHistoricoRegistrosMeteorologicos().stream()
+                    .filter(t -> t.getDataHora().equals(dataHoraDoRegistroMaisRecenteEntreEstacoes.get()) && t.getTemperaturaReal() != null)
                     .findFirst();
 
-            if (temperaturaMaisRecenteDaEstacao.isPresent()) {
-                Double temperatura = temperaturaMaisRecenteDaEstacao.get().getTemperaturaReal();
-                Double precipitacao = temperaturaMaisRecenteDaEstacao.get().getPrecipitacaoReal();
-                Double radiacaoSolar = temperaturaMaisRecenteDaEstacao.get().getRadiacaoSolarReal();
+            if (registroMaisRecenteDaEstacao.isPresent()) {
+                Double temperatura = registroMaisRecenteDaEstacao.get().getTemperaturaReal();
+                Double precipitacao = registroMaisRecenteDaEstacao.get().getPrecipitacaoReal();
+                Double radiacaoSolar = registroMaisRecenteDaEstacao.get().getRadiacaoSolarReal();
                 double peso = ponto.calcularPesoDeProximidadePara(estacao);
 
                 if (temperatura != null) {
@@ -243,7 +239,7 @@ public class RegistroMeteorologicoServico {
         registroMeteorologicoCalculado.setTemperaturaCalculada(temperatura);
         registroMeteorologicoCalculado.setPrecipitacaoCalculada(precipitacao);
         registroMeteorologicoCalculado.setRadiacaoSolarCalculada(radiacaoSolar);
-        registroMeteorologicoCalculado.setDataHora(dataHoraMaisRecenteDeRegistroMeteorologicoEntreAsEstacoes.get());
+        registroMeteorologicoCalculado.setDataHora(dataHoraDoRegistroMaisRecenteEntreEstacoes.get());
         return registroMeteorologicoCalculado;
     }
 
@@ -293,10 +289,10 @@ public class RegistroMeteorologicoServico {
 
         for (EstacaoMeteorologica estacao : estacaoMeteorologicas) {
             List<LocalDateTime> datasHorasDecrescentes = obterDatasHorasDescrescentes(dataHoraPrevisao);
-            List<RegistroMeteorologico> temperaturasCombinadas = combinarRegistrosDoBancoDeDadosComDadosHistoricos(estacao, datasHorasDecrescentes);
+            List<RegistroMeteorologico> registrosCombinados = combinarRegistrosDoBancoDeDadosComDadosHistoricos(estacao, datasHorasDecrescentes);
 
-            if (!temperaturasCombinadas.isEmpty()) {
-                registrosMeteorologicosPorEstacao.put(estacao, temperaturasCombinadas);
+            if (!registrosCombinados.isEmpty()) {
+                registrosMeteorologicosPorEstacao.put(estacao, registrosCombinados);
             }
         }
 
@@ -372,7 +368,7 @@ public class RegistroMeteorologicoServico {
         String dataFormatada = FormatadorUtil.formatarDataParaComparacao(dataHoraDoAnoAnteriorDaPrevisao);
         String horaFormatada = FormatadorUtil.formatarHoraParaComparacao(dataHoraDoAnoAnteriorDaPrevisao);
 
-        List<RegistroMeteorologico> registrosDosDadosHistoricos = LeitorArquivoUtil.lerRegistrosMeteorologicosHistoricosCsv(dataFormatada, horaFormatada, estacaoMeteorologica);
+        List<RegistroMeteorologico> registrosDosDadosHistoricos = LeitorArquivoUtil.lerRegistrosAnuaisDosCsv(dataFormatada, horaFormatada, estacaoMeteorologica);
         List<RegistroMeteorologico> registrosAusentesDoBancoDeDados = registrosDosDadosHistoricos.stream()
                 .filter(t -> !datasHorasObtidasDoBanco.contains(t.getDataHora()))
                 .toList();
