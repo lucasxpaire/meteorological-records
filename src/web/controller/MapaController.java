@@ -117,6 +117,7 @@ public class MapaController {
         LocalDateTime dataHoraPrevista = dataHoraAgora.plusHours(1).withMinute(0).withSecond(0);
 
         Ponto ponto = new Ponto(latitude, longitude);
+        ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
         return registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevista);
     }
 

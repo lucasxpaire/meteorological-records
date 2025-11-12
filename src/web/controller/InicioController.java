@@ -38,8 +38,8 @@ public class InicioController {
             mv.addObject("propriedadeMaisRecente", null);
         }
 
-        LocalDateTime ultimaAtualizacaoTemperaturas = registroMeteorologicoServico.obterUltimaAtualizacaoDeTemperaturas();
-        LocalDateTime proximaAtualizacaoTemperaturas = registroMeteorologicoServico.obterProximaAtualizacaoDeTemperaturas();
+        LocalDateTime ultimaAtualizacaoTemperaturas = registroMeteorologicoServico.obterUltimaAtualizacaoDeRegistrosMeteorologicos();
+        LocalDateTime proximaAtualizacaoTemperaturas = registroMeteorologicoServico.obterProximaAtualizacaoDeRegistrosMeteorologicos();
 
         if (ultimaAtualizacaoTemperaturas == null) {
             mv.addObject("ultimaAtualizacaoTemperaturas", "Aguardando execução");

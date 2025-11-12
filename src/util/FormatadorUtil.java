@@ -97,9 +97,39 @@ public class FormatadorUtil {
         return dataHora.format(DateTimeFormatter.ofPattern("HHmm"));
     }
 
-    public static String formatarParaDataBrasileira(String data) {
-        String[] partes = data.split("/");
-        return partes[2] + "/" + partes[1] + "/" + partes[0];
+    public static String formatarParaDataBrasileira(String dataCsv) {
+        if (dataCsv == null || dataCsv.isBlank()) {
+            return null;
+        }
+
+        String dataLimpa = dataCsv.trim();
+        String[] partes;
+
+        if (dataLimpa.contains("/") && dataLimpa.length() == 10) {
+            partes = dataLimpa.split("/");
+            if (partes.length == 3) {
+                if (partes[0].length() == 4) {
+                    return partes[2] + "/" + partes[1] + "/" + partes[0];
+                } else {
+                    return dataLimpa;
+                }
+            }
+        }
+        else if (dataLimpa.contains("-") && dataLimpa.length() == 10) {
+            partes = dataLimpa.split("-");
+            if (partes.length == 3) {
+                return partes[2] + "/" + partes[1] + "/" + partes[0];
+            }
+        }
+
+        return padronizarSeparadorData(dataLimpa);
+    }
+
+    public static String formatarHoraHHmm(String hora) {
+        if (hora == null) {
+            return null;
+        }
+        return hora.replace(DOIS_PONTOS, STRING_VAZIA).trim();
     }
 
     public static String converterObjetoParaJson(Object o) throws JsonProcessingException {
@@ -139,4 +169,6 @@ public class FormatadorUtil {
 
         return LocalDateTime.parse(dataPadronizada + ESPACO_EM_BRANCO + horaPadronizada, FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
     }
+
+
 }

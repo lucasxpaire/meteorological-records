@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import servico.PontoServico;
 import servico.PropriedadeServico;
 import servico.RegistroMeteorologicoServico;
 import util.FormatadorUtil;
@@ -26,9 +25,6 @@ public class PropriedadeController {
 
     @Autowired
     private PropriedadeServico propriedadeServico;
-
-    @Autowired
-    private PontoServico pontoServico;
 
     @Autowired
     private RegistroMeteorologicoServico registroMeteorologicoServico;
@@ -85,7 +81,7 @@ public class PropriedadeController {
         }
 
         Propriedade propriedade = propriedadeServico.prepararPropriedade(command);
-        RegistroMeteorologico temperaturaCalculada = registroMeteorologicoServico.calcularTemperatura(propriedade.getCentroide());
+        RegistroMeteorologico temperaturaCalculada = registroMeteorologicoServico.calcularRegistroMeteorologico(propriedade.getCentroide());
         propriedade.getCentroide().getHistoricoRegistrosMeteorologicos().add(temperaturaCalculada);
 
         propriedadeServico.salvar(propriedade);

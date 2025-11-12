@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static util.FormatadorUtil.*;
 
@@ -29,7 +28,7 @@ public class LeitorArquivoUtil {
     public static final Set<String> COLUNA_DATA = Set.of("Data", "DATA (YYYY-MM-DD)");
     public static final Set<String> COLUNA_HORA = Set.of("Hora UTC", "HORA (UTC)");
     public static final Set<String> COLUNA_PRECIPITACAO = Set.of("PRECIPITAÇÃO TOTAL, HORÁRIO (mm)");
-    public static final Set<String> COLUNA_RADIACAO = Set.of("RADIACAO GLOBAL (Kj/m²)", "RADIACAO GLOBAL (KJ/m²)", "RADIACAO GLOBAL");
+    public static final Set<String> COLUNA_RADIACAO_SOLAR = Set.of("RADIACAO GLOBAL (Kj/m²)", "RADIACAO GLOBAL (KJ/m²)", "RADIACAO GLOBAL");
     public static final Set<String> COLUNA_TEMPERATURA = Set.of("TEMPERATURA DO AR - BULBO SECO, HORARIA (°C)") ;
 
     public static List<String> obterCaminhosDeArquivosCsvDaEstacao(String codigoEstacao) {
@@ -71,9 +70,9 @@ public class LeitorArquivoUtil {
         }
     }
 
-    public static List<RegistroMeteorologico> lerTemperaturasHistoricasCsv(String dataDeBusca, String horaDeBusca, EstacaoMeteorologica estacaoMeteorologica) {
+    public static List<RegistroMeteorologico> lerRegistrosMeteorologicosHistoricosCsv(String dataDeBusca, String horaDeBusca, EstacaoMeteorologica estacaoMeteorologica) {
         List<String> caminhosArquivos = obterCaminhosDeArquivosCsvDaEstacao(estacaoMeteorologica.getCodigoEstacao());
-        List<RegistroMeteorologico> temperaturasHistoricas = new ArrayList<>();
+        List<RegistroMeteorologico> registrosHistoricos = new ArrayList<>();
 
         for (String caminhoArquivo : caminhosArquivos) {
             try (Scanner leitorArquivo = new Scanner(new File(caminhoArquivo), CODIFICADOR_DE_CARACTERES)) {
@@ -95,7 +94,7 @@ public class LeitorArquivoUtil {
                                     indiceColunaTemperatura = i;
                                 } else if (COLUNA_PRECIPITACAO.contains(cabecalho[i])) {
                                     indiceColunaPrecipitacao = i;
-                                } else if (COLUNA_RADIACAO.contains(cabecalho[i])) {
+                                } else if (COLUNA_RADIACAO_SOLAR.contains(cabecalho[i])) {
                                     indiceColunaRadiacaoSolar = i;
                                 }
                             }
@@ -117,21 +116,25 @@ public class LeitorArquivoUtil {
                         continue;
                     }
 
-                    Double colunaTemperatura = definirValorDouble(indiceColunaTemperatura, colunas);
+                    String dataNormalizada = FormatadorUtil.formatarParaDataBrasileira(colunaData);
+                    String horaNormalizada = FormatadorUtil.formatarHoraHHmm(FormatadorUtil.removerSubPalavraUTC(colunaHora));
 
                     String dataEsperadaDoArquivoAtual = selecionarDataEsperadaDoArquivoAtual(dataDeBusca, caminhoArquivo);
                     if (dataEsperadaDoArquivoAtual == null) {
                         continue;
                     }
 
-                    if (dataEsperadaDoArquivoAtual.contains(colunaData) && horaDeBusca.contains(colunaHora)) {
+                    if (dataEsperadaDoArquivoAtual.equals(dataNormalizada) && horaDeBusca.equals(horaNormalizada)) {
                         RegistroMeteorologico registroMeteorologico = new RegistroMeteorologico();
-                        registroMeteorologico.setTemperaturaReal(colunaTemperatura);
+                        registroMeteorologico.setTemperaturaReal(definirValorDouble(indiceColunaTemperatura, colunas));
+                        registroMeteorologico.setPrecipitacaoReal(definirValorDouble(indiceColunaPrecipitacao, colunas));
+                        registroMeteorologico.setRadiacaoSolarReal(definirValorDouble(indiceColunaRadiacaoSolar, colunas));
 
-                        LocalDateTime dataHora = LocalDateTime.parse(dataEsperadaDoArquivoAtual + ESPACO_EM_BRANCO +  horaDeBusca.substring(0, 2) + DOIS_PONTOS + horaDeBusca.substring(2, 4), FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
+                        String horaFormatada = horaDeBusca.substring(0, 2) + DOIS_PONTOS + horaDeBusca.substring(2, 4);
+                        LocalDateTime dataHora = LocalDateTime.parse(dataEsperadaDoArquivoAtual + ESPACO_EM_BRANCO + horaFormatada, FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
                         registroMeteorologico.setDataHora(dataHora);
 
-                        temperaturasHistoricas.add(registroMeteorologico);
+                        registrosHistoricos.add(registroMeteorologico);
                         break;
                     }
                 }
@@ -140,11 +143,9 @@ public class LeitorArquivoUtil {
             }
         }
 
-        temperaturasHistoricas.sort(Comparator.comparing(RegistroMeteorologico::getDataHora));
+        registrosHistoricos.sort(Comparator.comparing(RegistroMeteorologico::getDataHora));
 
-        return temperaturasHistoricas.stream()
-                .filter(t -> t.getTemperaturaReal() != null)
-                .collect(Collectors.toList());
+        return registrosHistoricos;
     }
 
     private static String definirValorString(int indiceColuna, String[] colunas) {

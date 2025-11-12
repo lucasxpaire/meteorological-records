@@ -81,6 +81,7 @@ public class RegistroMeteorologico {
         this.temperaturaCalculada = temperaturaCalculada;
     }
 
+    @JsonIgnore
     @Column(name = "PRECIPITACAO_REAL")
     public Double getPrecipitacaoReal() {
         return precipitacaoReal;
@@ -108,6 +109,7 @@ public class RegistroMeteorologico {
         this.precipitacaoCalculada = precipitacaoCalculada;
     }
 
+    @JsonIgnore
     @Column(name = "RADIACAO_SOLAR_REAL")
     public Double getRadiacaoSolarReal() {
         return radiacaoSolarReal;

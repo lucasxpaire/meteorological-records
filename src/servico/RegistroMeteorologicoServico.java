@@ -20,6 +20,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,15 +30,15 @@ import static util.FormatadorUtil.ESPACO_EM_BRANCO;
 @DependsOn("estacaoMeteorologicaServico")
 public class RegistroMeteorologicoServico {
 
-    private static final String URL_TEMPERATURAS = "https://megatecnologia.com.br/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
-    private static final String URL_TEMPERATURAS2 = "http://192.168.1.2:8081/controle/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
+    private static final String URL_REGISTROS_METEOROLOGICOS = "https://megatecnologia.com.br/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
+    private static final String URL_REGISTROS_METEOROLOGICOS2 = "http://192.168.1.2:8081/controle/silas.json?chave=A5AC5-6AA87-69587-2B9B2-A7BE1-C99F9-21&estacao=";
 
     private static final double PESO_NULO = 0.0;
 
-    private static final int ANO_MAIS_ANTIGO_TEMPERATURAS_HISTORICAS = 2020;
+    private static final int ANO_MAIS_ANTIGO_REGISTROS_HISTORICOS = 2020;
 
-    private static final int MINIMO_DE_TEMPERATURAS_PARA_PREVISAO = 2;
-    private static final int CONDICAO_DE_TEMPERATURA_UNICA = 1;
+    private static final int MINIMO_DE_REGISTROS_PARA_PREVISAO = 2;
+    private static final int CONDICAO_DE_REGISTRO_UNICO = 1;
 
     private static final TimeUnit UNIDADE_DE_TEMPO_DO_INTERVALO = TimeUnit.HOURS;
 
@@ -60,7 +61,7 @@ public class RegistroMeteorologicoServico {
     @Autowired
     private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
-    private LocalDateTime ultimaAtualizacaoDeTemperaturas;
+    private LocalDateTime ultimaAtualizacaoDeRegistrosMeteorologicos;
 
     public RegistroMeteorologicoServico() {
     }
@@ -71,11 +72,11 @@ public class RegistroMeteorologicoServico {
     }
 
     @PostConstruct
-    private void inicializarTemperaturas() {
+    private void inicializarRegistrosMeteorologicos() {
         dados.iniciarTransacao();
         try {
             popularHistoricoDeRegistrosMeteorologicos();
-            executarAtualizacaoDeTemperaturas();
+            executarAtualizacaoDeRegistrosMeteorologicos();
             dados.confirmarTransacao();
         } catch (Exception e) {
             dados.desfazerTransacao();
@@ -90,29 +91,29 @@ public class RegistroMeteorologicoServico {
     }
 
     @Scheduled(fixedRate = INTERVALO_ATUALIZACAO)
-    private void executarAtualizacaoDeTemperaturas() {
+    private void executarAtualizacaoDeRegistrosMeteorologicos() {
         dados.iniciarTransacao();
         try {
-            ultimaAtualizacaoDeTemperaturas = LocalDateTime.now();
-            atualizarTemperaturasDeEstacoesAssociadasACentroides();
-            atualizarTemperaturasDeCentroidesAssociadosAEstacoes();
+            ultimaAtualizacaoDeRegistrosMeteorologicos = LocalDateTime.now();
+            atualizarRegistrosMeteorologicosDeEstacoesAssociadasACentroides();
+            atualizarRegistrosMeteorologicosDeCentroidesAssociadosAEstacoes();
             dados.confirmarTransacao();
         } catch (Exception e) {
             dados.desfazerTransacao();
         }
     }
 
-    public void atualizarTemperaturasDeEstacoesAssociadasACentroides() {
+    public void atualizarRegistrosMeteorologicosDeEstacoesAssociadasACentroides() {
         List<EstacaoMeteorologica> estacoesAssociadas = dados.buscarEstacoesAssociadasAPropriedades();
         if (!estacoesAssociadas.isEmpty()) {
             atualizarRegistrosMeteorologicosEstacoes(estacoesAssociadas);
         }
     }
 
-    public void atualizarTemperaturasDeCentroidesAssociadosAEstacoes() {
+    public void atualizarRegistrosMeteorologicosDeCentroidesAssociadosAEstacoes() {
         List<Ponto> pontosAssociados = dados.buscarCentroidesAssociadosAEstacoes();
         if (!pontosAssociados.isEmpty()) {
-            atualizarTemperaturasCentroides(pontosAssociados);
+            atualizarRegistrosMeteorologicosDeCentroides(pontosAssociados);
         }
     }
 
@@ -123,7 +124,7 @@ public class RegistroMeteorologicoServico {
 
         for (EstacaoMeteorologica estacao : estacoes) {
             try {
-                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_TEMPERATURAS + estacao.getCodigoEstacao());
+                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_REGISTROS_METEOROLOGICOS + estacao.getCodigoEstacao());
 
                 if (dadosJson.isNull()) {
                     continue;
@@ -146,7 +147,7 @@ public class RegistroMeteorologicoServico {
                         registroMeteorologico.setTemperaturaReal(objeto.get(JSON_CHAVE_TEMPERATURA).asDouble());
                         registroMeteorologico.setPrecipitacaoReal(objeto.get(JSON_CHAVE_PRECIPITACAO).asDouble());
                         registroMeteorologico.setRadiacaoSolarReal(objeto.get(JSON_CHAVE_RADIACAO_SOLAR).asDouble());
-                        
+
                         registroMeteorologico.setDataHora(dataHoraGMT.toLocalDateTime());
                         registroMeteorologico.setPonto(estacao.getLocalizacao());
                         estacao.getLocalizacao().getHistoricoRegistrosMeteorologicos().add(registroMeteorologico);
@@ -161,32 +162,32 @@ public class RegistroMeteorologicoServico {
         }
     }
 
-    private void atualizarTemperaturasCentroides(List<Ponto> pontos) {
+    private void atualizarRegistrosMeteorologicosDeCentroides(List<Ponto> pontos) {
         for (Ponto ponto : pontos) {
             List<EstacaoMeteorologica> estacoesAssociadas = ponto.getEstacoesMeteorologicas();
             if (!estacoesAssociadas.isEmpty()) {
-                RegistroMeteorologico temperaturaCalculada = calcularTemperatura(ponto);
-                if (temperaturaCalculada != null) {
-                    boolean ehNovaTemperatura = ponto.getHistoricoRegistrosMeteorologicos().stream()
-                            .noneMatch(t -> t.getDataHora().equals(temperaturaCalculada.getDataHora()));
+                RegistroMeteorologico registroMeteorologicoCalculado = calcularRegistroMeteorologico(ponto);
+                if (registroMeteorologicoCalculado != null) {
+                    boolean ehNovoRegistro = ponto.getHistoricoRegistrosMeteorologicos().stream()
+                            .noneMatch(t -> t.getDataHora().equals(registroMeteorologicoCalculado.getDataHora()));
 
-                    if (ehNovaTemperatura) {
-                        ponto.getHistoricoRegistrosMeteorologicos().add(temperaturaCalculada);
-                        dados.salvar(temperaturaCalculada);
+                    if (ehNovoRegistro) {
+                        ponto.getHistoricoRegistrosMeteorologicos().add(registroMeteorologicoCalculado);
+                        dados.salvar(registroMeteorologicoCalculado);
                     }
                 }
             }
         }
     }
 
-    public RegistroMeteorologico calcularTemperatura(Ponto ponto) {
+    public RegistroMeteorologico calcularRegistroMeteorologico(Ponto ponto) {
         List<EstacaoMeteorologica> estacoesRelevantes = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
         if (estacoesRelevantes == null) {
             return null;
         }
         ponto.setEstacoesMeteorologicas(estacoesRelevantes);
 
-        Optional<LocalDateTime> dataHoraMaisRecenteDeTemperaturaEntreEstacoes = estacoesRelevantes.stream()
+        Optional<LocalDateTime> dataHoraMaisRecenteDeRegistroMeteorologicoEntreAsEstacoes = estacoesRelevantes.stream()
                 .map(e -> e.getLocalizacao().getHistoricoRegistrosMeteorologicos().stream()
                         .filter(t -> t.getTemperaturaReal() != null)
                         .map(RegistroMeteorologico::getDataHora)
@@ -195,22 +196,36 @@ public class RegistroMeteorologicoServico {
                 .filter(Objects::nonNull)
                 .max(Comparator.naturalOrder());
 
-        if (dataHoraMaisRecenteDeTemperaturaEntreEstacoes.isEmpty()) {
+        if (dataHoraMaisRecenteDeRegistroMeteorologicoEntreAsEstacoes.isEmpty()) {
             return null;
         }
 
         double somaTemperaturas = 0.0;
+        double somaPrecipitacao = 0.0;
+        double somaRadiacaoSolar = 0.0;
         double somaPesos = 0.0;
 
         for (EstacaoMeteorologica estacao : estacoesRelevantes) {
             Optional<RegistroMeteorologico> temperaturaMaisRecenteDaEstacao = estacao.getLocalizacao().getHistoricoRegistrosMeteorologicos().stream()
-                    .filter(t -> t.getDataHora().equals(dataHoraMaisRecenteDeTemperaturaEntreEstacoes.get()) && t.getTemperaturaReal() != null)
+                    .filter(t -> t.getDataHora().equals(dataHoraMaisRecenteDeRegistroMeteorologicoEntreAsEstacoes.get()) && t.getTemperaturaReal() != null)
                     .findFirst();
 
             if (temperaturaMaisRecenteDaEstacao.isPresent()) {
-                double temperatura = temperaturaMaisRecenteDaEstacao.get().getTemperaturaReal();
+                Double temperatura = temperaturaMaisRecenteDaEstacao.get().getTemperaturaReal();
+                Double precipitacao = temperaturaMaisRecenteDaEstacao.get().getPrecipitacaoReal();
+                Double radiacaoSolar = temperaturaMaisRecenteDaEstacao.get().getRadiacaoSolarReal();
                 double peso = ponto.calcularPesoDeProximidadePara(estacao);
-                somaTemperaturas += temperatura * peso;
+
+                if (temperatura != null) {
+                    somaTemperaturas += temperatura * peso;
+                }
+                if (precipitacao != null) {
+                    somaPrecipitacao += precipitacao * peso;
+                }
+                if (radiacaoSolar != null) {
+                    somaRadiacaoSolar += radiacaoSolar * peso;
+                }
+
                 somaPesos += peso;
             }
         }
@@ -220,31 +235,38 @@ public class RegistroMeteorologicoServico {
         }
 
         double temperatura = somaTemperaturas / somaPesos;
+        double precipitacao = somaPrecipitacao / somaPesos;
+        double radiacaoSolar = somaRadiacaoSolar / somaPesos;
 
-        RegistroMeteorologico temperaturaCalculada = new RegistroMeteorologico();
-        temperaturaCalculada.setPonto(ponto);
-        temperaturaCalculada.setTemperaturaCalculada(temperatura);
-        temperaturaCalculada.setDataHora(dataHoraMaisRecenteDeTemperaturaEntreEstacoes.get());
-        return temperaturaCalculada;
-
+        RegistroMeteorologico registroMeteorologicoCalculado = new RegistroMeteorologico();
+        registroMeteorologicoCalculado.setPonto(ponto);
+        registroMeteorologicoCalculado.setTemperaturaCalculada(temperatura);
+        registroMeteorologicoCalculado.setPrecipitacaoCalculada(precipitacao);
+        registroMeteorologicoCalculado.setRadiacaoSolarCalculada(radiacaoSolar);
+        registroMeteorologicoCalculado.setDataHora(dataHoraMaisRecenteDeRegistroMeteorologicoEntreAsEstacoes.get());
+        return registroMeteorologicoCalculado;
     }
 
     public RegistroMeteorologico preverRegistroMeteorologico(Ponto ponto, LocalDateTime dataHoraPrevisao) {
-        Map<EstacaoMeteorologica, RegistroMeteorologico> temperaturasPrevistasDasEstacoes = preverTemperaturasParaEstacoes(ponto.getEstacoesMeteorologicas(), dataHoraPrevisao);
+        Map<EstacaoMeteorologica, RegistroMeteorologico> registrosPrevistosDasEstacoes = preverRegistroMeteorologicoParaEstacoes(ponto.getEstacoesMeteorologicas(), dataHoraPrevisao);
 
         double somaTemperaturas = 0.0;
+        double somaPrecipitacao = 0.0;
+        double somaRadiacaoSolar = 0.0;
         double somaPesos = 0.0;
 
-        for (Map.Entry<EstacaoMeteorologica, RegistroMeteorologico> entry : temperaturasPrevistasDasEstacoes.entrySet()) {
+        for (Map.Entry<EstacaoMeteorologica, RegistroMeteorologico> entry : registrosPrevistosDasEstacoes.entrySet()) {
             EstacaoMeteorologica estacaoMeteorologica = entry.getKey();
-            RegistroMeteorologico temperaturaPrevista = entry.getValue();
+            RegistroMeteorologico registroMeteorologico = entry.getValue();
 
-            if (temperaturaPrevista == null) {
+            if (registroMeteorologico == null) {
                 continue;
             }
 
             double peso = ponto.calcularPesoDeProximidadePara(estacaoMeteorologica);
-            somaTemperaturas += temperaturaPrevista.getTemperaturaPrevista() * peso;
+            somaTemperaturas += registroMeteorologico.getTemperaturaPrevista() * peso;
+            somaPrecipitacao += registroMeteorologico.getPrecipitacaoPrevista() * peso;
+            somaRadiacaoSolar += registroMeteorologico.getRadiacaoSolarPrevista() * peso;
             somaPesos += peso;
         }
 
@@ -253,74 +275,96 @@ public class RegistroMeteorologicoServico {
         }
 
         double temperatura = somaTemperaturas / somaPesos;
+        double precipitacao = somaPrecipitacao / somaPesos;
+        double radiacaoSolar = somaRadiacaoSolar / somaPesos;
 
-        RegistroMeteorologico temperaturaPrevista = new RegistroMeteorologico();
-        temperaturaPrevista.setDataHora(dataHoraPrevisao);
-        temperaturaPrevista.setTemperaturaPrevista(temperatura);
-        temperaturaPrevista.setPonto(ponto);
+        RegistroMeteorologico registroMeteorologicoPrevisto = new RegistroMeteorologico();
+        registroMeteorologicoPrevisto.setDataHora(dataHoraPrevisao);
+        registroMeteorologicoPrevisto.setTemperaturaPrevista(temperatura);
+        registroMeteorologicoPrevisto.setPrecipitacaoPrevista(precipitacao);
+        registroMeteorologicoPrevisto.setRadiacaoSolarPrevista(radiacaoSolar);
+        registroMeteorologicoPrevisto.setPonto(ponto);
 
-        return temperaturaPrevista;
+        return registroMeteorologicoPrevisto;
     }
 
-    private Map<EstacaoMeteorologica, RegistroMeteorologico> preverTemperaturasParaEstacoes(List<EstacaoMeteorologica> estacaoMeteorologicas, LocalDateTime dataHoraPrevisao) {
-        Map<EstacaoMeteorologica, List<RegistroMeteorologico>> temperaturasPorEstacao = new HashMap<>();
+    private Map<EstacaoMeteorologica, RegistroMeteorologico> preverRegistroMeteorologicoParaEstacoes(List<EstacaoMeteorologica> estacaoMeteorologicas, LocalDateTime dataHoraPrevisao) {
+        Map<EstacaoMeteorologica, List<RegistroMeteorologico>> registrosMeteorologicosPorEstacao = new HashMap<>();
 
         for (EstacaoMeteorologica estacao : estacaoMeteorologicas) {
             List<LocalDateTime> datasHorasDecrescentes = obterDatasHorasDescrescentes(dataHoraPrevisao);
-            List<RegistroMeteorologico> temperaturasCombinadas = combinarTemperaturasDoBancoDeDadosComDadosHistoricos(estacao, datasHorasDecrescentes);
+            List<RegistroMeteorologico> temperaturasCombinadas = combinarRegistrosDoBancoDeDadosComDadosHistoricos(estacao, datasHorasDecrescentes);
 
             if (!temperaturasCombinadas.isEmpty()) {
-                temperaturasPorEstacao.put(estacao, temperaturasCombinadas);
+                registrosMeteorologicosPorEstacao.put(estacao, temperaturasCombinadas);
             }
         }
 
         Map<EstacaoMeteorologica, RegistroMeteorologico> previsoesDeCadaEstacao = new HashMap<>();
 
-        for (Map.Entry<EstacaoMeteorologica, List<RegistroMeteorologico>> temperaturasDaEstacao : temperaturasPorEstacao.entrySet()) {
-            List<RegistroMeteorologico> temperaturas = temperaturasDaEstacao.getValue();
-            if (temperaturas == null || temperaturas.isEmpty()) {
+        for (Map.Entry<EstacaoMeteorologica, List<RegistroMeteorologico>> registrosDaEstacao : registrosMeteorologicosPorEstacao.entrySet()) {
+            List<RegistroMeteorologico> registros = registrosDaEstacao.getValue();
+            if (registros == null || registros.isEmpty()) {
                 continue;
             }
 
-            double[] serieTemporal = temperaturas.stream()
-                    .mapToDouble(RegistroMeteorologico::getTemperaturaReal)
-                    .toArray();
+            try {
+                double temperaturaPrevista = preverValor(registros, RegistroMeteorologico::getTemperaturaReal, "temperatura");
+                double precipitacaoPrevista = preverValor(registros, RegistroMeteorologico::getPrecipitacaoReal, "precipitação");
+                double radiacaoSolarPrevista = preverValor(registros, RegistroMeteorologico::getRadiacaoSolarReal, "radiação solar");
 
-            RegistroMeteorologico temperaturaPrevistaDaEstacao = new RegistroMeteorologico();
-            if (serieTemporal.length == CONDICAO_DE_TEMPERATURA_UNICA) {
-                temperaturaPrevistaDaEstacao.setTemperaturaPrevista(serieTemporal[0]);
-            } else if (serieTemporal.length >= MINIMO_DE_TEMPERATURAS_PARA_PREVISAO) {
-                AR modeloAutoRegressivo = AR.fit(serieTemporal, serieTemporal.length - 1);
+                RegistroMeteorologico registroPrevisto = new RegistroMeteorologico();
+                registroPrevisto.setTemperaturaPrevista(temperaturaPrevista);
+                registroPrevisto.setPrecipitacaoPrevista(precipitacaoPrevista);
+                registroPrevisto.setRadiacaoSolarPrevista(radiacaoSolarPrevista);
+                registroPrevisto.setDataHora(dataHoraPrevisao);
+                previsoesDeCadaEstacao.put(registrosDaEstacao.getKey(), registroPrevisto);
 
-                double temperaturaPrevista = modeloAutoRegressivo.forecast();
-                temperaturaPrevistaDaEstacao.setTemperaturaPrevista(temperaturaPrevista);
-            } else {
-                throw new IllegalArgumentException("Falha: É necessário pelo menos " + MINIMO_DE_TEMPERATURAS_PARA_PREVISAO + " temperaturas de anos passados para prever a temperatura para a estação: " + temperaturasDaEstacao.getKey().getCodigoEstacao());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Falha ao prever valores para a estação: " + registrosDaEstacao.getKey().getCodigoEstacao() + ". " + e.getMessage());
             }
-
-            temperaturaPrevistaDaEstacao.setDataHora(dataHoraPrevisao);
-            previsoesDeCadaEstacao.put(temperaturasDaEstacao.getKey(), temperaturaPrevistaDaEstacao);
         }
 
         return previsoesDeCadaEstacao;
     }
 
-    private List<LocalDateTime> obterDatasHorasDescrescentes(LocalDateTime dataHora) {
+    private double preverValor(List<RegistroMeteorologico> registros, Function<RegistroMeteorologico, Double> getter, String nomeVariavel) {
+        double[] serieTemporal = registros.stream()
+                .map(getter)
+                .filter(Objects::nonNull)
+                .mapToDouble(Double::doubleValue)
+                .toArray();
+
+        if (serieTemporal.length == CONDICAO_DE_REGISTRO_UNICO) {
+            return serieTemporal[0];
+        } else if (serieTemporal.length >= MINIMO_DE_REGISTROS_PARA_PREVISAO) {
+            long valoresDistintos = Arrays.stream(serieTemporal).distinct().count();
+            if (valoresDistintos <= 1) {
+                return serieTemporal[0];
+            }
+            AR modelo = AR.fit(serieTemporal, serieTemporal.length - 1);
+            return modelo.forecast();
+        } else {
+            throw new IllegalArgumentException("Falha: É necessário pelo menos " + MINIMO_DE_REGISTROS_PARA_PREVISAO + " valores de anos passados para prever " + nomeVariavel);
+        }
+    }
+
+    private List<LocalDateTime> obterDatasHorasDescrescentes(LocalDateTime dataHoraPrevisao) {
         List<LocalDateTime> datasHorasDecrescentes = new ArrayList<>();
-        int anoDaDataHora = dataHora.getYear();
-        for (int ano = anoDaDataHora - 1; ano >= ANO_MAIS_ANTIGO_TEMPERATURAS_HISTORICAS; ano--) {
-            datasHorasDecrescentes.add(dataHora.withYear(ano));
+        int anoDaDataHora = dataHoraPrevisao.getYear();
+        for (int ano = anoDaDataHora - 1; ano >= ANO_MAIS_ANTIGO_REGISTROS_HISTORICOS; ano--) {
+            datasHorasDecrescentes.add(dataHoraPrevisao.withYear(ano));
         }
         return datasHorasDecrescentes;
     }
 
-    private List<RegistroMeteorologico> combinarTemperaturasDoBancoDeDadosComDadosHistoricos(EstacaoMeteorologica estacaoMeteorologica, List<LocalDateTime> datasHorasDecrescentes) {
+    private List<RegistroMeteorologico> combinarRegistrosDoBancoDeDadosComDadosHistoricos(EstacaoMeteorologica estacaoMeteorologica, List<LocalDateTime> datasHorasDecrescentes) {
         if (datasHorasDecrescentes == null || datasHorasDecrescentes.isEmpty()) {
             return new ArrayList<>();
         }
 
-        List<RegistroMeteorologico> temperaturasExistentesNoBancoDeDados = dados.buscarTemperaturasHistoricas(estacaoMeteorologica.getLocalizacao(), datasHorasDecrescentes);
-        Set<LocalDateTime> datasHorasObtidasDoBanco = temperaturasExistentesNoBancoDeDados.stream()
+        List<RegistroMeteorologico> registrosExistentesNoBancoDeDados = dados.buscarTemperaturasHistoricas(estacaoMeteorologica.getLocalizacao(), datasHorasDecrescentes);
+        Set<LocalDateTime> datasHorasObtidasDoBanco = registrosExistentesNoBancoDeDados.stream()
                 .map(RegistroMeteorologico::getDataHora)
                 .collect(Collectors.toSet());
 
@@ -328,23 +372,23 @@ public class RegistroMeteorologicoServico {
         String dataFormatada = FormatadorUtil.formatarDataParaComparacao(dataHoraDoAnoAnteriorDaPrevisao);
         String horaFormatada = FormatadorUtil.formatarHoraParaComparacao(dataHoraDoAnoAnteriorDaPrevisao);
 
-        List<RegistroMeteorologico> temperaturasDosDadosHistoricos = LeitorArquivoUtil.lerTemperaturasHistoricasCsv(dataFormatada, horaFormatada, estacaoMeteorologica);
-        List<RegistroMeteorologico> temperaturasDoCsvAusentesNoBancoDeDados = temperaturasDosDadosHistoricos.stream()
+        List<RegistroMeteorologico> registrosDosDadosHistoricos = LeitorArquivoUtil.lerRegistrosMeteorologicosHistoricosCsv(dataFormatada, horaFormatada, estacaoMeteorologica);
+        List<RegistroMeteorologico> registrosAusentesDoBancoDeDados = registrosDosDadosHistoricos.stream()
                 .filter(t -> !datasHorasObtidasDoBanco.contains(t.getDataHora()))
                 .toList();
 
-        return Stream.concat(temperaturasExistentesNoBancoDeDados.stream(), temperaturasDoCsvAusentesNoBancoDeDados.stream())
+        return Stream.concat(registrosExistentesNoBancoDeDados.stream(), registrosAusentesDoBancoDeDados.stream())
                 .sorted(Comparator.comparing(RegistroMeteorologico::getDataHora).reversed())
                 .collect(Collectors.toList());
     }
 
-    public LocalDateTime obterUltimaAtualizacaoDeTemperaturas() {
-        return ultimaAtualizacaoDeTemperaturas;
+    public LocalDateTime obterUltimaAtualizacaoDeRegistrosMeteorologicos() {
+        return ultimaAtualizacaoDeRegistrosMeteorologicos;
     }
 
-    public LocalDateTime obterProximaAtualizacaoDeTemperaturas() {
-        if (ultimaAtualizacaoDeTemperaturas != null) {
-            return ultimaAtualizacaoDeTemperaturas.plus(QUANTIDADE_HORAS, UNIDADE_DE_TEMPO_DO_INTERVALO.toChronoUnit());
+    public LocalDateTime obterProximaAtualizacaoDeRegistrosMeteorologicos() {
+        if (ultimaAtualizacaoDeRegistrosMeteorologicos != null) {
+            return ultimaAtualizacaoDeRegistrosMeteorologicos.plus(QUANTIDADE_HORAS, UNIDADE_DE_TEMPO_DO_INTERVALO.toChronoUnit());
         }
         return null;
     }
