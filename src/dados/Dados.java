@@ -156,7 +156,7 @@ public class Dados {
         }
     }
 
-    public List<RegistroMeteorologico> buscarTemperaturasHistoricas(Ponto ponto, List<LocalDateTime> datas) {
+    public List<RegistroMeteorologico> buscarRegistrosDaEstacaoMeteorologica(Ponto ponto, List<LocalDateTime> datas) {
         if (ponto == null || ponto.getId() == null || datas == null || datas.isEmpty()) {
             return new ArrayList<>();
         }
@@ -170,18 +170,12 @@ public class Dados {
         }
     }
 
-    public List<RegistroMeteorologico> buscarRegistrosHistoricos(Ponto ponto, List<LocalDateTime> datas) {
-        if (ponto == null || ponto.getId() == null || datas == null || datas.isEmpty()) {
-            return new ArrayList<>();
-        }
-        try {
-            return obterEntityManager().createQuery("SELECT r FROM RegistroMeteorologico r WHERE r.ponto = :ponto AND r.dataHora IN :datas", RegistroMeteorologico.class)
-                    .setParameter("ponto", ponto)
-                    .setParameter("datas", datas)
-                    .getResultList();
-        } catch (PersistenceException e) {
-            throw new RuntimeException("Não foi possível buscar os registros históricos do ponto.");
-        }
+    public List<RegistroMeteorologico> buscarRegistrosPrevistosSemValoresReais() {
+        return obterEntityManager().createQuery("SELECT r FROM RegistroMeteorologico r " +
+                "WHERE r.temperaturaPrevista IS NOT NULL AND r.temperaturaReal IS NULL " +
+                "AND r.precipitacaoPrevista IS NOT NULL AND r.precipitacaoReal IS NULL " +
+                "AND r.radiacaoSolarPrevista IS NOT NULL AND r.precipitacaoReal IS NULL ", RegistroMeteorologico.class)
+                .getResultList();
     }
 
     public List<EstacaoMeteorologica> buscarEstacoesAssociadasAPropriedades() {
@@ -195,13 +189,6 @@ public class Dados {
         return obterEntityManager().createQuery(
                         "SELECT DISTINCT p.centroide FROM Propriedade p JOIN p.centroide.estacoesMeteorologicas e WHERE e IS NOT NULL",
                         Ponto.class)
-                .getResultList();
-    }
-
-    public List<RegistroMeteorologico> buscarPrevisoesComTemperaturaCalculadaVazia() {
-        return obterEntityManager().createQuery(
-                        "SELECT t FROM RegistroMeteorologico t WHERE t.temperaturaReal IS NULL AND t.dataHora < :agora", RegistroMeteorologico.class)
-                .setParameter("agora", LocalDateTime.now())
                 .getResultList();
     }
 

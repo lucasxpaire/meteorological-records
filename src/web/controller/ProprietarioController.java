@@ -82,12 +82,13 @@ public class ProprietarioController {
 
         if (command.getId() != null) {
             model.addAttribute("sucesso", "Proprietário atualizado com sucesso!");
-            model.addAttribute("proprietario", proprietario);
         } else {
             model.addAttribute("sucesso", "Proprietário cadastrado com sucesso!");
         }
 
+        model.addAttribute("proprietario", proprietario);
         return "cadastroProprietario";
+
     }
 
     @GetMapping("/deletarProprietario.html")

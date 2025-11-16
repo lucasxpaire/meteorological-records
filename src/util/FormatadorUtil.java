@@ -34,6 +34,10 @@ public class FormatadorUtil {
     public static final String PONTO_E_VIRGULA = ";";
     public static final String DOIS_PONTOS = ":";
     public static final String ESPACO_EM_BRANCO = " ";
+    public static final String HIFEN = "-";
+    public static final String BARRA = "/";
+    public static final String UTC = "UTC";
+    public static final int TAMANHO_DATA = 10;
 
     public static String formatarTemperatura(Double temperatura) {
         return String.format("%.2f°C", temperatura).replace(PONTO, VIRGULA);
@@ -105,20 +109,19 @@ public class FormatadorUtil {
         String dataLimpa = dataCsv.trim();
         String[] partes;
 
-        if (dataLimpa.contains("/") && dataLimpa.length() == 10) {
-            partes = dataLimpa.split("/");
+        if (dataLimpa.contains(BARRA) && dataLimpa.length() == TAMANHO_DATA) {
+            partes = dataLimpa.split(BARRA);
             if (partes.length == 3) {
                 if (partes[0].length() == 4) {
-                    return partes[2] + "/" + partes[1] + "/" + partes[0];
+                    return partes[2] + BARRA + partes[1] + BARRA + partes[0];
                 } else {
                     return dataLimpa;
                 }
             }
-        }
-        else if (dataLimpa.contains("-") && dataLimpa.length() == 10) {
-            partes = dataLimpa.split("-");
+        } else if (dataLimpa.contains(HIFEN) && dataLimpa.length() == 10) {
+            partes = dataLimpa.split(HIFEN);
             if (partes.length == 3) {
-                return partes[2] + "/" + partes[1] + "/" + partes[0];
+                return partes[2] + BARRA + partes[1] + BARRA + partes[0];
             }
         }
 
@@ -139,36 +142,15 @@ public class FormatadorUtil {
     }
 
     public static String padronizarSeparadorData(String data) {
-        if (data.contains("-")) {
-            return data.replace('-', '/').trim();
+        if (data.contains(HIFEN)) {
+            return data.replace(HIFEN, BARRA).trim();
         } else {
             return data.trim();
         }
     }
 
-    public static String padronizarSeparadorHora(String hora) {
-        String horaPadronizada = hora.trim();
-        if (horaPadronizada.contains("UTC")) {
-            horaPadronizada = horaPadronizada.replace(" UTC", "");
-        }
-
-        if (!horaPadronizada.contains(":")) {
-            horaPadronizada = horaPadronizada.substring(0, 2) + DOIS_PONTOS + horaPadronizada.substring(2, 4);
-        }
-
-        return horaPadronizada;
-    }
-
     public static String removerSubPalavraUTC(String hora) {
-        return hora.replace(" UTC", "").trim();
+        return hora.replace(UTC, STRING_VAZIA).trim();
     }
-
-    public static LocalDateTime formatarECombinarDataHora(String data, String hora) {
-        String dataPadronizada = padronizarSeparadorData(formatarParaDataBrasileira(data));
-        String horaPadronizada = padronizarSeparadorHora(hora);
-
-        return LocalDateTime.parse(dataPadronizada + ESPACO_EM_BRANCO + horaPadronizada, FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
-    }
-
 
 }

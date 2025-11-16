@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static util.FormatadorUtil.ESPACO_EM_BRANCO;
+import static util.FormatadorUtil.UTC;
 
 @Service
 @DependsOn("estacaoMeteorologicaServico")
@@ -71,6 +72,18 @@ public class RegistroMeteorologicoServico {
         this.estacaoMeteorologicaServico = estacaoMeteorologicaServico;
     }
 
+    public void salvar(RegistroMeteorologico registroMeteorologico) {
+        if (registroMeteorologico == null) {
+            throw new IllegalArgumentException("Falha: o registro meteorológico não pode ser nulo.");
+        } else if (registroMeteorologico.getPonto() == null) {
+            throw new IllegalArgumentException("Falha: o ponto associado ao registro meteorológico não pode ser nulo.");
+        } else if (registroMeteorologico.getDataHora() == null) {
+            throw new IllegalArgumentException("Falha: a data e hora do registro meteorológico não podem ser nulas.");
+        }
+
+        dados.salvar(registroMeteorologico);
+    }
+
     @PostConstruct
     private void inicializarRegistrosMeteorologicos() {
         dados.iniciarTransacao();
@@ -80,13 +93,12 @@ public class RegistroMeteorologicoServico {
             dados.confirmarTransacao();
         } catch (Exception e) {
             dados.desfazerTransacao();
-            throw e;
         }
     }
 
     private void popularHistoricoDeRegistrosMeteorologicos() {
         if (dados.existeAlgumVazio(EstacaoMeteorologica.class, "localizacao.historicoRegistrosMeteorologicos")) {
-            atualizarRegistrosMeteorologicosEstacoes(dados.buscarOndeCampoForVazio(EstacaoMeteorologica.class, "localizacao.historicoRegistrosMeteorologicos"));
+            atualizarRegistrosDeEstacoes(dados.buscarOndeCampoForVazio(EstacaoMeteorologica.class, "localizacao.historicoRegistrosMeteorologicos"));
         }
     }
 
@@ -95,36 +107,105 @@ public class RegistroMeteorologicoServico {
         dados.iniciarTransacao();
         try {
             ultimaAtualizacaoDeRegistrosMeteorologicos = LocalDateTime.now();
-            atualizarRegistrosMeteorologicosDeEstacoesAssociadasACentroides();
-            atualizarRegistrosMeteorologicosDeCentroidesAssociadosAEstacoes();
+            atualizarRegistrosDeEstacoesAssociadasACentroides();
+            atualizarRegistrosDeCentroidesAssociadosAEstacoes();
+            atualizarValoresPrevistosComReaisESuasDiferencas();
             dados.confirmarTransacao();
         } catch (Exception e) {
             dados.desfazerTransacao();
         }
     }
 
-    public void atualizarRegistrosMeteorologicosDeEstacoesAssociadasACentroides() {
+    public void atualizarRegistrosDeEstacoesAssociadasACentroides() {
         List<EstacaoMeteorologica> estacoesAssociadas = dados.buscarEstacoesAssociadasAPropriedades();
         if (!estacoesAssociadas.isEmpty()) {
-            atualizarRegistrosMeteorologicosEstacoes(estacoesAssociadas);
+            atualizarRegistrosDeEstacoes(estacoesAssociadas);
         }
     }
 
-    public void atualizarRegistrosMeteorologicosDeCentroidesAssociadosAEstacoes() {
+    public void atualizarRegistrosDeCentroidesAssociadosAEstacoes() {
         List<Ponto> pontosAssociados = dados.buscarCentroidesAssociadosAEstacoes();
         if (!pontosAssociados.isEmpty()) {
             atualizarRegistrosMeteorologicosDeCentroides(pontosAssociados);
         }
     }
 
-    private void atualizarRegistrosMeteorologicosEstacoes(List<EstacaoMeteorologica> estacoes) {
+    private void atualizarValoresPrevistosComReaisESuasDiferencas() {
+        List<RegistroMeteorologico> registrosPrevistos = dados.buscarRegistrosPrevistosSemValoresReais();
+        for (RegistroMeteorologico registroPrevisto : registrosPrevistos) {
+            if (registroPrevisto.getDataHora().isAfter(LocalDateTime.now())) {
+                continue;
+            }
+            preencherValoresDeRegistrosPrevistosComReais(registroPrevisto);
+            calcularDiferencaDeValoresPrevistosParaReais(registroPrevisto);
+            dados.salvar(registroPrevisto);
+        }
+    }
+
+    private void preencherValoresDeRegistrosPrevistosComReais(RegistroMeteorologico registroPrevisto) {
+        double temperaturaCalculada;
+        double radiacaoSolarCalculada;
+        double precipitacaoCalculada;
+
+        double somaTemperaturas = 0.0;
+        double somaRadiacaoSolar = 0.0;
+        double somaPrecipitacao = 0.0;
+        double somaPesos = 0.0;
+
+        for (EstacaoMeteorologica estacaoMeteorologica : registroPrevisto.getPonto().getEstacoesMeteorologicas()) {
+            RegistroMeteorologico registroRealNoHorarioDoRegistroPrevisto = estacaoMeteorologica.getLocalizacao().getHistoricoRegistrosMeteorologicos().stream()
+                    .filter(registroReal -> registroReal.getDataHora().equals(registroPrevisto.getDataHora()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (registroRealNoHorarioDoRegistroPrevisto == null) {
+                continue;
+            }
+
+            if (registroRealNoHorarioDoRegistroPrevisto.getTemperaturaReal() != null) {
+                somaTemperaturas += registroRealNoHorarioDoRegistroPrevisto.getTemperaturaReal();
+            }
+            if (registroRealNoHorarioDoRegistroPrevisto.getPrecipitacaoReal() != null) {
+                somaPrecipitacao += registroRealNoHorarioDoRegistroPrevisto.getPrecipitacaoReal();
+            }
+            if (registroRealNoHorarioDoRegistroPrevisto.getRadiacaoSolarReal() != null) {
+                somaRadiacaoSolar += registroRealNoHorarioDoRegistroPrevisto.getRadiacaoSolarReal();
+            }
+
+            somaPesos += registroPrevisto.getPonto().calcularPesoDeProximidadePara(estacaoMeteorologica);
+        }
+
+        if (somaPesos != PESO_NULO) {
+            temperaturaCalculada = somaTemperaturas / somaPesos;
+            precipitacaoCalculada = somaPrecipitacao / somaPesos;
+            radiacaoSolarCalculada = somaRadiacaoSolar / somaPesos;
+
+            registroPrevisto.setTemperaturaCalculada(temperaturaCalculada);
+            registroPrevisto.setPrecipitacaoCalculada(precipitacaoCalculada);
+            registroPrevisto.setRadiacaoSolarCalculada(radiacaoSolarCalculada);
+        }
+    }
+
+    private void calcularDiferencaDeValoresPrevistosParaReais(RegistroMeteorologico registroPrevisto) {
+        if (registroPrevisto.getTemperaturaCalculada() != null && registroPrevisto.getTemperaturaPrevista() != null) {
+            registroPrevisto.setDiferencaTemperatura(registroPrevisto.getTemperaturaCalculada() - registroPrevisto.getTemperaturaPrevista());
+        }
+        if (registroPrevisto.getPrecipitacaoCalculada() != null && registroPrevisto.getPrecipitacaoPrevista() != null) {
+            registroPrevisto.setDiferencaPrecipitacao(registroPrevisto.getPrecipitacaoCalculada() - registroPrevisto.getPrecipitacaoPrevista());
+        }
+        if (registroPrevisto.getRadiacaoSolarCalculada() != null && registroPrevisto.getRadiacaoSolarPrevista() != null) {
+            registroPrevisto.setDiferencaRadiacaoSolar(registroPrevisto.getRadiacaoSolarCalculada() - registroPrevisto.getRadiacaoSolarPrevista());
+        }
+    }
+
+    private void atualizarRegistrosDeEstacoes(List<EstacaoMeteorologica> estacoes) {
         if (estacoes.isEmpty()) {
             return;
         }
 
         for (EstacaoMeteorologica estacao : estacoes) {
             try {
-                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_REGISTROS_METEOROLOGICOS + estacao.getCodigoEstacao());
+                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_REGISTROS_METEOROLOGICOS2 + estacao.getCodigoEstacao());
 
                 if (dadosJson.isNull()) {
                     continue;
@@ -140,7 +221,7 @@ public class RegistroMeteorologicoServico {
                     String data = objeto.get(JSON_CHAVE_DATA).asText();
                     String hora = String.format("%02d", objeto.get(JSON_CHAVE_HORA).asInt());
                     LocalDateTime dataHoraUTC = LocalDateTime.parse(data + ESPACO_EM_BRANCO + hora, FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_JSON);
-                    ZonedDateTime dataHoraGMT = dataHoraUTC.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of(estacao.getLocalizacao().getFusoHorario()));
+                    ZonedDateTime dataHoraGMT = dataHoraUTC.atZone(ZoneId.of(UTC)).withZoneSameInstant(ZoneId.of(estacao.getLocalizacao().getFusoHorario()));
 
                     if (!datasHorasExistentes.contains(dataHoraGMT.toLocalDateTime())) {
                         RegistroMeteorologico registroMeteorologico = new RegistroMeteorologico();
@@ -151,6 +232,7 @@ public class RegistroMeteorologicoServico {
                         registroMeteorologico.setDataHora(dataHoraGMT.toLocalDateTime());
                         registroMeteorologico.setPonto(estacao.getLocalizacao());
                         estacao.getLocalizacao().getHistoricoRegistrosMeteorologicos().add(registroMeteorologico);
+
                         datasHorasExistentes.add(dataHoraGMT.toLocalDateTime());
                     }
                 }
@@ -164,16 +246,15 @@ public class RegistroMeteorologicoServico {
 
     private void atualizarRegistrosMeteorologicosDeCentroides(List<Ponto> pontos) {
         for (Ponto ponto : pontos) {
-            List<EstacaoMeteorologica> estacoesAssociadas = ponto.getEstacoesMeteorologicas();
-            if (!estacoesAssociadas.isEmpty()) {
-                RegistroMeteorologico registroMeteorologicoCalculado = calcularRegistroMeteorologico(ponto);
-                if (registroMeteorologicoCalculado != null) {
+            if (!ponto.getEstacoesMeteorologicas().isEmpty()) {
+                RegistroMeteorologico registroCalculado = calcularRegistroMeteorologico(ponto);
+                if (registroCalculado != null) {
                     boolean ehNovoRegistro = ponto.getHistoricoRegistrosMeteorologicos().stream()
-                            .noneMatch(t -> t.getDataHora().equals(registroMeteorologicoCalculado.getDataHora()));
+                            .noneMatch(t -> t.getDataHora().equals(registroCalculado.getDataHora()));
 
                     if (ehNovoRegistro) {
-                        ponto.getHistoricoRegistrosMeteorologicos().add(registroMeteorologicoCalculado);
-                        dados.salvar(registroMeteorologicoCalculado);
+                        ponto.getHistoricoRegistrosMeteorologicos().add(registroCalculado);
+                        dados.salvar(registroCalculado);
                     }
                 }
             }
@@ -181,8 +262,6 @@ public class RegistroMeteorologicoServico {
     }
 
     public RegistroMeteorologico calcularRegistroMeteorologico(Ponto ponto) {
-        ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
-
         Optional<LocalDateTime> dataHoraDoRegistroMaisRecenteEntreEstacoes = ponto.getEstacoesMeteorologicas().stream()
                 .map(e -> e.getLocalizacao().getHistoricoRegistrosMeteorologicos().stream()
                         .filter(t -> t.getTemperaturaReal() != null && t.getRadiacaoSolarReal() != null && t.getPrecipitacaoReal() != null)
@@ -206,24 +285,36 @@ public class RegistroMeteorologicoServico {
                     .filter(t -> t.getDataHora().equals(dataHoraDoRegistroMaisRecenteEntreEstacoes.get()) && t.getTemperaturaReal() != null)
                     .findFirst();
 
-            if (registroMaisRecenteDaEstacao.isPresent()) {
-                Double temperatura = registroMaisRecenteDaEstacao.get().getTemperaturaReal();
-                Double precipitacao = registroMaisRecenteDaEstacao.get().getPrecipitacaoReal();
-                Double radiacaoSolar = registroMaisRecenteDaEstacao.get().getRadiacaoSolarReal();
-                double peso = ponto.calcularPesoDeProximidadePara(estacao);
-
-                if (temperatura != null) {
-                    somaTemperaturas += temperatura * peso;
-                }
-                if (precipitacao != null) {
-                    somaPrecipitacao += precipitacao * peso;
-                }
-                if (radiacaoSolar != null) {
-                    somaRadiacaoSolar += radiacaoSolar * peso;
-                }
-
-                somaPesos += peso;
+            Double temperatura = 0.0;
+            Double precipitacao = 0.0;
+            Double radiacaoSolar = 0.0;
+            Double peso = 0.0;
+            if (registroMaisRecenteDaEstacao.isEmpty()) {
+                Map<EstacaoMeteorologica, RegistroMeteorologico> registrosPrevistosDasEstacoes = preverRegistroMeteorologicoParaEstacoes(List.of(estacao), dataHoraDoRegistroMaisRecenteEntreEstacoes.get());
+                temperatura = registrosPrevistosDasEstacoes.get(estacao).getTemperaturaPrevista();
+                precipitacao = registrosPrevistosDasEstacoes.get(estacao).getPrecipitacaoPrevista();
+                radiacaoSolar = registrosPrevistosDasEstacoes.get(estacao).getRadiacaoSolarPrevista();
+                peso = ponto.calcularPesoDeProximidadePara(estacao);
             }
+
+            if (registroMaisRecenteDaEstacao.isPresent()) {
+                temperatura = registroMaisRecenteDaEstacao.get().getTemperaturaReal();
+                precipitacao = registroMaisRecenteDaEstacao.get().getPrecipitacaoReal();
+                radiacaoSolar = registroMaisRecenteDaEstacao.get().getRadiacaoSolarReal();
+                peso = ponto.calcularPesoDeProximidadePara(estacao);
+            }
+
+            if (temperatura != null) {
+                somaTemperaturas += temperatura * peso;
+            }
+            if (precipitacao != null) {
+                somaPrecipitacao += precipitacao * peso;
+            }
+            if (radiacaoSolar != null) {
+                somaRadiacaoSolar += radiacaoSolar * peso;
+            }
+
+            somaPesos += peso;
         }
 
         if (somaPesos == PESO_NULO) {
@@ -359,7 +450,7 @@ public class RegistroMeteorologicoServico {
             return new ArrayList<>();
         }
 
-        List<RegistroMeteorologico> registrosExistentesNoBancoDeDados = dados.buscarTemperaturasHistoricas(estacaoMeteorologica.getLocalizacao(), datasHorasDecrescentes);
+        List<RegistroMeteorologico> registrosExistentesNoBancoDeDados = dados.buscarRegistrosDaEstacaoMeteorologica(estacaoMeteorologica.getLocalizacao(), datasHorasDecrescentes);
         Set<LocalDateTime> datasHorasObtidasDoBanco = registrosExistentesNoBancoDeDados.stream()
                 .map(RegistroMeteorologico::getDataHora)
                 .collect(Collectors.toSet());

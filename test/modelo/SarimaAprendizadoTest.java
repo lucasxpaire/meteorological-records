@@ -80,24 +80,23 @@ public class SarimaAprendizadoTest {
 
     @Test
     public void listarRegistrosMeteorologicos() throws URISyntaxException {
-        dados.iniciarTransacao();
-        List<EstacaoMeteorologica> estacoesAssociadas = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
-        dados.confirmarTransacao();
-
-        for (EstacaoMeteorologica estacaoMeteorologica : estacoesAssociadas) {
-            if (estacaoMeteorologica.getCodigoEstacao().equals("A803")) {
-                System.out.println("--- Testando SARIMA na Estação: " + estacaoMeteorologica.getCodigoEstacao() + " ---");
-                String caminhoArquivo = LeitorArquivoUtil.obterCaminhoDoArquivoDaEstacao("2024", estacaoMeteorologica.getCodigoEstacao());
-
-                if (!caminhoArquivo.isEmpty()) {
+//        dados.iniciarTransacao();
+//        List<EstacaoMeteorologica> estacoesAssociadas = estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto);
+//        dados.confirmarTransacao();
+//
+//        for (EstacaoMeteorologica estacaoMeteorologica : estacoesAssociadas) {
+//            if (estacaoMeteorologica.getCodigoEstacao().equals("A803")) {
+//                System.out.println("--- Testando SARIMA na Estação: " + estacaoMeteorologica.getCodigoEstacao() + " ---");
+//                String caminhoArquivo = LeitorArquivoUtil.obterCaminhoDoArquivoDaEstacao("2024", estacaoMeteorologica.getCodigoEstacao());
+//
+//                if (!caminhoArquivo.isEmpty()) {
 //                    List<RegistroMeteorologico> registrosMeteorologicos = LeitorArquivoUtil.lerRegistrosMeteorologicos(caminhoArquivo);
 //                    System.out.println("Total de dados: " + registrosMeteorologicos.size());
 //
 //                    for (RegistroMeteorologico registroMeteorologico : registrosMeteorologicos) {
 //                        System.out.format("DataHora: %s | Precipitação: %f | Radiação Solar: %f | Temperatura: %f \n", registroMeteorologico.getDataHora(), registroMeteorologico.getPrecipitacaoReal(), registroMeteorologico.getRadiacaoSolarReal(), registroMeteorologico.getTemperaturaReal());
 //                    }
-                }
-            }
-        }
+//                }
+//            }
     }
 }

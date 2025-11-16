@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import servico.EstacaoMeteorologicaServico;
 import servico.PropriedadeServico;
 import servico.RegistroMeteorologicoServico;
 import util.FormatadorUtil;
@@ -25,6 +26,9 @@ public class PropriedadeController {
 
     @Autowired
     private PropriedadeServico propriedadeServico;
+
+    @Autowired
+    private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
     @Autowired
     private RegistroMeteorologicoServico registroMeteorologicoServico;
@@ -81,6 +85,8 @@ public class PropriedadeController {
         }
 
         Propriedade propriedade = propriedadeServico.prepararPropriedade(command);
+        propriedade.getCentroide().setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(propriedade.getCentroide()));
+
         RegistroMeteorologico temperaturaCalculada = registroMeteorologicoServico.calcularRegistroMeteorologico(propriedade.getCentroide());
         propriedade.getCentroide().getHistoricoRegistrosMeteorologicos().add(temperaturaCalculada);
 
@@ -88,11 +94,11 @@ public class PropriedadeController {
 
         if (command.getId() != null) {
             model.addAttribute("sucesso", "Propriedade atualizada com sucesso!");
-            model.addAttribute("propriedade", propriedade);
         } else {
             model.addAttribute("sucesso", "Propriedade cadastrada com sucesso!");
         }
 
+        model.addAttribute("propriedade", propriedade);
         return "cadastroPropriedade";
     }
 

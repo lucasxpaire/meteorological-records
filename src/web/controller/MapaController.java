@@ -1,5 +1,6 @@
 package web.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import modelo.Ponto;
 import modelo.Propriedade;
@@ -16,8 +17,8 @@ import servico.*;
 import util.FormatadorUtil;
 import web.command.ControleMapaCommand;
 import web.validator.ControleMapaValidator;
+import web.view.JsonVisualizador;
 
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,16 +110,28 @@ public class MapaController {
         return mv;
     }
 
+    @JsonView(JsonVisualizador.Previsao.class)
     @ResponseBody
-    @GetMapping(value = "/preverTemperatura", produces = MediaType.APPLICATION_JSON_VALUE)
-    public RegistroMeteorologico calcularPrevisaoDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) throws URISyntaxException {
-
-        LocalDateTime dataHoraAgora = LocalDateTime.now();
-        LocalDateTime dataHoraPrevista = dataHoraAgora.plusHours(1).withMinute(0).withSecond(0);
+    @GetMapping(value = "/preverRegistroMeteorologico", produces = MediaType.APPLICATION_JSON_VALUE)
+    public RegistroMeteorologico preverRegistroDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
+        LocalDateTime dataHoraPrevista = LocalDateTime.now().plusHours(1).withMinute(0).withSecond(0);
 
         Ponto ponto = new Ponto(latitude, longitude);
         ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
-        return registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevista);
+        RegistroMeteorologico registroMeteorologico = registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevista);
+        registroMeteorologicoServico.salvar(registroMeteorologico);
+        return registroMeteorologico;
+    }
+
+    @JsonView(JsonVisualizador.Calculada.class)
+    @ResponseBody
+    @GetMapping(value = "/calcularRegistroMeteorologico", produces = MediaType.APPLICATION_JSON_VALUE)
+    public RegistroMeteorologico calcularRegistroDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
+        Ponto ponto = new Ponto(latitude, longitude);
+        ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
+        RegistroMeteorologico registroMeteorologico = registroMeteorologicoServico.calcularRegistroMeteorologico(ponto);
+        registroMeteorologicoServico.salvar(registroMeteorologico);
+        return registroMeteorologico;
     }
 
 }

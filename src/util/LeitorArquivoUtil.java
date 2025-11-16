@@ -5,7 +5,6 @@ import modelo.RegistroMeteorologico;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -169,39 +168,6 @@ public class LeitorArquivoUtil {
             }
         }
         return null;
-    }
-
-    public static String obterCaminhoDoArquivoDaEstacao(String nomeSubPasta, String codigoEstacao) throws URISyntaxException {
-        URL resourceUrl = LeitorArquivoUtil.class.getClassLoader().getResource("dadosEstacoesMeteorologicas");
-
-        if (resourceUrl == null) {
-            throw new IllegalArgumentException("Pasta de dados históricos não encontrada no classpath: dadosEstacoesMeteorologicas/");
-        }
-
-        File pastaRaiz = new File(resourceUrl.toURI());
-
-        if (!pastaRaiz.exists()) {
-            throw new IllegalArgumentException("Pasta de dados Estacoes Meteorologicas não encontrada: " + pastaRaiz.getAbsolutePath());
-        }
-
-        File[] subpastas = pastaRaiz.listFiles(File::isDirectory);
-
-        if (subpastas == null) {
-            return STRING_VAZIA;
-        }
-
-        for (File subspasta : subpastas) {
-            if (subspasta.getName().equals(nomeSubPasta)) {
-                File[] arquivos = subspasta.listFiles((dir, name) -> name.contains(codigoEstacao));
-                if (arquivos != null && arquivos.length > NENHUM_ARQUIVO) {
-                    return arquivos[0].getPath();
-                } else {
-                    return STRING_VAZIA;
-                }
-            }
-        }
-
-        return STRING_VAZIA;
     }
 
 }
