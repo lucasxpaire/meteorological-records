@@ -3,9 +3,8 @@ package modelo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonView;
 import util.FormatadorUtil;
-import web.view.JsonVisualizador;
+import web.view.JsonView;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -68,7 +67,7 @@ public class RegistroMeteorologico {
         this.temperaturaReal = temperaturaReal;
     }
 
-    @JsonView(JsonVisualizador.Previsao.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Previsao.class)
     @Column(name = "TEMPERATURA_PREVISTA")
     public Double getTemperaturaPrevista() {
         return temperaturaPrevista;
@@ -78,7 +77,7 @@ public class RegistroMeteorologico {
         this.temperaturaPrevista = temperaturaPrevista;
     }
 
-    @JsonView(JsonVisualizador.Calculada.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Calculada.class)
     @Column(name = "TEMPERATURA_CALCULADA")
     public Double getTemperaturaCalculada() {
         return temperaturaCalculada;
@@ -98,7 +97,7 @@ public class RegistroMeteorologico {
         this.precipitacaoReal = precipitacaoReal;
     }
 
-    @JsonView(JsonVisualizador.Previsao.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Previsao.class)
     @Column(name = "PRECIPITACAO_PREVISTA")
     public Double getPrecipitacaoPrevista() {
         return precipitacaoPrevista;
@@ -108,7 +107,7 @@ public class RegistroMeteorologico {
         this.precipitacaoPrevista = precipitacaoPrevista;
     }
 
-    @JsonView(JsonVisualizador.Calculada.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Calculada.class)
     @Column(name = "PRECIPITACAO_CALCULADA")
     public Double getPrecipitacaoCalculada() {
         return precipitacaoCalculada;
@@ -128,7 +127,7 @@ public class RegistroMeteorologico {
         this.radiacaoSolarReal = radiacaoSolar;
     }
 
-    @JsonView(JsonVisualizador.Previsao.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Previsao.class)
     @Column(name = "RADIACAO_SOLAR_PREVISTA")
     public Double getRadiacaoSolarPrevista() {
         return radiacaoSolarPrevista;
@@ -138,7 +137,7 @@ public class RegistroMeteorologico {
         this.radiacaoSolarPrevista = radiacaoPrevista;
     }
 
-    @JsonView(JsonVisualizador.Calculada.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Calculada.class)
     @Column(name = "RADIACAO_SOLAR_CALCULADA")
     public Double getRadiacaoSolarCalculada() {
         return radiacaoSolarCalculada;
@@ -186,28 +185,28 @@ public class RegistroMeteorologico {
         this.ponto = ponto;
     }
 
-    @JsonView(JsonVisualizador.Publico.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Publico.class)
     @Transient
     @JsonProperty("latitude")
     private Double obterLatitude() {
         return ponto.getLatitude();
     }
 
-    @JsonView(JsonVisualizador.Publico.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Publico.class)
     @Transient
     @JsonProperty("longitude")
     private Double obterLongitude() {
         return ponto.getLongitude();
     }
 
-    @JsonView(JsonVisualizador.Previsao.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Previsao.class)
     @Transient
     @JsonProperty("dataHoraPrevisao")
     private String obterDataHoraPrevisao() {
         return dataHora.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO);
     }
 
-    @JsonView(JsonVisualizador.Calculada.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Calculada.class)
     @Transient
     @JsonProperty("dataHoraCalculada")
     private String obterDataHoraRegistroCalculado() {

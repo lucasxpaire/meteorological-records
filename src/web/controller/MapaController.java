@@ -1,12 +1,8 @@
 package web.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import modelo.Ponto;
 import modelo.Propriedade;
-import modelo.RegistroMeteorologico;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -17,9 +13,7 @@ import servico.*;
 import util.FormatadorUtil;
 import web.command.ControleMapaCommand;
 import web.validator.ControleMapaValidator;
-import web.view.JsonVisualizador;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

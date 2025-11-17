@@ -1,6 +1,6 @@
 package web.view;
 
-public class JsonVisualizador {
+public class JsonView {
 
     public interface Publico {}
     public interface Previsao extends Publico {}

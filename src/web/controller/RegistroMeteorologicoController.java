@@ -1,6 +1,5 @@
 package web.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import modelo.Ponto;
 import modelo.RegistroMeteorologico;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import servico.EstacaoMeteorologicaServico;
 import servico.PontoServico;
 import servico.RegistroMeteorologicoServico;
-import web.view.JsonVisualizador;
+import web.view.JsonView;
 
 import java.time.LocalDateTime;
 
@@ -28,7 +27,7 @@ public class RegistroMeteorologicoController {
     @Autowired
     private RegistroMeteorologicoServico registroMeteorologicoServico;
 
-    @JsonView(JsonVisualizador.Previsao.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Previsao.class)
     @ResponseBody
     @GetMapping(value = "/preverRegistroMeteorologico", produces = MediaType.APPLICATION_JSON_VALUE)
     public RegistroMeteorologico preverRegistroDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
@@ -39,7 +38,7 @@ public class RegistroMeteorologicoController {
         return registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevista);
     }
 
-    @JsonView(JsonVisualizador.Previsao.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Previsao.class)
     @ResponseBody
     @GetMapping(value = "/preverRegistroMeteorologicoParaCentroide", produces = MediaType.APPLICATION_JSON_VALUE)
     public RegistroMeteorologico preverRegistroParaCentroide(@RequestParam("idCentroide") Long idCentroide) {
@@ -51,7 +50,7 @@ public class RegistroMeteorologicoController {
         return registroMeteorologico;
     }
 
-    @JsonView(JsonVisualizador.Calculada.class)
+    @com.fasterxml.jackson.annotation.JsonView(JsonView.Calculada.class)
     @ResponseBody
     @GetMapping(value = "/calcularRegistroMeteorologico", produces = MediaType.APPLICATION_JSON_VALUE)
     public RegistroMeteorologico calcularRegistroDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
