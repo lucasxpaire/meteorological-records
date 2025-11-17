@@ -374,9 +374,15 @@ public class RegistroMeteorologicoServico {
             }
 
             double peso = ponto.calcularPesoDeProximidadePara(estacaoMeteorologica);
-            somaTemperaturas += registroMeteorologico.getTemperaturaPrevista() * peso;
-            somaPrecipitacao += registroMeteorologico.getPrecipitacaoPrevista() * peso;
-            somaRadiacaoSolar += registroMeteorologico.getRadiacaoSolarPrevista() * peso;
+            if (registroMeteorologico.getTemperaturaPrevista() != null) {
+                somaTemperaturas += registroMeteorologico.getTemperaturaPrevista() * peso;
+            }
+            if (registroMeteorologico.getPrecipitacaoPrevista() != null) {
+                somaPrecipitacao += registroMeteorologico.getPrecipitacaoPrevista() * peso;
+            }
+            if (registroMeteorologico.getRadiacaoSolarPrevista() != null) {
+                somaRadiacaoSolar += registroMeteorologico.getRadiacaoSolarPrevista() * peso;
+            }
             somaPesos += peso;
         }
 
@@ -419,9 +425,9 @@ public class RegistroMeteorologicoServico {
             }
 
             try {
-                double temperaturaPrevista = preverValor(registros, RegistroMeteorologico::getTemperaturaReal, "temperatura");
-                double precipitacaoPrevista = preverValor(registros, RegistroMeteorologico::getPrecipitacaoReal, "precipitação");
-                double radiacaoSolarPrevista = preverValor(registros, RegistroMeteorologico::getRadiacaoSolarReal, "radiação solar");
+                Double temperaturaPrevista = preverValor(registros, RegistroMeteorologico::getTemperaturaReal);
+                Double precipitacaoPrevista = preverValor(registros, RegistroMeteorologico::getPrecipitacaoReal);
+                Double radiacaoSolarPrevista = preverValor(registros, RegistroMeteorologico::getRadiacaoSolarReal);
 
                 RegistroMeteorologico registroPrevisto = new RegistroMeteorologico();
                 registroPrevisto.setTemperaturaPrevista(temperaturaPrevista);
@@ -439,7 +445,7 @@ public class RegistroMeteorologicoServico {
         return previsoesDeCadaEstacao;
     }
 
-    private double preverValor(List<RegistroMeteorologico> registros, Function<RegistroMeteorologico, Double> getter, String nomeVariavel) {
+    private Double preverValor(List<RegistroMeteorologico> registros, Function<RegistroMeteorologico, Double> getter) {
         double[] serieTemporal = registros.stream()
                 .map(getter)
                 .filter(Objects::nonNull)
@@ -456,7 +462,7 @@ public class RegistroMeteorologicoServico {
             AR modelo = AR.fit(serieTemporal, serieTemporal.length - 1);
             return modelo.forecast();
         } else {
-            throw new IllegalArgumentException("Falha: É necessário pelo menos " + MINIMO_DE_REGISTROS_PARA_PREVISAO + " valores de anos passados para prever " + nomeVariavel);
+            return null;
         }
     }
 

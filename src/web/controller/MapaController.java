@@ -36,9 +36,6 @@ public class MapaController {
     private EstacaoMeteorologicaServico estacaoMeteorologicaServico;
 
     @Autowired
-    private RegistroMeteorologicoServico registroMeteorologicoServico;
-
-    @Autowired
     private ControleMapaValidator controleMapaValidator;
 
     @InitBinder("ControleMapaCommand")

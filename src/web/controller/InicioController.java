@@ -38,19 +38,19 @@ public class InicioController {
             mv.addObject("propriedadeMaisRecente", null);
         }
 
-        LocalDateTime ultimaAtualizacaoTemperaturas = registroMeteorologicoServico.obterUltimaAtualizacaoDeRegistrosMeteorologicos();
-        LocalDateTime proximaAtualizacaoTemperaturas = registroMeteorologicoServico.obterProximaAtualizacaoDeRegistrosMeteorologicos();
+        LocalDateTime ultimaAtualizacaoRegistros = registroMeteorologicoServico.obterUltimaAtualizacaoDeRegistrosMeteorologicos();
+        LocalDateTime proximaAtualizacaoRegistros = registroMeteorologicoServico.obterProximaAtualizacaoDeRegistrosMeteorologicos();
 
-        if (ultimaAtualizacaoTemperaturas == null) {
-            mv.addObject("ultimaAtualizacaoTemperaturas", "Aguardando execução");
+        if (ultimaAtualizacaoRegistros == null) {
+            mv.addObject("ultimaAtualizacaoRegistros", "Aguardando execução");
         } else {
-            mv.addObject("ultimaAtualizacaoTemperaturas", ultimaAtualizacaoTemperaturas.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO));
+            mv.addObject("ultimaAtualizacaoRegistros", ultimaAtualizacaoRegistros.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO));
         }
 
-        if (proximaAtualizacaoTemperaturas == null) {
-            mv.addObject("proximaAtualizacaoTemperaturas", "Aguardando execução");
+        if (proximaAtualizacaoRegistros == null) {
+            mv.addObject("proximaAtualizacaoRegistros", "Aguardando execução");
         } else {
-            mv.addObject("proximaAtualizacaoTemperaturas", proximaAtualizacaoTemperaturas.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO));
+            mv.addObject("proximaAtualizacaoRegistros", proximaAtualizacaoRegistros.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO));
         }
 
         return mv;

@@ -10,7 +10,7 @@
         <tags:menuLateral paginaAtiva="inicio"/>
         <main class="estrutura-pagina-conteudo">
             <h1>Início</h1>
-            <p>Visualize as estatísticas, atualizações de temperaturas e ações rápidas.</p>
+            <p>Visualize as estatísticas, atualizações de registros meteorológicos e ações rápidas.</p>
 
             <div class="painel-container">
                 <h2>Estatísticas</h2>
@@ -29,18 +29,18 @@
                     </div>
                 </div>
 
-                <h2>Atualização de temperaturas</h2>
+                <h2>Atualização de registros meteorológicos</h2>
                 <div class="painel-estatisticas">
                     <div class="cartao-estatistica cartao-rotina">
-                        <h2>Última atualização de temperaturas</h2>
-                        <span>${ultimaAtualizacaoTemperaturas}</span>
+                        <h2>Última atualização de registros meteorológicos</h2>
+                        <span>${ultimaAtualizacaoRegistros}</span>
                     </div>
                 </div>
 
                 <div class="painel-estatisticas">
                     <div class="cartao-estatistica cartao-rotina">
-                        <h2>Próxima atualização de temperaturas</h2>
-                        <span>${proximaAtualizacaoTemperaturas}</span>
+                        <h2>Próxima atualização de registros meteorológicos</h2>
+                        <span>${proximaAtualizacaoRegistros}</span>
                     </div>
                 </div>
 
