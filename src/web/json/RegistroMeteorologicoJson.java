@@ -1,6 +1,6 @@
-package web.view;
+package web.json;
 
-public class JsonView {
+public class RegistroMeteorologicoJson {
 
     public interface Publico {}
     public interface Previsao extends Publico {}

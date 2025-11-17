@@ -1,5 +1,6 @@
 package web.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import modelo.Ponto;
 import modelo.RegistroMeteorologico;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import servico.EstacaoMeteorologicaServico;
 import servico.PontoServico;
 import servico.RegistroMeteorologicoServico;
-import web.view.JsonView;
+import web.json.RegistroMeteorologicoJson;
 
 import java.time.LocalDateTime;
 
@@ -27,18 +28,19 @@ public class RegistroMeteorologicoController {
     @Autowired
     private RegistroMeteorologicoServico registroMeteorologicoServico;
 
-    @com.fasterxml.jackson.annotation.JsonView(JsonView.Previsao.class)
+    @JsonView(RegistroMeteorologicoJson.Previsao.class)
     @ResponseBody
     @GetMapping(value = "/preverRegistroMeteorologico", produces = MediaType.APPLICATION_JSON_VALUE)
     public RegistroMeteorologico preverRegistroDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
         LocalDateTime dataHoraPrevista = LocalDateTime.now().plusHours(1).withMinute(0).withSecond(0);
 
         Ponto ponto = new Ponto(latitude, longitude);
+        // pontoServico.salvar(ponto);
         ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
         return registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevista);
     }
 
-    @com.fasterxml.jackson.annotation.JsonView(JsonView.Previsao.class)
+    @JsonView(RegistroMeteorologicoJson.Previsao.class)
     @ResponseBody
     @GetMapping(value = "/preverRegistroMeteorologicoParaCentroide", produces = MediaType.APPLICATION_JSON_VALUE)
     public RegistroMeteorologico preverRegistroParaCentroide(@RequestParam("idCentroide") Long idCentroide) {
@@ -50,11 +52,12 @@ public class RegistroMeteorologicoController {
         return registroMeteorologico;
     }
 
-    @com.fasterxml.jackson.annotation.JsonView(JsonView.Calculada.class)
+    @JsonView(RegistroMeteorologicoJson.Calculada.class)
     @ResponseBody
     @GetMapping(value = "/calcularRegistroMeteorologico", produces = MediaType.APPLICATION_JSON_VALUE)
     public RegistroMeteorologico calcularRegistroDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
         Ponto ponto = new Ponto(latitude, longitude);
+        // pontoServico.salvar(ponto);
         ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
         return registroMeteorologicoServico.calcularRegistroMeteorologico(ponto);
     }
