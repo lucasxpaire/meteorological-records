@@ -49,7 +49,7 @@
                             <c:url var="urlAlterarPropriedade" value="alterarPropriedade.html">
                                 <c:param name="idPropriedade" value="${propriedade.id}"/>
                             </c:url>
-                            <tags:botao label="Alterar" css="botao-tabela botao-tabela--alterar" href="${urlAlterarPropriedade}"/>
+                            <tags:botao label="Editar" css="botao-tabela botao-tabela--alterar" href="${urlAlterarPropriedade}"/>
 
                             <c:url var="urlDeletarPropriedade" value="deletarPropriedade.html">
                                 <c:param name="idPropriedade" value="${propriedade.id}"/>

@@ -148,7 +148,6 @@ public class RegistroMeteorologico {
         this.radiacaoSolarCalculada = radiacaoCalculada;
     }
 
-    @JsonView(JsonVisualizador.Publico.class)
     @Column(name = "DIFERENCA_TEMPERATURA")
     public Double getDiferencaTemperatura() {
         return diferencaTemperatura;
@@ -158,7 +157,6 @@ public class RegistroMeteorologico {
         this.diferencaTemperatura = diferencaTemperatura;
     }
 
-    @JsonView(JsonVisualizador.Publico.class)
     @Column(name = "DIFERENCA_PRECIPITACAO")
     public Double getDiferencaPrecipitacao() {
         return diferencaPrecipitacao;
@@ -168,7 +166,6 @@ public class RegistroMeteorologico {
         this.diferencaPrecipitacao = diferencaPrecipitacao;
     }
 
-    @JsonView(JsonVisualizador.Publico.class)
     @Column(name = "DIFERENCA_RADIACAO_SOLAR")
     public Double getDiferencaRadiacaoSolar() {
         return diferencaRadiacaoSolar;

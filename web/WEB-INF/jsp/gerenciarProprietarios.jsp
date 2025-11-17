@@ -46,7 +46,7 @@
                                 <c:url var="urlAlterar" value="/alterarProprietario.html">
                                     <c:param name="idProprietario" value="${proprietario.id}"/>
                                 </c:url>
-                                <tags:botao label="Alterar" css="botao-tabela botao-tabela--alterar" href="${urlAlterar}"/>
+                                <tags:botao label="Editar" css="botao-tabela botao-tabela--alterar" href="${urlAlterar}"/>
 
                                 <c:url var="urlDeletar" value="deletarProprietario.html">
                                     <c:param name="idProprietario" value="${proprietario.id}"/>
