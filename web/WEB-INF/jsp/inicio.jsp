@@ -48,7 +48,7 @@
                 <div class="painel-acoes">
                     <a href="${urlCadastroProprietario}" class="cartao-acao">
                         <h3>Cadastro proprietário</h3>
-                        <p>Adicione um novo proprietário no sitema.</p>
+                        <p>Adicione um novo proprietário no sistema.</p>
                     </a>
                     <a href="${urlCadastroPropriedade}" class="cartao-acao">
                         <h3>Cadastro propriedade</h3>

@@ -10,6 +10,8 @@ import web.json.RegistroMeteorologicoJson;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static util.FormatadorUtil.INDISPONIVEL;
+
 @Entity
 @Table(name = "REGISTRO_METEOROLOGICO")
 @JsonPropertyOrder({"latitude", "longitude", "dataHoraPrevisao", "temperaturaPrevista"})

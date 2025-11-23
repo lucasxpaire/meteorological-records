@@ -29,10 +29,10 @@
 
             <table class="tabela">
                 <thead>
-                <th>Nome</th>
-                <th>Cor</th>
-                <th>Proprietário</th>
-                <th>Ações</th>
+                    <th>Nome</th>
+                    <th>Cor</th>
+                    <th>Proprietário</th>
+                    <th>Ações</th>
                 </thead>
                 <tbody>
                 <c:forEach var="propriedade" items="${propriedades}">

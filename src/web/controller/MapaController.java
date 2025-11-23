@@ -45,7 +45,7 @@ public class MapaController {
 
     @GetMapping("/visualizarMapa.html")
     public ModelAndView visualizarMapa(@ModelAttribute("ControleMapaCommand") @Validated ControleMapaCommand command, BindingResult erros) {
-        ModelAndView mv = new ModelAndView("visualizarMapa");
+        ModelAndView mv = new ModelAndView("mapa");
 
         List<Propriedade> propriedadesEncontradas = new ArrayList<>();
 
@@ -83,7 +83,7 @@ public class MapaController {
 
     @GetMapping("/visualizarPropriedade.html")
     public ModelAndView visualizarPropriedade(@ModelAttribute("ControleMapaCommand") @Validated ControleMapaCommand command, @RequestParam("idPropriedade") Long idPropriedade) {
-        ModelAndView mv = new ModelAndView("visualizarMapa");
+        ModelAndView mv = new ModelAndView("mapa");
 
         if (idPropriedade != null) {
             try {

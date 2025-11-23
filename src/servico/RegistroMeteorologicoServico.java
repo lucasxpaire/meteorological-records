@@ -205,7 +205,7 @@ public class RegistroMeteorologicoServico {
 
         for (EstacaoMeteorologica estacao : estacoes) {
             try {
-                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_REGISTROS_METEOROLOGICOS + estacao.getCodigoEstacao());
+                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_REGISTROS_METEOROLOGICOS2 + estacao.getCodigoEstacao());
 
                 if (dadosJson.isNull()) {
                     continue;

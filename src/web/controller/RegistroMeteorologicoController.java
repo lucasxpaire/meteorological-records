@@ -35,7 +35,6 @@ public class RegistroMeteorologicoController {
         LocalDateTime dataHoraPrevista = LocalDateTime.now().plusHours(1).withMinute(0).withSecond(0);
 
         Ponto ponto = new Ponto(latitude, longitude);
-        // pontoServico.salvar(ponto);
         ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
         return registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevista);
     }
@@ -57,7 +56,6 @@ public class RegistroMeteorologicoController {
     @GetMapping(value = "/calcularRegistroMeteorologico", produces = MediaType.APPLICATION_JSON_VALUE)
     public RegistroMeteorologico calcularRegistroDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
         Ponto ponto = new Ponto(latitude, longitude);
-        // pontoServico.salvar(ponto);
         ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
         return registroMeteorologicoServico.calcularRegistroMeteorologico(ponto);
     }
