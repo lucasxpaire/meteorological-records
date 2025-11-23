@@ -10,8 +10,6 @@ import web.json.RegistroMeteorologicoJson;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import static util.FormatadorUtil.INDISPONIVEL;
-
 @Entity
 @Table(name = "REGISTRO_METEOROLOGICO")
 @JsonPropertyOrder({"latitude", "longitude", "dataHoraPrevisao", "temperaturaPrevista"})
@@ -31,10 +29,6 @@ public class RegistroMeteorologico {
     private Double radiacaoSolarReal;
     private Double radiacaoSolarPrevista;
     private Double radiacaoSolarCalculada;
-
-    private Double diferencaTemperatura;
-    private Double diferencaPrecipitacao;
-    private Double diferencaRadiacaoSolar;
 
     private Ponto ponto;
 
@@ -150,33 +144,6 @@ public class RegistroMeteorologico {
         this.radiacaoSolarCalculada = radiacaoCalculada;
     }
 
-    @Column(name = "DIFERENCA_TEMPERATURA")
-    public Double getDiferencaTemperatura() {
-        return diferencaTemperatura;
-    }
-
-    public void setDiferencaTemperatura(Double diferencaTemperatura) {
-        this.diferencaTemperatura = diferencaTemperatura;
-    }
-
-    @Column(name = "DIFERENCA_PRECIPITACAO")
-    public Double getDiferencaPrecipitacao() {
-        return diferencaPrecipitacao;
-    }
-
-    public void setDiferencaPrecipitacao(Double diferencaPrecipitacao) {
-        this.diferencaPrecipitacao = diferencaPrecipitacao;
-    }
-
-    @Column(name = "DIFERENCA_RADIACAO_SOLAR")
-    public Double getDiferencaRadiacaoSolar() {
-        return diferencaRadiacaoSolar;
-    }
-
-    public void setDiferencaRadiacaoSolar(Double diferencaRadiacaoSolar) {
-        this.diferencaRadiacaoSolar = diferencaRadiacaoSolar;
-    }
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ID_PONTO")
@@ -206,14 +173,14 @@ public class RegistroMeteorologico {
     @Transient
     @JsonProperty("dataHoraPrevisao")
     private String obterDataHoraPrevisao() {
-        return dataHora.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO);
+        return dataHora.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
     }
 
     @JsonView(RegistroMeteorologicoJson.Calculada.class)
     @Transient
     @JsonProperty("dataHoraCalculada")
     private String obterDataHoraRegistroCalculado() {
-        return dataHora.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO);
+        return dataHora.format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV);
     }
 
 }

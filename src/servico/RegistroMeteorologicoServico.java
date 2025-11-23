@@ -109,7 +109,7 @@ public class RegistroMeteorologicoServico {
             ultimaAtualizacaoDeRegistrosMeteorologicos = LocalDateTime.now();
             atualizarRegistrosDeEstacoesAssociadasACentroides();
             atualizarRegistrosDeCentroidesAssociadosAEstacoes();
-            atualizarValoresPrevistosComReaisESuasDiferencas();
+            atualizarValoresPrevistosComReais();
             dados.confirmarTransacao();
         } catch (Exception e) {
             dados.desfazerTransacao();
@@ -130,14 +130,13 @@ public class RegistroMeteorologicoServico {
         }
     }
 
-    private void atualizarValoresPrevistosComReaisESuasDiferencas() {
+    private void atualizarValoresPrevistosComReais() {
         List<RegistroMeteorologico> registrosPrevistos = dados.buscarRegistrosPrevistosSemValoresReais();
         for (RegistroMeteorologico registroPrevisto : registrosPrevistos) {
             if (registroPrevisto.getDataHora().isAfter(LocalDateTime.now())) {
                 continue;
             }
             preencherValoresDeRegistrosPrevistosComReais(registroPrevisto);
-            calcularDiferencaDeValoresPrevistosParaReais(registroPrevisto);
             dados.salvar(registroPrevisto);
         }
     }
@@ -186,18 +185,6 @@ public class RegistroMeteorologicoServico {
         }
     }
 
-    private void calcularDiferencaDeValoresPrevistosParaReais(RegistroMeteorologico registroPrevisto) {
-        if (registroPrevisto.getTemperaturaCalculada() != null && registroPrevisto.getTemperaturaPrevista() != null) {
-            registroPrevisto.setDiferencaTemperatura(registroPrevisto.getTemperaturaCalculada() - registroPrevisto.getTemperaturaPrevista());
-        }
-        if (registroPrevisto.getPrecipitacaoCalculada() != null && registroPrevisto.getPrecipitacaoPrevista() != null) {
-            registroPrevisto.setDiferencaPrecipitacao(registroPrevisto.getPrecipitacaoCalculada() - registroPrevisto.getPrecipitacaoPrevista());
-        }
-        if (registroPrevisto.getRadiacaoSolarCalculada() != null && registroPrevisto.getRadiacaoSolarPrevista() != null) {
-            registroPrevisto.setDiferencaRadiacaoSolar(registroPrevisto.getRadiacaoSolarCalculada() - registroPrevisto.getRadiacaoSolarPrevista());
-        }
-    }
-
     private void atualizarRegistrosDeEstacoes(List<EstacaoMeteorologica> estacoes) {
         if (estacoes.isEmpty()) {
             return;
@@ -205,7 +192,7 @@ public class RegistroMeteorologicoServico {
 
         for (EstacaoMeteorologica estacao : estacoes) {
             try {
-                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_REGISTROS_METEOROLOGICOS2 + estacao.getCodigoEstacao());
+                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_REGISTROS_METEOROLOGICOS + estacao.getCodigoEstacao());
 
                 if (dadosJson.isNull()) {
                     continue;
@@ -238,9 +225,6 @@ public class RegistroMeteorologicoServico {
                         registroPrevisto.setTemperaturaReal(objeto.get(JSON_CHAVE_TEMPERATURA).asDouble());
                         registroPrevisto.setPrecipitacaoReal(objeto.get(JSON_CHAVE_PRECIPITACAO).asDouble());
                         registroPrevisto.setRadiacaoSolarReal(objeto.get(JSON_CHAVE_RADIACAO_SOLAR).asDouble());
-                        registroPrevisto.setDiferencaTemperatura(registroPrevisto.getTemperaturaReal() - registroPrevisto.getTemperaturaPrevista());
-                        registroPrevisto.setDiferencaPrecipitacao(registroPrevisto.getPrecipitacaoReal() - registroPrevisto.getPrecipitacaoPrevista());
-                        registroPrevisto.setDiferencaRadiacaoSolar(registroPrevisto.getRadiacaoSolarReal() - registroPrevisto.getRadiacaoSolarPrevista());
                     }
 
                     if (!datasHorasExistentes.contains(dataHoraGMT.toLocalDateTime())) {

@@ -13,7 +13,6 @@ public class FormatadorUtil {
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_EXIBICAO = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
     
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    public static final DateTimeFormatter FORMATADOR_DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static final DateTimeFormatter FORMATADOR_DATA_HORA_PARA_COMPARACAO_JSON = DateTimeFormatter.ofPattern("dd/MM/yyyy HH");
 
@@ -38,18 +37,6 @@ public class FormatadorUtil {
     public static final String BARRA = "/";
     public static final String UTC = "UTC";
     public static final int TAMANHO_DATA = 10;
-
-    public static String formatarTemperatura(Double temperatura) {
-        return String.format("%.2f °C", temperatura).replace(PONTO, VIRGULA);
-    }
-
-    public static String formatarPrecipitacao(Double precipitacao) {
-        return String.format("%.2f mm", precipitacao).replace(PONTO, VIRGULA);
-    }
-
-    public static String formatarRadiacaoSolar(Double radiacaoSolar) {
-        return String.format("%.2f kJ/m²", radiacaoSolar).replace(PONTO, VIRGULA);
-    }
 
     public static Double converterStringParaDouble(String valor) {
        try {

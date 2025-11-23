@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.time.ZoneId;
 import java.util.*;
 
-import static util.FormatadorUtil.INDISPONIVEL;
 import static util.FormatadorUtil.STRING_VAZIA;
 
 @Entity
@@ -181,116 +180,92 @@ public class Ponto {
     }
 
     @Transient
-    @JsonProperty("temperaturaReal")
-    private String obterTemperaturaReal() {
-        return obterRegistroRealMaisRecente()
-                .map(t -> FormatadorUtil.formatarTemperatura(t.getTemperaturaReal()))
-                .orElse(INDISPONIVEL);
-    }
-
-    @Transient
-    @JsonProperty("temperaturaPrevista")
-    private String obterTemperaturaPrevista() {
-        return obterRegistroPrevistoMaisRecente()
-                .map(t -> FormatadorUtil.formatarTemperatura(t.getTemperaturaPrevista()))
-                .orElse(INDISPONIVEL);
-    }
-
-    @Transient
-    @JsonProperty("temperaturaCalculada")
-    private String obterTemperaturaCalculada() {
-        return obterRegistroCalculadoMaisRecente()
-                .map(t -> FormatadorUtil.formatarTemperatura(t.getTemperaturaCalculada()))
-                .orElse(INDISPONIVEL);
-    }
-
-    @Transient
-    @JsonProperty("temperaturaRealMaisRecenteFormatada")
-    private String obterTemperaturaRealMaisRecenteFormatada() {
+    @JsonProperty("temperaturaRealMaisRecente")
+    private Double obterTemperaturaRealMaisRecente() {
         if (obterRegistroRealMaisRecente().isPresent()) {
-            return FormatadorUtil.formatarTemperatura(obterRegistroRealMaisRecente().get().getTemperaturaReal());
+            return obterRegistroRealMaisRecente().get().getTemperaturaReal();
         } else {
-            return INDISPONIVEL;
+            return null;
         }
     }
 
     @Transient
-    @JsonProperty("temperaturaPrevistaMaisRecenteFormatada")
-    private String obterTemperaturaPrevistaMaisRecenteFormatada() {
+    @JsonProperty("temperaturaPrevistaMaisRecente")
+    private Double obterTemperaturaPrevistaMaisRecente() {
         if (obterRegistroPrevistoMaisRecente().isPresent()) {
-            return FormatadorUtil.formatarTemperatura(obterRegistroPrevistoMaisRecente().get().getTemperaturaPrevista());
+            return obterRegistroPrevistoMaisRecente().get().getTemperaturaPrevista();
         } else {
-            return INDISPONIVEL;
+            return null;
         }
     }
 
     @Transient
-    @JsonProperty("temperaturaCalculadaMaisRecenteFormatada")
-    private String obterTemperaturaCalculadaMaisRecenteFormatada() {
+    @JsonProperty("temperaturaCalculadaMaisRecente")
+    private Double obterTemperaturaCalculadaMaisRecente() {
         if (obterRegistroCalculadoMaisRecente().isPresent()) {
-            return FormatadorUtil.formatarTemperatura(obterRegistroCalculadoMaisRecente().get().getTemperaturaCalculada());
+            return obterRegistroCalculadoMaisRecente().get().getTemperaturaCalculada();
         } else {
-            return INDISPONIVEL;
+            return null;
         }
     }
 
     @Transient
-    @JsonProperty("precipitacaoRealMaisRecenteFormatada")
-    private String obterPrecipitacaoRealMaisRecenteFormatada() {
+    @JsonProperty("precipitacaoRealMaisRecente")
+    private Double obterPrecipitacaoRealMaisRecente() {
         if (obterRegistroRealMaisRecente().isPresent()) {
-            return FormatadorUtil.formatarPrecipitacao(obterRegistroRealMaisRecente().get().getPrecipitacaoReal());
+            return obterRegistroRealMaisRecente().get().getPrecipitacaoReal();
         } else {
-            return INDISPONIVEL;
+            return null;
         }
     }
 
     @Transient
-    @JsonProperty("precipitacaoPrevistaMaisRecenteFormatada")
-    private String obterPrecipitacaoPrevistaMaisRecenteFormatada() {
+    @JsonProperty("precipitacaoPrevistaMaisRecente")
+    private Double obterPrecipitacaoPrevistaMaisRecente() {
         if (obterRegistroPrevistoMaisRecente().isPresent()) {
-            return FormatadorUtil.formatarPrecipitacao(obterRegistroPrevistoMaisRecente().get().getPrecipitacaoPrevista());
+            return obterRegistroPrevistoMaisRecente().get().getPrecipitacaoPrevista();
         } else {
-            return INDISPONIVEL;
+            return null;
         }
     }
 
     @Transient
-    @JsonProperty("precipitacaoCalculadaMaisRecenteFormatada")
-    private String obterPrecipitacaoCalculadaMaisRecenteFormatada() {
+    @JsonProperty("precipitacaoCalculadaMaisRecente")
+    private Double obterPrecipitacaoCalculadaMaisRecente() {
         if (obterRegistroCalculadoMaisRecente().isPresent()) {
-            return FormatadorUtil.formatarPrecipitacao(obterRegistroCalculadoMaisRecente().get().getPrecipitacaoCalculada());
+            return obterRegistroCalculadoMaisRecente().get().getPrecipitacaoCalculada();
         } else {
-            return INDISPONIVEL;
+            return null;
         }
     }
 
     @Transient
-    @JsonProperty("radiacaoSolarRealMaisRecenteFormatada")
-    private String obterRadiacaoSolarRealMaisRecenteFormatada() {
+    @JsonProperty("radiacaoSolarRealMaisRecente")
+    private Double obterRadiacaoSolarRealMaisRecente() {
         if (obterRegistroRealMaisRecente().isPresent()) {
-            return FormatadorUtil.formatarRadiacaoSolar(obterRegistroRealMaisRecente().get().getRadiacaoSolarReal());
+            return obterRegistroRealMaisRecente().get().getRadiacaoSolarReal();
         } else {
-            return INDISPONIVEL;
+            return null;
         }
     }
 
     @Transient
-    @JsonProperty("radiacaoSolarPrevistaMaisRecenteFormatada")
-    private String obterRadiacaoSolarPrevistaMaisRecenteFormatada() {
+    @JsonProperty("radiacaoSolarPrevistaMaisRecente")
+    private Double obterRadiacaoSolarPrevistaMaisRecente() {
         if (obterRegistroPrevistoMaisRecente().isPresent()) {
-            return FormatadorUtil.formatarRadiacaoSolar(obterRegistroPrevistoMaisRecente().get().getRadiacaoSolarPrevista());
+            return obterRegistroPrevistoMaisRecente().get().getRadiacaoSolarPrevista();
         } else {
-            return INDISPONIVEL;
+            return null;
         }
     }
 
     @Transient
-    @JsonProperty("radiacaoSolarCalculadaMaisRecenteFormatada")
-    private String obterRadiacaoSolarCalculadaMaisRecenteFormatada() {
+    @JsonProperty("radiacaoSolarCalculadaMaisRecente")
+    private Double obterRadiacaoSolarCalculadaMaisRecente() {
         if (obterRegistroCalculadoMaisRecente().isPresent()) {
-            return FormatadorUtil.formatarRadiacaoSolar(obterRegistroCalculadoMaisRecente().get().getRadiacaoSolarCalculada());
+            return obterRegistroCalculadoMaisRecente().get().getRadiacaoSolarCalculada();
         } else {
-            return INDISPONIVEL;
+            return null;
         }
     }
 

@@ -18,9 +18,9 @@
             </div>
 
             <div class="formulario-container">
-                <tags:alternarTexto condicao="${not empty propriedade}" textoCondicaoVerdadeira="Altere os dados necessários de propriedade" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar uma propriedade" tagHtml="h3" />
-
                 <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
+
+                <tags:alternarTexto condicao="${not empty propriedade}" textoCondicaoVerdadeira="Altere os dados necessários de propriedade" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar uma propriedade" tagHtml="h3" />
 
                 <form:form modelAttribute="PropriedadeCommand" method="post" action="${urlCadastroPropriedade}">
                     <form:hidden path="id" />

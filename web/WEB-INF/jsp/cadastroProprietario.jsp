@@ -16,10 +16,10 @@
             </div>
 
             <div class="formulario-container">
-                <tags:alternarTexto condicao="${not empty proprietario}" textoCondicaoVerdadeira="Altere os dados necessários do proprietário" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar um proprietário" tagHtml="h3" />
-
                 <tags:alerta css="alerta-sucesso" alerta="${sucesso}" />
 
+                <tags:alternarTexto condicao="${not empty proprietario}" textoCondicaoVerdadeira="Altere os dados necessários do proprietário" textoCondicaoFalsa="Insira os dados no formulário abaixo para cadastrar um proprietário" tagHtml="h3" />
+                
                 <form:form modelAttribute="ProprietarioCommand" method="post" action="${urlCadastroProprietario}">
                     <form:hidden path="id"/>
 
