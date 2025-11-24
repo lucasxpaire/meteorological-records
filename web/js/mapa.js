@@ -134,15 +134,15 @@ function criarElementosPropriedades() {
         poligono.addListener('click', (event) => {
             descricaoPropriedade.setPosition(event.latLng);
             descricaoPropriedade.open(mapa);
-            linhasTracejadas.forEach(linha => linha.setVisible(true));
         });
 
         centroide.addListener('click', (event) => {
             descricaoCentroide.setPosition(event.latLng);
             descricaoCentroide.open(mapa);
-        })
+            linhasTracejadas.forEach(linha => linha.setVisible(true));
+        });
 
-        descricaoPropriedade.addListener('closeclick', () => {
+        centroide.addListener('closeclick', () => {
             linhasTracejadas.forEach(linha => linha.setVisible(false));
         });
 
@@ -262,7 +262,7 @@ function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisR
                 return `
                     <span class="valor-previsto" onclick="alterarBalao(this)">
                         ${valor}
-                        <span class="balao-prevista">Prevista</span>
+                        <span class="balao-prevista">Previsto</span>
                     </span>
                 `;
             }

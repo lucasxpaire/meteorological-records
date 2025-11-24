@@ -55,6 +55,7 @@ public class RegistroMeteorologicoServico {
     public static final String JSON_CHAVE_DATA = "data";
     public static final String JSON_CHAVE_HORA = "hora";
     public static final String JSON_CHAVE_RADIACAO_SOLAR = "radiacao_solar";
+    public static final long ATRASO_INICIAL = 0L;
 
     @Autowired
     private Dados dados;
@@ -102,7 +103,7 @@ public class RegistroMeteorologicoServico {
         }
     }
 
-    @Scheduled(fixedRate = INTERVALO_ATUALIZACAO)
+    @Scheduled(fixedRate = INTERVALO_ATUALIZACAO, initialDelay = ATRASO_INICIAL)
     private void executarAtualizacaoDeRegistrosMeteorologicos() {
         dados.iniciarTransacao();
         try {

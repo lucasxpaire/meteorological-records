@@ -32,10 +32,14 @@ public class RegistroMeteorologicoController {
     @ResponseBody
     @GetMapping(value = "/preverRegistroMeteorologico", produces = MediaType.APPLICATION_JSON_VALUE)
     public RegistroMeteorologico preverRegistroDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
-        LocalDateTime dataHoraPrevista = LocalDateTime.now().plusHours(1).withMinute(0).withSecond(0);
+        if (!Ponto.validarLatitude(latitude) || !Ponto.validarLongitude(longitude)) {
+            throw new IllegalArgumentException("Latitude ou Longitude inválida.");
+        }
 
         Ponto ponto = new Ponto(latitude, longitude);
         ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
+
+        LocalDateTime dataHoraPrevista = LocalDateTime.now().plusHours(1).withMinute(0).withSecond(0);
         return registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevista);
     }
 
@@ -55,6 +59,9 @@ public class RegistroMeteorologicoController {
     @ResponseBody
     @GetMapping(value = "/calcularRegistroMeteorologico", produces = MediaType.APPLICATION_JSON_VALUE)
     public RegistroMeteorologico calcularRegistroDoPonto(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude) {
+        if (!Ponto.validarLatitude(latitude) || !Ponto.validarLongitude(longitude)) {
+            throw new IllegalArgumentException("Latitude ou Longitude inválida.");
+        }
         Ponto ponto = new Ponto(latitude, longitude);
         ponto.setEstacoesMeteorologicas(estacaoMeteorologicaServico.buscarEstacoesRelevantes(ponto));
         return registroMeteorologicoServico.calcularRegistroMeteorologico(ponto);
