@@ -16,11 +16,11 @@ const BUSCA_POR_NOME = '3';
 const BUSCA_POR_CPF = '4';
 
 const COLUNAS_TABELA_ESTACOES_ASSOCIADAS = [
-    'Município', 'Temperatura', 'Precipitação', 'Radiação Solar'
+    'Município', 'Temperatura', 'Precipitação', 'Radiação solar'
 ];
 
 const COLUNAS_TABELA_REGISTROS = [
-    'Temperatura', 'Precipitação', 'Radiação Solar'
+    'Temperatura', 'Precipitação', 'Radiação solar'
 ];
 
 const GRAUS_CELSIUS = '°C';
@@ -95,7 +95,7 @@ function criarDescricaoEstacao(estacao) {
     cabecalho.className = 'info-window-cabecalho';
 
     cabecalho.innerHTML = `
-        <h3>Estação Meteorológica: ${estacao.nome}</h3>
+        <p><strong>Estação meteorológica:</strong> ${estacao.nome}</p>
         <p><strong>Latitude:</strong> ${estacao.localizacao.latitudeFormatada}</p>
         <p><strong>Longitude:</strong> ${estacao.localizacao.longitudeFormatada}</p>
         <p><strong>Código:</strong> ${estacao.codigoEstacao}</p>
@@ -116,7 +116,7 @@ function criarDescricaoEstacao(estacao) {
         ]
     ];
 
-    descricaoConteudo.appendChild(criarTabela(estacao.id, COLUNAS_TABELA_REGISTROS, linhasTabela, 'Registro Meteorológico'));
+    descricaoConteudo.appendChild(criarTabela(estacao.id, COLUNAS_TABELA_REGISTROS, linhasTabela, 'Registro meteorológico'));
 
     return new google.maps.InfoWindow({
         content: descricaoConteudo
@@ -193,7 +193,7 @@ function criarDescricaoPropriedade(propriedade) {
     const cabecalho = document.createElement('div');
     cabecalho.className = 'info-window-cabecalho'
     cabecalho.innerHTML = `
-        <h3>Propriedade: ${propriedade.nome}</h3>
+        <p><strong>Propriedade:</strong> ${propriedade.nome}</p>
         <p><strong>Proprietário:</strong> ${propriedade.nomeProprietario}</p>
         <p><strong>CPF:</strong> ${propriedade.cpfProprietario}</p>
         <p><strong>Cor:</strong> ${propriedade.corNome}</p>
@@ -214,7 +214,7 @@ function criarDescricaoPropriedade(propriedade) {
             radiacaoCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente)
         ]
     ];
-    descricaoConteudo.appendChild(criarTabela(`registroCalculado-${propriedade.id}`, COLUNAS_TABELA_REGISTROS, linhasRegistroCalculado, 'Registro Meteorológico Calculado'));
+    descricaoConteudo.appendChild(criarTabela(`registroCalculado-${propriedade.id}`, COLUNAS_TABELA_REGISTROS, linhasRegistroCalculado, 'Registro meteorológico calculado'));
 
     const divBotao = document.createElement('div');
     const idTemperaturaPrevista = `temperatura-prevista-propriedade-${propriedade.id}`;
@@ -277,14 +277,14 @@ function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisR
         ];
     });
 
-    return criarTabela(`estacoes-associadas-${propriedade.id}`, COLUNAS_TABELA_ESTACOES_ASSOCIADAS, linhasTabela, "Registros Meteorológicos das Estações Associadas");
+    return criarTabela(`estacoes-associadas-${propriedade.id}`, COLUNAS_TABELA_ESTACOES_ASSOCIADAS, linhasTabela, "Registros meteorológicos das estações associadas");
 }
 
 function criarDescricaoCentroide(propriedade) {
     return new google.maps.InfoWindow({
         content: `
             <div class="info-window-cabecalho">
-                <h3>Centróide</h3>
+                <p><strong>Centróide</strong></p>
                 <p><strong>Latitude:</strong> ${propriedade.centroide.latitudeFormatada}</p>
                 <p><strong>Longitude:</strong> ${propriedade.centroide.longitudeFormatada}</p>
             </div>
@@ -319,24 +319,6 @@ function criarLinhasTracejadasEntreCentroideEEstacoes(propriedade) {
     return linhas;
 }
 
-function formatarValor(valor, quantidadeCasasDecimais) {
-    if (valor === null || valor === undefined) {
-        return null;
-    }
-    return valor.toLocaleString('pt-BR', {
-        minimumFractionDigits: quantidadeCasasDecimais,
-        maximumFractionDigits: quantidadeCasasDecimais
-    });
-}
-
-function obterTextoFormatado(valor, casasDecimais, unidade) {
-    const valorFormatado = formatarValor(valor, casasDecimais);
-    if (valorFormatado === null) {
-        return TEXTO_INDISPONIVEL;
-    }
-    return valorFormatado + unidade;
-}
-
 async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrevisao) {
     const paragrafoTemperatura = document.getElementById(idTemperaturaPrevista);
     const botaoPrevisao = document.getElementById(idBotaoPrevisao);
@@ -361,7 +343,7 @@ async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrev
             ]
         ];
 
-        const tabelaPrevisao = criarTabela(`previsao-${idCentroide}`, COLUNAS_TABELA_REGISTROS, linhasTabela, "Registro Meteorológico Previsto");
+        const tabelaPrevisao = criarTabela(`previsao-${idCentroide}`, COLUNAS_TABELA_REGISTROS, linhasTabela, "Registro meteorológico previsto");
 
         paragrafoTemperatura.innerHTML = '';
         paragrafoTemperatura.appendChild(tabelaPrevisao);
@@ -372,7 +354,7 @@ async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrev
             ['Indisponível', 'Indisponível', 'Indisponível']
         ];
 
-        const tabelaPrevisao = criarTabela(`previsao-${idCentroide}`, COLUNAS_TABELA_REGISTROS, linhasTabela, "Registro Meteorológico Previsto");
+        const tabelaPrevisao = criarTabela(`previsao-${idCentroide}`, COLUNAS_TABELA_REGISTROS, linhasTabela, "Registro meteorológico previsto");
 
         paragrafoTemperatura.innerHTML = '';
         paragrafoTemperatura.appendChild(tabelaPrevisao);
@@ -472,4 +454,22 @@ function formatarDataHora(dataHora) {
 
 function alterarBalao(elemento) {
     elemento.classList.toggle('ativo');
+}
+
+function formatarValor(valor, quantidadeCasasDecimais) {
+    if (valor === null || valor === undefined) {
+        return null;
+    }
+    return valor.toLocaleString('pt-BR', {
+        minimumFractionDigits: quantidadeCasasDecimais,
+        maximumFractionDigits: quantidadeCasasDecimais
+    });
+}
+
+function obterTextoFormatado(valor, casasDecimais, unidade) {
+    const valorFormatado = formatarValor(valor, casasDecimais);
+    if (valorFormatado === null) {
+        return TEXTO_INDISPONIVEL;
+    }
+    return valorFormatado + unidade;
 }

@@ -377,14 +377,14 @@ body {
 }
 
 .info-window-cabecalho p {
-    font-size: 1.1em;
+    font-size: 1.5em;
     margin: 6px 0;
     color: #000000;
 }
 
 .info-window-cabecalho strong {
     color: #000000;
-    font-weight: 600;
+    font-weight: 700;
     margin-right: 5px;
 }
 
