@@ -399,7 +399,7 @@ body {
     margin-top: 10px;
 }
 
-.info-window-conteudo th, td {
+.info-window-conteudo th, .info-window-conteudo td {
     border: 1px solid #ccc;
     padding: 8px;
     text-align: center;

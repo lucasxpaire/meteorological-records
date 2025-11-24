@@ -273,7 +273,7 @@ public class Ponto {
     @JsonProperty("dataHoraRegistroRealMaisRecente")
     public String obterDataHoraRegistroRealMaisRecente() {
         return obterRegistroRealMaisRecente()
-                .map(t -> t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO))
+                .map(t -> t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV))
                 .orElse(STRING_VAZIA);
     }
 
@@ -281,7 +281,7 @@ public class Ponto {
     @JsonProperty("dataHoraRegistroPrevistoMaisRecente")
     public String obterDataHoraRegistroPrevistoMaisRecente() {
         return obterRegistroPrevistoMaisRecente()
-                .map(t -> t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO))
+                .map(t -> t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV))
                 .orElse(STRING_VAZIA);
     }
 
@@ -289,7 +289,7 @@ public class Ponto {
     @JsonProperty("dataHoraRegistroCalculadoMaisRecente")
     public String obterDataHoraRegistroCalculadoMaisRecente() {
         return obterRegistroCalculadoMaisRecente()
-                .map(t -> t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO))
+                .map(t -> t.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_COMPARACAO_CSV))
                 .orElse(STRING_VAZIA);
     }
 

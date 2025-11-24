@@ -27,7 +27,6 @@ public class FormatadorUtil {
     public static final int QUANTIDADE_DIGITOS_VALIDOS_TELEFONE = 11;
 
     public static final String STRING_VAZIA = "";
-    public static final String INDISPONIVEL = "Indisponível";
     public static final char PONTO = '.';
     public static final char VIRGULA = ',';
     public static final String PONTO_E_VIRGULA = ";";
