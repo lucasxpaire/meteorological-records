@@ -11,6 +11,10 @@ public class PontoServico {
     @Autowired
     private Dados dados;
 
+    public PontoServico(Dados dados) {
+        this.dados = dados;
+    }
+
     public Ponto buscarPorId(Long id) {
         if (dados.existeAlgumComEsseCampo(Ponto.class, "id", id)) {
             return dados.buscarUnicoPorCampo(Ponto.class, "id", id);

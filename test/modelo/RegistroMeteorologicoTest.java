@@ -1,12 +1,15 @@
 package modelo;
 
+import dados.Dados;
 import org.junit.Test;
 
+import servico.PontoServico;
 import servico.RegistroMeteorologicoServico;
 import util.FormatadorUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 public class RegistroMeteorologicoTest {
 
@@ -14,6 +17,8 @@ public class RegistroMeteorologicoTest {
     public static final double LONGITUDE = -53.78460970215507;
 
     private final RegistroMeteorologicoServico registroMeteorologicoServico = new RegistroMeteorologicoServico();
+    private final Dados dados = new Dados();
+    private final PontoServico pontoServico = new PontoServico(dados);
 
     @Test
     public void gerarPrevisaoTemperatura() {
@@ -27,5 +32,18 @@ public class RegistroMeteorologicoTest {
         RegistroMeteorologico temperatura = registroMeteorologicoServico.preverRegistroMeteorologico(ponto, dataHoraPrevisao);
         System.out.println(" DataHora: " + temperatura.getDataHora().format(FormatadorUtil.FORMATADOR_DATA_HORA_PARA_EXIBICAO) + " | Temperatura: " + FormatadorUtil.formatarPontoDecimalParaVirgula(temperatura.getTemperaturaPrevista()) + " °C");
 
+    }
+
+    @Test
+    public void testarPesos() {
+        dados.iniciarTransacao();
+        Ponto ponto = pontoServico.buscarPorId(780L);
+        Map<String, Double> pesos = ponto.calcularPesosDasEstacoes();
+
+        for (String chave : pesos.keySet()) {
+            System.out.println(chave + ": " + pesos.get(chave));
+        }
+
+        dados.confirmarTransacao();
     }
 }

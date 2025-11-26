@@ -7,7 +7,9 @@ import util.FormatadorUtil;
 import javax.persistence.*;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static servico.RegistroMeteorologicoServico.PESO_NULO;
 import static util.FormatadorUtil.STRING_VAZIA;
 
 @Entity
@@ -305,4 +307,33 @@ public class Ponto {
         return FormatadorUtil.formatarPontoDecimalParaVirgula(longitude);
     }
 
+    @Transient
+    @JsonProperty("pesosDoPontoEntreEstacoes")
+    public Map<String, Double> calcularPesosDasEstacoes() {
+        if (this.getEstacoesMeteorologicas() == null || this.getEstacoesMeteorologicas().isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Double> pesosPorEstacao = new LinkedHashMap<>();
+
+        double somaPesos = 0.0;
+        for (EstacaoMeteorologica estacao : this.getEstacoesMeteorologicas()) {
+            double peso = this.calcularPesoDeProximidadePara(estacao);
+            if (peso <= PESO_NULO) {
+                continue;
+            }
+            pesosPorEstacao.put(estacao.getNome(), peso);
+            somaPesos += peso;
+        }
+
+        if (somaPesos == PESO_NULO) {
+            return Collections.emptyMap();
+        }
+
+        double somaFinal = somaPesos;
+        return pesosPorEstacao.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue() / somaFinal,
+                        (primeiro, segundo) -> primeiro,
+                        LinkedHashMap::new));
+    }
 }

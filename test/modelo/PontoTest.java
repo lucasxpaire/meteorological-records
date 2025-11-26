@@ -8,15 +8,18 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import servico.EstacaoMeteorologicaServico;
+import servico.PontoServico;
 import servico.RegistroMeteorologicoServico;
+
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"file:web/WEB-INF/spring-config.xml"})
 public class PontoTest {
 
     private final Dados dados = new Dados();
-    private final EstacaoMeteorologicaServico estacaoMeteorologicaServico = new EstacaoMeteorologicaServico(dados);
     private final RegistroMeteorologicoServico registroMeteorologicoServico = new RegistroMeteorologicoServico();
+    private final PontoServico pontoServico = new PontoServico(dados);
 
     @Test
     public void gerarFusoHorario() throws JsonProcessingException {

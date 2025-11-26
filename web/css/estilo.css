@@ -586,6 +586,12 @@ body {
     display: block;
 }
 
+.peso-estacao {
+    font-size: 0.85em;
+    color: #6c757d;
+    font-weight: 500;
+}
+
 .cabecalho-com-lupa {
     display: flex;
     justify-content: space-between;
@@ -599,7 +605,7 @@ body {
     flex: 1;
 }
 
-.wrapper-lupa {
+.container-lupa {
     margin-left: auto;
     display: flex;
     align-items: flex-start;
@@ -622,7 +628,7 @@ body {
     position: absolute;
     top: 0;
     left: calc(100% + 12px);
-    width: 600px;
+    width: 650px;
     max-height: 420px;
     overflow-y: auto;
     background-color: #FFFFFF;
