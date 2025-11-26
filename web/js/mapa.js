@@ -108,11 +108,13 @@ function criarDescricaoEstacao(estacao) {
     const temperatura = obterTextoFormatado(estacao.localizacao.temperaturaRealMaisRecente, CASAS_DECIMAIS_PADRAO, GRAUS_CELSIUS);
     const precipitacao = obterTextoFormatado(estacao.localizacao.precipitacaoRealMaisRecente, CASAS_DECIMAIS_PRECIPITACAO, PRECIPITACAO_MM);
     const radiacao = obterTextoFormatado(estacao.localizacao.radiacaoSolarRealMaisRecente, CASAS_DECIMAIS_PADRAO, RADIACAO_SOLAR_KJ_M2);
+
+    const estiloDataHora = "font-size: 0.85em; color: #7a7a7a;";
     const linhasTabela = [
         [
-            temperatura + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente),
-            precipitacao + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente),
-            radiacao + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente)
+            temperatura + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente, estiloDataHora),
+            precipitacao + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente, estiloDataHora),
+            radiacao + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente, estiloDataHora)
         ]
     ];
 
@@ -186,6 +188,61 @@ function criarCentroide(propriedade) {
     });
 }
 
+// function criarDescricaoPropriedade(propriedade) {
+//     const descricaoConteudo = document.createElement('div');
+//     descricaoConteudo.className = 'info-window-conteudo';
+//
+//     const cabecalho = document.createElement('div');
+//     cabecalho.className = 'info-window-cabecalho'
+//     cabecalho.innerHTML = `
+//         <p><strong>Propriedade:</strong> ${propriedade.nome}</p>
+//         <p><strong>Proprietário:</strong> ${propriedade.nomeProprietario}</p>
+//         <p><strong>CPF:</strong> ${propriedade.cpfProprietario}</p>
+//     `;
+//     descricaoConteudo.appendChild(cabecalho);
+//
+//     const temperaturaCalculada = obterTextoFormatado(propriedade.centroide.temperaturaCalculadaMaisRecente, CASAS_DECIMAIS_PADRAO, GRAUS_CELSIUS);
+//     const precipitacaoCalculada = obterTextoFormatado(propriedade.centroide.precipitacaoCalculadaMaisRecente, CASAS_DECIMAIS_PRECIPITACAO, PRECIPITACAO_MM);
+//     const radiacaoCalculada = obterTextoFormatado(propriedade.centroide.radiacaoSolarCalculadaMaisRecente, CASAS_DECIMAIS_PADRAO, RADIACAO_SOLAR_KJ_M2);
+//
+//     const estiloDataHora = "font-size: 0.85em; color: #7a7a7a;";
+//     const linhasRegistroCalculado = [
+//         [
+//             temperaturaCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente, estiloDataHora),
+//             precipitacaoCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente, estiloDataHora),
+//             radiacaoCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente, estiloDataHora)
+//         ]
+//     ];
+//
+//     descricaoConteudo.appendChild(criarTabela(`registroCalculado-${propriedade.id}`, COLUNAS_TABELA_REGISTROS, linhasRegistroCalculado, 'Registro meteorológico calculado'));
+//
+//     const divBotao = document.createElement('div');
+//     const idTemperaturaPrevista = `temperatura-prevista-propriedade-${propriedade.id}`;
+//     const idBotaoPrevisao = `botao-previsao-${propriedade.id}`;
+//
+//     divBotao.innerHTML = `
+//         <p style="display: none" id="${idTemperaturaPrevista}"></p>
+//         <button id="${idBotaoPrevisao}" onclick="criarDescricaoRegistroPrevisto(${propriedade.centroide.id}, '${idTemperaturaPrevista}', '${idBotaoPrevisao}')" class="botao botao-tabela--visualizar">Prever registro meteorológico para ${calcularProximaDataHoraPrevisao()}</button>
+//     `;
+//     descricaoConteudo.appendChild(divBotao);
+//
+//     const tabelaRegistrosEstacoes = gerarHtmlEstacoesAssociadas(propriedade, propriedade.centroide.dataHoraRegistroCalculadoMaisRecente);
+//     descricaoConteudo.appendChild(tabelaRegistrosEstacoes);
+//
+//     return new google.maps.InfoWindow({
+//         content: descricaoConteudo
+//     });
+// }
+
+function alternarBalaoEstacoes(idBalao) {
+    const balao = document.getElementById(idBalao);
+    if (!balao) {
+        return;
+    }
+
+    balao.classList.toggle('ativo');
+}
+
 function criarDescricaoPropriedade(propriedade) {
     const descricaoConteudo = document.createElement('div');
     descricaoConteudo.className = 'info-window-conteudo';
@@ -196,25 +253,42 @@ function criarDescricaoPropriedade(propriedade) {
         <p><strong>Propriedade:</strong> ${propriedade.nome}</p>
         <p><strong>Proprietário:</strong> ${propriedade.nomeProprietario}</p>
         <p><strong>CPF:</strong> ${propriedade.cpfProprietario}</p>
-        <p><strong>Cor:</strong> ${propriedade.corNome}</p>
     `;
-
     descricaoConteudo.appendChild(cabecalho);
-
-    const tabelaRegistrosEstacoes = gerarHtmlEstacoesAssociadas(propriedade, propriedade.centroide.dataHoraRegistroCalculadoMaisRecente);
-    descricaoConteudo.appendChild(tabelaRegistrosEstacoes);
 
     const temperaturaCalculada = obterTextoFormatado(propriedade.centroide.temperaturaCalculadaMaisRecente, CASAS_DECIMAIS_PADRAO, GRAUS_CELSIUS);
     const precipitacaoCalculada = obterTextoFormatado(propriedade.centroide.precipitacaoCalculadaMaisRecente, CASAS_DECIMAIS_PRECIPITACAO, PRECIPITACAO_MM);
     const radiacaoCalculada = obterTextoFormatado(propriedade.centroide.radiacaoSolarCalculadaMaisRecente, CASAS_DECIMAIS_PADRAO, RADIACAO_SOLAR_KJ_M2);
+
+    const estiloDataHora = "font-size: 0.85em; color: #7a7a7a;";
     const linhasRegistroCalculado = [
         [
-            temperaturaCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente),
-            precipitacaoCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente),
-            radiacaoCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente)
+            temperaturaCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente, estiloDataHora),
+            precipitacaoCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente, estiloDataHora),
+            radiacaoCalculada + '<br>' + formatarDataHora(propriedade.centroide.dataHoraRegistroCalculadoMaisRecente, estiloDataHora)
         ]
     ];
-    descricaoConteudo.appendChild(criarTabela(`registroCalculado-${propriedade.id}`, COLUNAS_TABELA_REGISTROS, linhasRegistroCalculado, 'Registro meteorológico calculado'));
+
+    const tabelaRegistrosEstacoes = gerarHtmlEstacoesAssociadas(propriedade, propriedade.centroide.dataHoraRegistroCalculadoMaisRecente);
+
+    const idBalao = `balao-estacoes-${propriedade.id}`;
+    const htmlBalao = `
+        <div id="${idBalao}" class="balao-estacoes">
+            ${tabelaRegistrosEstacoes.outerHTML}
+        </div>
+    `;
+
+    const tituloTabelaCalculada = `
+        <div class="cabecalho-com-lupa">
+            <span>Registro meteorológico calculado</span>
+            <div class="wrapper-lupa">
+                <img src="https://img.icons8.com/?size=100&id=59878&format=png&color=000000" class="icone-lupa" title="Ver estações utilizadas" onclick="alternarBalaoEstacoes('${idBalao}')"/>
+                ${htmlBalao}
+            </div>
+        </div>
+    `;
+
+    descricaoConteudo.appendChild(criarTabela(`registroCalculado-${propriedade.id}`, COLUNAS_TABELA_REGISTROS, linhasRegistroCalculado, tituloTabelaCalculada));
 
     const divBotao = document.createElement('div');
     const idTemperaturaPrevista = `temperatura-prevista-propriedade-${propriedade.id}`;
@@ -222,7 +296,7 @@ function criarDescricaoPropriedade(propriedade) {
 
     divBotao.innerHTML = `
         <p style="display: none" id="${idTemperaturaPrevista}"></p>
-        <button id="${idBotaoPrevisao}" onclick="preverTemperatura(${propriedade.centroide.id}, '${idTemperaturaPrevista}', '${idBotaoPrevisao}')" class="botao botao-tabela--visualizar">Prever registro meteorológico</button>
+        <button id="${idBotaoPrevisao}" onclick="criarDescricaoRegistroPrevisto(${propriedade.centroide.id}, '${idTemperaturaPrevista}', '${idBotaoPrevisao}')" class="botao botao-tabela--visualizar">Prever registro meteorológico para ${calcularProximaDataHoraPrevisao()}</button>
     `;
     descricaoConteudo.appendChild(divBotao);
 
@@ -235,12 +309,16 @@ function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisR
     const linhasTabela = propriedade.centroide.estacoesMeteorologicas.map(estacao => {
         const dataHoraReal = estacao.localizacao.dataHoraRegistroRealMaisRecente;
 
-        const ehPrevista = dataHoraRegistroCalculadoMaisRecente && dataHoraReal !== dataHoraRegistroCalculadoMaisRecente;
+        let ehPrevista = false;
+        if (dataHoraRegistroCalculadoMaisRecente && dataHoraReal !== dataHoraRegistroCalculadoMaisRecente) {
+            ehPrevista = true;
+        }
 
         let temperaturaValor;
         let precipitacaoValor;
         let radiacaoSolarValor;
         let dataHora;
+
         if (ehPrevista) {
             temperaturaValor = estacao.localizacao.temperaturaPrevistaMaisRecente;
             precipitacaoValor = estacao.localizacao.precipitacaoPrevistaMaisRecente;
@@ -262,22 +340,39 @@ function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisR
                 return `
                     <span class="valor-previsto" onclick="alterarBalao(this)">
                         ${valor}
-                        <span class="balao-prevista">Previsto</span>
+                        <span class="balao-prevista">Prevista</span>
                     </span>
                 `;
             }
             return valor;
         };
 
+        const estiloDataHora = "font-size: 0.85em; color: #7a7a7a;";
         return [
             estacao.nome,
-            formatarDado(textoTemperatura) + '<br>' + formatarDataHora(dataHora),
-            formatarDado(textoPrecipitacao) + '<br>' + formatarDataHora(dataHora),
-            formatarDado(textoRadiacao) + '<br>' + formatarDataHora(dataHora)
+            formatarDado(textoTemperatura) + '<br>' + formatarDataHora(dataHora, estiloDataHora),
+            formatarDado(textoPrecipitacao) + '<br>' + formatarDataHora(dataHora, estiloDataHora),
+            formatarDado(textoRadiacao) + '<br>' + formatarDataHora(dataHora, estiloDataHora)
         ];
     });
 
-    return criarTabela(`estacoes-associadas-${propriedade.id}`, COLUNAS_TABELA_ESTACOES_ASSOCIADAS, linhasTabela, "Registros meteorológicos das estações associadas");
+    return criarTabela(`estacoes-associadas-${propriedade.id}`, COLUNAS_TABELA_ESTACOES_ASSOCIADAS, linhasTabela, "Registros meteorológicos das estações utilizadas no cálculo");
+}
+
+function calcularProximaDataHoraPrevisao() {
+    const data = new Date();
+
+    data.setHours(data.getHours() + 1);
+    data.setMinutes(0);
+
+    const dia = String(data.getDate()).padStart(2, '0');
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const ano = data.getFullYear();
+
+    const horas = String(data.getHours()).padStart(2, '0');
+    const minutos = String(data.getMinutes()).padStart(2, '0');
+
+    return `${dia}/${mes}/${ano} às ${horas}:${minutos}`;
 }
 
 function criarDescricaoCentroide(propriedade) {
@@ -319,27 +414,36 @@ function criarLinhasTracejadasEntreCentroideEEstacoes(propriedade) {
     return linhas;
 }
 
-async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrevisao) {
-    const paragrafoTemperatura = document.getElementById(idTemperaturaPrevista);
-    const botaoPrevisao = document.getElementById(idBotaoPrevisao);
-
-    botaoPrevisao.disabled = true;
-    botaoPrevisao.innerHTML = 'Carregando...';
-
+async function obterRegistroPrevisto(idCentroide) {
     try {
         const resposta = await fetch(`${urlPrevisao}?idCentroide=${idCentroide}`);
         if (!resposta.ok) {
             throw new Error(`Falha na requisição: ${resposta.status}`);
         }
-        const json = await resposta.json();
+        return await resposta.json();
+    } catch (error) {
+        return null;
+    }
+}
+
+async function criarDescricaoRegistroPrevisto(idCentroide, idTemperaturaPrevista, idBotaoPrevisao) {
+    const paragrafoTemperatura = document.getElementById(idTemperaturaPrevista);
+    const botaoPrevisao = document.getElementById(idBotaoPrevisao);
+
+    botaoPrevisao.disabled = true;
+    botaoPrevisao.textContent = 'Carregando...';
+
+    try {
+        const json = await obterRegistroPrevisto(idCentroide);
 
         paragrafoTemperatura.style.display = VISIVEL;
 
+        const estiloDataHora = "font-size: 0.85em; color: #7a7a7a;";
         const linhasTabela = [
             [
-                obterTextoFormatado(json.temperaturaPrevista, CASAS_DECIMAIS_PADRAO, GRAUS_CELSIUS) + '<br>' + formatarDataHora(json.dataHoraPrevisao),
-                obterTextoFormatado(json.precipitacaoPrevista, CASAS_DECIMAIS_PRECIPITACAO, PRECIPITACAO_MM) + '<br>' + formatarDataHora(json.dataHoraPrevisao),
-                obterTextoFormatado(json.radiacaoSolarPrevista, CASAS_DECIMAIS_PADRAO, RADIACAO_SOLAR_KJ_M2) + '<br>' + formatarDataHora(json.dataHoraPrevisao)
+                obterTextoFormatado(json.temperaturaPrevista, CASAS_DECIMAIS_PADRAO, GRAUS_CELSIUS) + '<br>' + formatarDataHora(json.dataHoraPrevisao, estiloDataHora),
+                obterTextoFormatado(json.precipitacaoPrevista, CASAS_DECIMAIS_PRECIPITACAO, PRECIPITACAO_MM) + '<br>' + formatarDataHora(json.dataHoraPrevisao, estiloDataHora),
+                obterTextoFormatado(json.radiacaoSolarPrevista, CASAS_DECIMAIS_PADRAO, RADIACAO_SOLAR_KJ_M2) + '<br>' + formatarDataHora(json.dataHoraPrevisao, estiloDataHora)
             ]
         ];
 
@@ -347,6 +451,10 @@ async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrev
 
         paragrafoTemperatura.innerHTML = '';
         paragrafoTemperatura.appendChild(tabelaPrevisao);
+
+        botaoPrevisao.disabled = false;
+        const dataHoraPrevisaoTexto = formatarDataHoraSimples(json.dataHoraPrevisao);
+        botaoPrevisao.textContent = `Prever registro meteorológico para ${dataHoraPrevisaoTexto}`;
     } catch (error) {
         paragrafoTemperatura.style.display = VISIVEL;
 
@@ -358,9 +466,9 @@ async function preverTemperatura(idCentroide, idTemperaturaPrevista, idBotaoPrev
 
         paragrafoTemperatura.innerHTML = '';
         paragrafoTemperatura.appendChild(tabelaPrevisao);
-    } finally {
+
         botaoPrevisao.disabled = false;
-        botaoPrevisao.innerHTML = 'Prever registro meteorológico';
+        botaoPrevisao.textContent = `Prever registro meteorológico para ${calcularProximaDataHoraPrevisao()}`;
     }
 }
 
@@ -411,7 +519,7 @@ function criarTabela(idTabela, dadosColunas, dadosLinhas, tituloTabela) {
     if (tituloTabela) {
         const trTitulo = document.createElement("tr");
         const thTitulo = document.createElement("th");
-        thTitulo.textContent = tituloTabela;
+        thTitulo.innerHTML = tituloTabela;
         thTitulo.colSpan = dadosColunas.length;
         trTitulo.appendChild(thTitulo);
         thead.appendChild(trTitulo);
@@ -444,12 +552,19 @@ function criarTabela(idTabela, dadosColunas, dadosLinhas, tituloTabela) {
     return tabela;
 }
 
-function formatarDataHora(dataHora) {
+function formatarDataHora(dataHora, estiloDataHora) {
     if (!dataHora) {
         return '';
     }
     const dataHoraFormatada = dataHora.replace(' ', ' às ');
-    return `<span style="font-size: 0.85em; color: #7a7a7a;">(${dataHoraFormatada})</span>`;
+    return `<span style="${estiloDataHora}">(${dataHoraFormatada})</span>`;
+}
+
+function formatarDataHoraSimples(dataHora) {
+    if (!dataHora) {
+        return '';
+    }
+    return dataHora.replace(' ', ' às ');
 }
 
 function alterarBalao(elemento) {
