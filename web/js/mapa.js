@@ -293,13 +293,13 @@ function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisR
             return valor;
         };
 
-        const estiloDataHora = "font-size: 0.85em; color: #7a7a7a;";
+        const estiloTextoSecundario = "font-size: 0.85em; color: #7a7a7a;";
 
         let estiloPeso;
         if (pesos[estacao.nome] === maiorPeso) {
             estiloPeso = "color: #d6a600; font-weight: 700;";
         } else {
-            estiloPeso = estiloDataHora;
+            estiloPeso = estiloTextoSecundario;
         }
 
         const pesoTexto = formatarPesosEntreEstacoesECentroide(estacao.nome, propriedade.centroide.pesosDoPontoEntreEstacoes);
@@ -307,9 +307,9 @@ function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisR
 
         return [
             estacao.nome + '<br>' + pesoHtml,
-            formatarDado(textoTemperatura) + '<br>' + formatarDataHora(dataHora, estiloDataHora),
-            formatarDado(textoPrecipitacao) + '<br>' + formatarDataHora(dataHora, estiloDataHora),
-            formatarDado(textoRadiacao) + '<br>' + formatarDataHora(dataHora, estiloDataHora)
+            formatarDado(textoTemperatura) + '<br>' + formatarDataHora(dataHora, estiloTextoSecundario),
+            formatarDado(textoPrecipitacao) + '<br>' + formatarDataHora(dataHora, estiloTextoSecundario),
+            formatarDado(textoRadiacao) + '<br>' + formatarDataHora(dataHora, estiloTextoSecundario)
         ];
     });
 
