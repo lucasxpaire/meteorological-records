@@ -251,19 +251,20 @@ function criarDescricaoPropriedade(propriedade) {
 }
 
 function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisRecente) {
+
+    const pesos = propriedade.centroide.pesosDoPontoEntreEstacoes;
+    const valoresPesos = Object.values(pesos);
+    const maiorPeso = Math.max(...valoresPesos);
+
     const linhasTabela = propriedade.centroide.estacoesMeteorologicas.map(estacao => {
         const dataHoraReal = estacao.localizacao.dataHoraRegistroRealMaisRecente;
-
-        let ehPrevista = false;
-        if (dataHoraRegistroCalculadoMaisRecente && dataHoraReal !== dataHoraRegistroCalculadoMaisRecente) {
-            ehPrevista = true;
-        }
 
         let temperaturaValor;
         let precipitacaoValor;
         let radiacaoSolarValor;
         let dataHora;
 
+        let ehPrevista = dataHoraRegistroCalculadoMaisRecente && dataHoraReal !== dataHoraRegistroCalculadoMaisRecente;
         if (ehPrevista) {
             temperaturaValor = estacao.localizacao.temperaturaPrevistaMaisRecente;
             precipitacaoValor = estacao.localizacao.precipitacaoPrevistaMaisRecente;
@@ -293,8 +294,19 @@ function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisR
         };
 
         const estiloDataHora = "font-size: 0.85em; color: #7a7a7a;";
+
+        let estiloPeso;
+        if (pesos[estacao.nome] === maiorPeso) {
+            estiloPeso = "color: #d6a600; font-weight: 700;";
+        } else {
+            estiloPeso = estiloDataHora;
+        }
+
+        const pesoTexto = formatarPesosEntreEstacoesECentroide(estacao.nome, propriedade.centroide.pesosDoPontoEntreEstacoes);
+        const pesoHtml = `<span style="${estiloPeso}">${pesoTexto}</span>`;
+
         return [
-            estacao.nome + '<br>' + formatarPesosEntreEstacoesECentroide(estacao.nome, propriedade.centroide.pesosDoPontoEntreEstacoes),
+            estacao.nome + '<br>' + pesoHtml,
             formatarDado(textoTemperatura) + '<br>' + formatarDataHora(dataHora, estiloDataHora),
             formatarDado(textoPrecipitacao) + '<br>' + formatarDataHora(dataHora, estiloDataHora),
             formatarDado(textoRadiacao) + '<br>' + formatarDataHora(dataHora, estiloDataHora)
