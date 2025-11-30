@@ -89,10 +89,10 @@ function criarIconeEstacao(estacao) {
 
 function criarDescricaoEstacao(estacao) {
     const descricaoConteudo = document.createElement('div');
-    descricaoConteudo.className = 'info-window-conteudo';
+    descricaoConteudo.className = 'janela-informacoes--conteudo';
 
     const cabecalho = document.createElement('div');
-    cabecalho.className = 'info-window-cabecalho';
+    cabecalho.className = 'janela-informacoes--cabecalho';
 
     cabecalho.innerHTML = `
         <p><strong>Estação meteorológica:</strong> ${estacao.nome}</p>
@@ -109,12 +109,12 @@ function criarDescricaoEstacao(estacao) {
     const precipitacao = obterTextoFormatado(estacao.localizacao.precipitacaoRealMaisRecente, CASAS_DECIMAIS_PRECIPITACAO, PRECIPITACAO_MM);
     const radiacao = obterTextoFormatado(estacao.localizacao.radiacaoSolarRealMaisRecente, CASAS_DECIMAIS_PADRAO, RADIACAO_SOLAR_KJ_M2);
 
-    const estiloDataHora = "font-size: 0.85em; color: #7a7a7a;";
+    const estiloTextoSecundario = "font-size: 0.85em; color: #7a7a7a;";
     const linhasTabela = [
         [
-            temperatura + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente, estiloDataHora),
-            precipitacao + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente, estiloDataHora),
-            radiacao + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente, estiloDataHora)
+            temperatura + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente, estiloTextoSecundario),
+            precipitacao + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente, estiloTextoSecundario),
+            radiacao + '<br>' + formatarDataHora(estacao.localizacao.dataHoraRegistroRealMaisRecente, estiloTextoSecundario)
         ]
     ];
 
@@ -190,10 +190,10 @@ function criarCentroide(propriedade) {
 
 function criarDescricaoPropriedade(propriedade) {
     const descricaoConteudo = document.createElement('div');
-    descricaoConteudo.className = 'info-window-conteudo';
+    descricaoConteudo.className = 'janela-informacoes--conteudo';
 
     const cabecalho = document.createElement('div');
-    cabecalho.className = 'info-window-cabecalho'
+    cabecalho.className = 'janela-informacoes--cabecalho'
     cabecalho.innerHTML = `
         <p><strong>Propriedade:</strong> ${propriedade.nome}</p>
         <p><strong>Proprietário:</strong> ${propriedade.nomeProprietario}</p>
@@ -216,19 +216,19 @@ function criarDescricaoPropriedade(propriedade) {
 
     const tabelaRegistrosEstacoes = gerarHtmlEstacoesAssociadas(propriedade, propriedade.centroide.dataHoraRegistroCalculadoMaisRecente);
 
-    const idBalao = `balao-estacoes-${propriedade.id}`;
-    const htmlBalao = `
-        <div id="${idBalao}" class="balao-estacoes">
+    const idPainelEstacoes = `painel-estacoes-${propriedade.id}`;
+    const htmlPainelEstacoes = `
+        <div id="${idPainelEstacoes}" class="painel-detalhes-estacoes">
             ${tabelaRegistrosEstacoes.outerHTML}
         </div>
     `;
 
     const tituloTabelaCalculada = `
-        <div class="cabecalho-com-lupa">
-            <span>Registro meteorológico calculado</span>
-            <div class="container-lupa">
-                <img src="https://img.icons8.com/?size=100&id=59878&format=png&color=000000" class="icone-lupa" title="Ver estações utilizadas" onclick="alternarBalaoEstacoes('${idBalao}')" alt="Lupa"/>
-                ${htmlBalao}
+        <div class="titulo-com-acao">
+            <span class="titulo-com-acao--texto">Registro meteorológico calculado</span>
+            <div class="titulo-com-acao--controles">
+                <img src="https://img.icons8.com/?size=100&id=59878&format=png&color=000000" class="titulo-com-acao--icone" title="Ver estações utilizadas" onclick="alternarPainelEstacoes('${idPainelEstacoes}')" alt="Lupa"/>
+                ${htmlPainelEstacoes}
             </div>
         </div>
     `;
@@ -251,42 +251,28 @@ function criarDescricaoPropriedade(propriedade) {
 }
 
 function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisRecente) {
-
     const pesos = propriedade.centroide.pesosDoPontoEntreEstacoes;
-    const valoresPesos = Object.values(pesos);
-    const maiorPeso = Math.max(...valoresPesos);
+    const maiorPeso = Math.max(...Object.values(pesos));
 
     const linhasTabela = propriedade.centroide.estacoesMeteorologicas.map(estacao => {
         const dataHoraReal = estacao.localizacao.dataHoraRegistroRealMaisRecente;
+        const ehRegistroPrevisto = dataHoraRegistroCalculadoMaisRecente && dataHoraReal !== dataHoraRegistroCalculadoMaisRecente;
 
-        let temperaturaValor;
-        let precipitacaoValor;
-        let radiacaoSolarValor;
-        let dataHora;
-
-        let ehPrevista = dataHoraRegistroCalculadoMaisRecente && dataHoraReal !== dataHoraRegistroCalculadoMaisRecente;
-        if (ehPrevista) {
-            temperaturaValor = estacao.localizacao.temperaturaPrevistaMaisRecente;
-            precipitacaoValor = estacao.localizacao.precipitacaoPrevistaMaisRecente;
-            radiacaoSolarValor = estacao.localizacao.radiacaoSolarPrevistaMaisRecente;
-            dataHora = estacao.localizacao.dataHoraRegistroPrevistoMaisRecente;
-        } else {
-            temperaturaValor = estacao.localizacao.temperaturaRealMaisRecente;
-            precipitacaoValor = estacao.localizacao.precipitacaoRealMaisRecente;
-            radiacaoSolarValor = estacao.localizacao.radiacaoSolarRealMaisRecente;
-            dataHora = estacao.localizacao.dataHoraRegistroRealMaisRecente;
-        }
+        const temperaturaValor = ehRegistroPrevisto ? estacao.localizacao.temperaturaPrevistaMaisRecente : estacao.localizacao.temperaturaRealMaisRecente;
+        const precipitacaoValor = ehRegistroPrevisto ? estacao.localizacao.precipitacaoPrevistaMaisRecente : estacao.localizacao.precipitacaoRealMaisRecente;
+        const radiacaoSolarValor = ehRegistroPrevisto ? estacao.localizacao.radiacaoSolarPrevistaMaisRecente : estacao.localizacao.radiacaoSolarRealMaisRecente;
+        const dataHora = ehRegistroPrevisto ? estacao.localizacao.dataHoraRegistroPrevistoMaisRecente : estacao.localizacao.dataHoraRegistroRealMaisRecente;
 
         const textoTemperatura = obterTextoFormatado(temperaturaValor, CASAS_DECIMAIS_PADRAO, GRAUS_CELSIUS);
         const textoPrecipitacao = obterTextoFormatado(precipitacaoValor, CASAS_DECIMAIS_PRECIPITACAO, PRECIPITACAO_MM);
         const textoRadiacao = obterTextoFormatado(radiacaoSolarValor, CASAS_DECIMAIS_PADRAO, RADIACAO_SOLAR_KJ_M2);
 
         const formatarDado = (valor) => {
-            if (ehPrevista) {
+            if (ehRegistroPrevisto) {
                 return `
-                    <span class="valor-previsto" onclick="alterarBalao(this)">
+                    <span class="dado-previsao" onclick="alternarTooltip(this)">
                         ${valor}
-                        <span class="balao-prevista">Prevista</span>
+                        <span class="balao-informacao">Prevista</span>
                     </span>
                 `;
             }
@@ -294,13 +280,9 @@ function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisR
         };
 
         const estiloTextoSecundario = "font-size: 0.85em; color: #7a7a7a;";
-
-        let estiloPeso;
-        if (pesos[estacao.nome] === maiorPeso) {
-            estiloPeso = "color: #d6a600; font-weight: 700;";
-        } else {
-            estiloPeso = estiloTextoSecundario;
-        }
+        const estiloPeso = pesos[estacao.nome] === maiorPeso
+            ? "color: #d6a600; font-weight: 700;"
+            : estiloTextoSecundario;
 
         const pesoTexto = formatarPesosEntreEstacoesECentroide(estacao.nome, propriedade.centroide.pesosDoPontoEntreEstacoes);
         const pesoHtml = `<span style="${estiloPeso}">${pesoTexto}</span>`;
@@ -348,7 +330,7 @@ function calcularProximaDataHoraPrevisao() {
 function criarDescricaoCentroide(propriedade) {
     return new google.maps.InfoWindow({
         content: `
-            <div class="info-window-cabecalho">
+            <div class="janela-informacoes--cabecalho">
                 <p><strong>Centróide</strong></p>
                 <p><strong>Latitude:</strong> ${propriedade.centroide.latitudeFormatada}</p>
                 <p><strong>Longitude:</strong> ${propriedade.centroide.longitudeFormatada}</p>
@@ -423,8 +405,8 @@ async function criarDescricaoRegistroPrevisto(idCentroide, idTemperaturaPrevista
         paragrafoTemperatura.appendChild(tabelaPrevisao);
 
         botaoPrevisao.disabled = false;
-        const dataHoraPrevisaoTexto = formatarDataHoraSimples(json.dataHoraPrevisao);
-        botaoPrevisao.textContent = `Prever registro meteorológico para ${dataHoraPrevisaoTexto}`;
+        const dataHoraPrevisaoFormatada = json.dataHoraPrevisao.replace(' ', ' às ');
+        botaoPrevisao.textContent = `Prever registro meteorológico para ${dataHoraPrevisaoFormatada}`;
     } catch (error) {
         paragrafoTemperatura.style.display = VISIVEL;
 
@@ -526,18 +508,10 @@ function formatarDataHora(dataHora, estiloDataHora) {
     if (!dataHora) {
         return '';
     }
-    const dataHoraFormatada = dataHora.replace(' ', ' às ');
-    return `<span style="${estiloDataHora}">(${dataHoraFormatada})</span>`;
+    return `<span style="${estiloDataHora}">(${dataHora.replace(' ', ' às ')})</span>`;
 }
 
-function formatarDataHoraSimples(dataHora) {
-    if (!dataHora) {
-        return '';
-    }
-    return dataHora.replace(' ', ' às ');
-}
-
-function alterarBalao(elemento) {
+function alternarTooltip(elemento) {
     elemento.classList.toggle('ativo');
 }
 
@@ -567,11 +541,11 @@ function formatarPeso(valor) {
     return `${(numero * 100).toFixed(1).replace('.', ',')}%`;
 }
 
-function alternarBalaoEstacoes(idBalao) {
-    const balao = document.getElementById(idBalao);
-    if (!balao) {
+function alternarPainelEstacoes(idPainel) {
+    const painel = document.getElementById(idPainel);
+    if (!painel) {
         return;
     }
 
-    balao.classList.toggle('ativo');
+    painel.classList.toggle('ativo');
 }

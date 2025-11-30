@@ -364,48 +364,49 @@ body {
     margin-top: 10px;
 }
 
-.info-window-cabecalho {
+.janela-informacoes--cabecalho {
     margin-bottom: 15px;
     padding-bottom: 10px;
 }
 
-.info-window-cabecalho h3 {
+.janela-informacoes--cabecalho h3 {
     font-size: 1.5em;
     color: #000000;
     margin: 0 0 12px 0;
     font-weight: 700;
 }
 
-.info-window-cabecalho p {
+.janela-informacoes--cabecalho p {
     font-size: 1.5em;
     margin: 6px 0;
     color: #000000;
 }
 
-.info-window-cabecalho strong {
+.janela-informacoes--cabecalho strong {
     color: #000000;
     font-weight: 700;
     margin-right: 5px;
 }
 
-.info-window-conteudo button.botao {
+.janela-informacoes--conteudo button.botao {
     color: #ffffff;
     font-weight: 600;
 }
 
-.info-window-conteudo table {
+.janela-informacoes--conteudo table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
 }
 
-.info-window-conteudo th, .info-window-conteudo td {
+.janela-informacoes--conteudo th,
+.janela-informacoes--conteudo td {
     border: 1px solid #ccc;
     padding: 8px;
     text-align: center;
 }
 
-.info-window-conteudo th {
+.janela-informacoes--conteudo th {
     background-color: #f2f2f2;
 }
 
@@ -484,17 +485,17 @@ body {
     font-weight: 500;
 }
 
-.info-window-lista-estacoes {
+.janela-informacoes--lista-estacoes {
     list-style-type: disc;
     margin: 8px 0 0 20px;
     padding: 0;
 }
 
-.info-window-lista-estacoes li {
+.janela-informacoes--lista-estacoes li {
     margin-bottom: 5px;
 }
 
-.info-window-conteudo .botao-tabela--visualizar {
+.janela-informacoes--conteudo .botao-tabela--visualizar {
     width: 70%;
     margin-left: auto;
     margin-right: auto;
@@ -535,7 +536,7 @@ body {
     outline: none;
 }
 
-.valor-previsto {
+.dado-previsao {
     position: relative;
     display: inline-block;
     color: #17a2b8;
@@ -545,7 +546,7 @@ body {
     text-decoration-color: #17a2b8;
 }
 
-.balao-prevista {
+.balao-informacao {
     display: none;
     position: absolute;
     bottom: 120%;
@@ -566,7 +567,7 @@ body {
     z-index: 5;
 }
 
-.balao-prevista::after {
+.balao-informacao::after {
     content: " ";
     position: absolute;
     top: 100%;
@@ -574,10 +575,10 @@ body {
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: #6878c2 transparent transparent transparent;
+    border-color: #17a2b8 transparent transparent transparent;
 }
 
-.valor-previsto.ativo .balao-prevista {
+.dado-previsao.ativo .balao-informacao {
     display: block;
 }
 
@@ -587,7 +588,7 @@ body {
     font-weight: 500;
 }
 
-.cabecalho-com-lupa {
+.titulo-com-acao {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -595,12 +596,11 @@ body {
     gap: 8px;
 }
 
-
-.cabecalho-com-lupa span {
+.titulo-com-acao--texto {
     flex: 1;
 }
 
-.container-lupa {
+.titulo-com-acao--controles {
     margin-left: auto;
     display: flex;
     align-items: flex-start;
@@ -608,7 +608,7 @@ body {
     position: relative;
 }
 
-.icone-lupa {
+.titulo-com-acao--icone {
     width: 20px;
     height: 20px;
     cursor: pointer;
@@ -619,11 +619,11 @@ body {
     flex-shrink: 0;
 }
 
-.balao-estacoes {
+.painel-detalhes-estacoes {
     position: absolute;
     top: 0;
     left: calc(100% + 12px);
-    width: 650px;
+    width: 750px;
     max-height: 420px;
     overflow-y: auto;
     background-color: #FFFFFF;
@@ -635,7 +635,7 @@ body {
     z-index: 20;
 }
 
-.balao-estacoes::before {
+.painel-detalhes-estacoes::before {
     content: '';
     position: absolute;
     top: 18px;
@@ -648,14 +648,14 @@ body {
     border-top: 1px solid #DEE2E6;
 }
 
-.balao-estacoes.ativo {
+.painel-detalhes-estacoes.ativo {
     display: block;
 }
 
 .gm-style .gm-style-iw-c, .gm-style .gm-style-iw-d {
-    overflow: visible !important;
+    overflow: visible;
 }
 
 .gm-style .gm-style-iw-c {
-    max-width: none !important;
+    max-width: none;
 }
