@@ -193,7 +193,7 @@ public class RegistroMeteorologicoServico {
 
         for (EstacaoMeteorologica estacao : estacoes) {
             try {
-                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_REGISTROS_METEOROLOGICOS + estacao.getCodigoEstacao());
+                JsonNode dadosJson = estacaoMeteorologicaServico.obterDadosDaEstacao(URL_REGISTROS_METEOROLOGICOS2 + estacao.getCodigoEstacao());
 
                 if (dadosJson.isNull()) {
                     continue;
@@ -285,10 +285,9 @@ public class RegistroMeteorologicoServico {
         double somaRadiacaoSolar = 0.0;
         double somaPesos = 0.0;
 
-//        Map<String, Double> pesosPorEstacao = new LinkedHashMap<>();
         for (EstacaoMeteorologica estacao : ponto.getEstacoesMeteorologicas()) {
             Optional<RegistroMeteorologico> registroMaisRecenteDaEstacao = estacao.getLocalizacao().getHistoricoRegistrosMeteorologicos().stream()
-                    .filter(t -> t.getDataHora().equals(dataHoraDoRegistroMaisRecenteEntreEstacoes.get()) && t.getTemperaturaReal() != null)
+                    .filter(t -> t.getDataHora().equals(dataHoraDoRegistroMaisRecenteEntreEstacoes.get()))
                     .findFirst();
 
             Double temperatura = 0.0;
@@ -324,18 +323,11 @@ public class RegistroMeteorologicoServico {
             }
 
             somaPesos += peso;
-//            pesosPorEstacao.put(estacao.getNome(), peso);
         }
 
         if (somaPesos == PESO_NULO) {
             return null;
         }
-
-//        double finalSomaPesos = somaPesos;
-//        pesosPorEstacao.forEach((nomeEstacao, peso) -> {
-//            double percentual = peso / finalSomaPesos;
-//            System.out.printf("Estação: %s, Peso normalizado: %.6f%n", nomeEstacao, percentual);
-//        });
 
         double temperatura = somaTemperaturas / somaPesos;
         double precipitacao = somaPrecipitacao / somaPesos;

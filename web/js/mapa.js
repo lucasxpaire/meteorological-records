@@ -214,7 +214,7 @@ function criarDescricaoPropriedade(propriedade) {
         ]
     ];
 
-    const tabelaRegistrosEstacoes = gerarHtmlEstacoesAssociadas(propriedade, propriedade.centroide.dataHoraRegistroCalculadoMaisRecente);
+    const tabelaRegistrosEstacoes = gerarDescricaoEstacoesAssociadas(propriedade, propriedade.centroide.dataHoraRegistroCalculadoMaisRecente);
 
     const idPainelEstacoes = `painel-estacoes-${propriedade.id}`;
     const htmlPainelEstacoes = `
@@ -250,7 +250,7 @@ function criarDescricaoPropriedade(propriedade) {
     });
 }
 
-function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisRecente) {
+function gerarDescricaoEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisRecente) {
     const pesos = propriedade.centroide.pesosDoPontoEntreEstacoes;
     const maiorPeso = Math.max(...Object.values(pesos));
 
@@ -280,9 +280,7 @@ function gerarHtmlEstacoesAssociadas(propriedade, dataHoraRegistroCalculadoMaisR
         };
 
         const estiloTextoSecundario = "font-size: 0.85em; color: #7a7a7a;";
-        const estiloPeso = pesos[estacao.nome] === maiorPeso
-            ? "color: #d6a600; font-weight: 700;"
-            : estiloTextoSecundario;
+        const estiloPeso = pesos[estacao.nome] === maiorPeso ? "color: #d6a600; font-weight: 700;" : estiloTextoSecundario;
 
         const pesoTexto = formatarPesosEntreEstacoesECentroide(estacao.nome, propriedade.centroide.pesosDoPontoEntreEstacoes);
         const pesoHtml = `<span style="${estiloPeso}">${pesoTexto}</span>`;
