@@ -13,8 +13,6 @@ Para obter os dados necessários:
 2. Baixe os anos de interesse.
 3. Extraia os arquivos `.csv` e coloque-os dentro da pasta `resources/dadosEstacoesMeteorologicas` (crie esta pasta se ela não existir dentro de `resources`).
 
-> O projeto já contém alguns exemplos de CSV na raiz de `resources` (ex: `SantaMaria.csv`, `PortoAlegre.csv`) para testes rápidos, mas a carga completa depende do passo acima.
-
 ## 🚀 Tecnologias Utilizadas
 
 O projeto foi construído utilizando uma arquitetura MVC clássica com as seguintes tecnologias:
