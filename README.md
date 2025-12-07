@@ -38,7 +38,7 @@ O projeto foi construído utilizando uma arquitetura MVC clássica com as seguin
 * Banco de Dados MySQL instalado e rodando.
 
 ### Configuração do Banco de Dados
-1. Crie um banco de dados no MySQL (o nome padrão geralmente é `meteorological_records`, mas verifique sua configuração).
+1. Crie um banco de dados no MySQL.
 2. Verifique o arquivo de persistência em:
    `src/META-INF/persistence.xml`
 3. Ajuste as propriedades `javax.persistence.jdbc.user`, `javax.persistence.jdbc.password` e `javax.persistence.jdbc.url` conforme as credenciais do seu banco local.
@@ -66,4 +66,4 @@ Certifique-se de adicionar todos os JARs desta pasta ao **Classpath** ou às **L
 4. Acesse no navegador: `http://localhost:8080/` (ou a porta configurada no seu Tomcat).
 
 ---
-*Projeto desenvolvido como parte de atividades acadêmicas/estágio (Pré-Estágio 2022).*
+*Projeto desenvolvido como parte de ensimanetos de pré-estágio.*
